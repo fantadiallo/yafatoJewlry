@@ -1,0 +1,8 @@
+// 1. Bootstrap first
+@import 'bootstrap/scss/bootstrap';
+@import './utils/functions';
+@import './utils/mixins';
+@import './variables';
+@import './base'; 
+@import './layout';
+@import './components';
