@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { supabase } from "../../supabse/Client";
+import styles from "./NewsletterForm.module.scss";
 
 export default function NewsletterForm() {
   const [email, setEmail] = useState("");
@@ -10,38 +11,50 @@ export default function NewsletterForm() {
     e.preventDefault();
     setMessage("");
     setLoading(true);
+
+    const cleanEmail = email.trim().toLowerCase();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(cleanEmail)) {
+      setMessage("Please enter a valid email address.");
+      setLoading(false);
+      return;
+    }
+
     try {
-      // Check if email already exists
       const { count, error: countError } = await supabase
         .from("newsletter_subscribers")
         .select("*", { count: "exact", head: true })
-        .eq("email", email);
+        .eq("email", cleanEmail);
 
       if (countError) throw countError;
 
       if (count > 0) {
         setMessage("This email is already subscribed.");
       } else {
-        // Insert new subscriber
-        const { error: insertError } = await supabase
-          .from("newsletter_subscribers")
-          .insert([{ email }]);
-        if (insertError) throw insertError;
-
-        // Give discount code to first 5 subscribers
-        const { count: totalCount } = await supabase
+        const { count: totalCount, error: countTotalError } = await supabase
           .from("newsletter_subscribers")
           .select("*", { count: "exact", head: true });
 
-        if (totalCount && totalCount <= 5) {
-          setMessage(
-            "🎉 Welcome! You're one of the first 5! Use code SaYafato50# at checkout."
-          );
-        } else {
-          setMessage(
-            "💌 Welcome! Use code YAFATO10la for 10% off your first order."
-          );
-        }
+        if (countTotalError) throw countTotalError;
+
+        const discount_code =
+          totalCount && totalCount < 5
+            ? "SaYafato50#"
+            : "YAFATO10la";
+
+        const { error: insertError } = await supabase
+          .from("newsletter_subscribers")
+          .insert([{ email: cleanEmail, discount_code }]);
+
+        if (insertError) throw insertError;
+
+        setMessage(
+          discount_code === "SaYafato50#"
+            ? "🎉 Welcome! You're one of the first 5! Use code SaYafato50# at checkout."
+            : "💌 Welcome! Use code YAFATO10la for 10% off your first order."
+        );
+
         setEmail("");
       }
     } catch (err) {
@@ -53,14 +66,11 @@ export default function NewsletterForm() {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="newsletter-form text-center"
-    >
+    <form onSubmit={handleSubmit} className={`${styles["newsletter-form"]} text-center`}>
       <div className="mb-3">
         <input
           type="email"
-          className="form-control newsletter-input"
+          className={styles["newsletter-input"]}
           placeholder="Enter your email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -70,10 +80,10 @@ export default function NewsletterForm() {
 
       <button
         type="submit"
-        className="btn newsletter-btn"
+        className={styles["newsletter-btn"]}
         disabled={loading}
       >
-        {loading ? "Subscribing..." : "Notify Me"}
+        {loading ? "Subscribing..." : "subscribe"}
       </button>
 
       {message && (
