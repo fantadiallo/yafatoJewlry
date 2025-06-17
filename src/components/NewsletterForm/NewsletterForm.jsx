@@ -83,7 +83,7 @@ export default function NewsletterForm() {
         className={styles["newsletter-btn"]}
         disabled={loading}
       >
-        {loading ? "Subscribing..." : "subscribe"}
+        {loading ? "Subscribing..." : "Subscribe !"}
       </button>
 
       {message && (

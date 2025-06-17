@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { FaInstagram, FaTiktok } from "react-icons/fa";
+import NewsletterForm from "../../components/NewsletterForm/NewsletterForm";
 import styles from "./CommingSoon.module.scss";
 
 const fadeUp = {
@@ -49,20 +50,24 @@ export default function ComingSoon() {
             }}
           >
             <motion.h1 className={styles.logo} variants={fadeUp}>
-              COMING SOON
+              YAFATO
             </motion.h1>
 
             <motion.h2 className={styles.heading} variants={fadeUp}>
-              Launching in AUGUST!
+              A light that never leaves
             </motion.h2>
 
             <motion.p className={styles.subheading} variants={fadeUp}>
-              First 5 get 50% off
+              A new era of silver is coming. Launching August 25.
             </motion.p>
 
             <motion.p className={styles.notice} variants={fadeUp}>
-              Newsletter sign-up will open soon 
+              Be first. First 5 get 50% off, —  10% of for new sign up.
             </motion.p>
+
+            <motion.div className={styles.formWrapper} variants={fadeUp}>
+              <NewsletterForm />
+            </motion.div>
 
             <motion.div className={styles.socials} variants={fadeUp}>
               <a
