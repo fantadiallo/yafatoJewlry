@@ -1,62 +1,75 @@
-@use "../../styles/variables" as *;
+@import "../../styles/variables"; // adjust as needed
 
-.form {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.25rem;
-  max-width: 500px;
-  width: 100%;
-  margin: 0 auto;
-}
+.newsletter-form {
+  background-color: $color-light;
+  padding: 2rem;
+  border-radius: 2rem;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+  max-width: 480px;
+  margin: 2rem auto;
+  animation: fadeUp 0.6s ease-out both;
 
-.fields {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  gap: 0.75rem;
+  @media (max-width: 576px) {
+    padding: 1.5rem 1rem;
+    border-radius: 1.5rem;
+  }
 
-  @media (min-width: 500px) {
-    flex-direction: row;
+  .newsletter-input {
+    border: 1px solid $color-muted;
+    background-color: $color-white;
+    color: $color-dark;
+    border-radius: 3rem;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    width: 100%;
+    transition: border-color 0.3s ease;
+
+    &:focus {
+      border-color: $color-accent;
+      outline: none;
+    }
+
+    &::placeholder {
+      color: $color-muted;
+      font-style: italic;
+    }
+  }
+
+  .newsletter-btn {
+    margin-top: 1rem;
+    background-color: $color-dark;
+    color: $color-white;
+    padding: 0.65rem 2.5rem;
+    font-weight: 600;
+    border-radius: 3rem;
+    border: none;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background-color: $color-accent;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  .message {
+    margin-top: 1rem;
+    color: $color-muted;
+    font-style: italic;
+    font-size: 0.95rem;
   }
 }
 
-.input {
-  flex: 1;
-  text-align: center;
-  padding: 0.75rem 1rem;
-  border: 1px solid $color-muted;
-  border-radius: 6px;
-  font-size: 1rem;
-  background-color: white;
-  color: $color-dark;
-  transition: border 0.3s ease;
-
-  &:focus {
-    outline: none;
-    border-color: $color-accent;
+@keyframes fadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
   }
-}
-
-.button {
-  padding: 0.75rem 1.5rem;
-  background-color: $color-accent;
-  color: $color-white;
-  border: none;
-  border-radius: 6px;
-  font-weight: 500;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-
-  &:hover {
-    background-color: darken($color-accent, 10%);
+  100% {
+    opacity: 1;
+    transform: translateY(0);
   }
-}
-
-.success {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: $color-primary;
-  text-align: center;
 }
