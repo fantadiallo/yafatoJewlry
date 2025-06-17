@@ -1,57 +1,84 @@
 import React, { useState } from "react";
-import styles from "./NewsletterForm.module.scss";
-import { motion, AnimatePresence } from "framer-motion";
+import { supabase } from "../../supabse/Client";
 
 export default function NewsletterForm() {
   const [email, setEmail] = useState("");
-  const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
 
-  const handleSubmit = (e) => {
+  async function handleSubmit(e) {
     e.preventDefault();
-    console.log("Subscribed email:", email);
-    setSubmitted(true);
-    setEmail("");
-  };
+    setMessage("");
+    setLoading(true);
+    try {
+      // Check if email already exists
+      const { count, error: countError } = await supabase
+        .from("newsletter_subscribers")
+        .select("*", { count: "exact", head: true })
+        .eq("email", email);
+
+      if (countError) throw countError;
+
+      if (count > 0) {
+        setMessage("This email is already subscribed.");
+      } else {
+        // Insert new subscriber
+        const { error: insertError } = await supabase
+          .from("newsletter_subscribers")
+          .insert([{ email }]);
+        if (insertError) throw insertError;
+
+        // Give discount code to first 5 subscribers
+        const { count: totalCount } = await supabase
+          .from("newsletter_subscribers")
+          .select("*", { count: "exact", head: true });
+
+        if (totalCount && totalCount <= 5) {
+          setMessage(
+            "🎉 Welcome! You're one of the first 5! Use code SaYafato50# at checkout."
+          );
+        } else {
+          setMessage(
+            "💌 Welcome! Use code YAFATO10la for 10% off your first order."
+          );
+        }
+        setEmail("");
+      }
+    } catch (err) {
+      setMessage("Something went wrong. Try again later.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
-    <form onSubmit={handleSubmit} className={styles.form}>
-      <AnimatePresence mode="wait">
-        {!submitted ? (
-          <motion.div
-            key="form"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className={styles.fields}
-          >
-            <label htmlFor="newsletter" className="visually-hidden">
-              Email address
-            </label>
-            <input
-              id="newsletter"
-              type="email"
-              placeholder="Enter your email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className={styles.input}
-            />
-            <button type="submit" className={styles.button}>
-             subscribe
-            </button>
-          </motion.div>
-        ) : (
-          <motion.p
-            key="success"
-            className={styles.success}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            You're on the list! ✨
-          </motion.p>
-        )}
-      </AnimatePresence>
+    <form
+      onSubmit={handleSubmit}
+      className="newsletter-form text-center"
+    >
+      <div className="mb-3">
+        <input
+          type="email"
+          className="form-control newsletter-input"
+          placeholder="Enter your email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+      </div>
+
+      <button
+        type="submit"
+        className="btn newsletter-btn"
+        disabled={loading}
+      >
+        {loading ? "Subscribing..." : "Notify Me"}
+      </button>
+
+      {message && (
+        <p className="message mt-3">{message}</p>
+      )}
     </form>
   );
 }
