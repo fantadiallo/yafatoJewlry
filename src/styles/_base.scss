@@ -1,4 +1,4 @@
-
+@use './variables' as *;
 
 *,
 *::before,
@@ -8,13 +8,27 @@
   padding: 0;
 }
 
-
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Mulish', sans-serif;
   font-size: 16px;
-  line-height: 1.5;
-  background-color: $color-white;
+  line-height: 1.6;
+  background-color: $color-primary;
   color: $color-dark;
+  letter-spacing: 0.3px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.5px;
+  color: $color-dark;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.3s ease;
 }
 
 img,
@@ -23,19 +37,6 @@ svg {
   display: block;
   max-width: 100%;
   height: auto;
-}
-
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1rem;
 }
 
 .flex-center {
