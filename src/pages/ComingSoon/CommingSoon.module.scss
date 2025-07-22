@@ -39,6 +39,7 @@
   background-color: rgba($color-muted, 0.9);
   color: $color-light;
   display: flex;
+
   align-items: center;
   justify-content: center;
   padding: 4rem 2rem;
@@ -88,7 +89,7 @@
 
 .heading {
   font-size: 2rem;
-  font-weight: 500;
+  font-weight: 800;
   color: $color-light;
   margin-top: 1.2rem;
   letter-spacing: 0.05rem;
@@ -100,7 +101,7 @@
 
 .subheading {
   font-size: 1.2rem;
-  font-weight: 400;
+  font-weight: 800;
   color: $color-accent;
   margin-top: 0.5rem;
   line-height: 1.4;
