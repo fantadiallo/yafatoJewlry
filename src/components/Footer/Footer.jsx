@@ -28,8 +28,8 @@ export default function Footer() {
         <div className={styles.contact}>
           <h4>Contact</h4>
           <ul>
-            <li><FiMail /> support@yafato.com</li>
-            <li><FiPhone /> +1 (555) 123-4567</li>
+            <li><FiMail /> shes.fato@gmail.com</li>
+            <li><FiPhone /> +47 (944) 64 132</li>
           </ul>
         </div>
 
