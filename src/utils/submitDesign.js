@@ -1,4 +1,5 @@
 import { supabase } from "../supabse/Client";
+import { sendCustomDesignEmail } from "./sendCustomDesignEmail";
 import { uploadPatternFile } from "./uploadPatternFile";
 
 export async function submitDesign(formData) {
@@ -30,6 +31,12 @@ export async function submitDesign(formData) {
   ]);
 
   if (insertError) throw new Error("Failed to save your submission.");
+
+  // ✅ Send email notification
+  await sendCustomDesignEmail({
+    ...formData,
+    patternFileUrl: uploadedPatternUrl,
+  });
 
   return {
     success: true,
