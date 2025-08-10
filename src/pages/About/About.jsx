@@ -6,33 +6,45 @@ export default function AboutPage() {
   return (
     <div className={styles.aboutPage}>
 
-      {/* Hero Slideshow with Overlay */}
-  <section className={styles.heroSection}>
-  <div className={styles.heroImages}>
-    <img
-      src="/images/africa-light.jpg"
-      alt="West African Craft"
-      className={styles.bgImage}
-    />
-    <img
-      src="/images/norway-light.jpg"
-      alt="Norwegian Identity"
-      className={styles.bgImageOverlay}
-    />
+      {/* Hero Section */}
+      <section className={styles.heroSection}>
+        <div className={styles.heroImages}>
+          <img
+            src="/imagetest1.jpg"
+            alt="Yafato Visual"
+            className={styles.bgImage}
+          />
+          <div className={styles.sliderWrapper}>
+            <div className={styles.slide}>
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1 }}
+              >
+                Yafato Means You’re Already Enough
+              </motion.h1>
+              <p>Yafato is a reminder. A reflection. A quiet power.</p>
+              <p>Our pieces — whether it’s silver, clothing, or lifestyle — are created for this generation: one that heals, learns, loves, and leads. We express softness. We move with meaning.</p>
+            </div>
 
-    <div className={styles.overlayText}>
-      <motion.h1
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1 }}
-      >
-        A Light That Never Leaves
-      </motion.h1>
-      <p>Jewelry born from legacy and identity</p>
-    </div>
-  </div>
-</section>
-
+            <div className={styles.slide}>
+              <motion.blockquote
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1, duration: 1 }}
+                className={styles.quoteSlide}
+              >
+                <p>
+                  “Yafato started with silver — but it quickly became about people. 
+                  The ones breaking through patterns. The ones who show up even when it’s hard.
+                  We make pieces that reflect energy, healing, softness, rebellion, and deep self-worth.
+                  Luxury, to us, means truth. And love. And choosing your own story.”
+                </p>
+              </motion.blockquote>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Quote */}
       <motion.section className={styles.quoteSection}
@@ -43,7 +55,7 @@ export default function AboutPage() {
         <p>– My mother</p>
       </motion.section>
 
-      {/* Meet the Maker (Image left, text right) */}
+      {/* Meet the Maker */}
       <motion.section className={styles.makerSection}>
         <div className={styles.split}>
           <div className={styles.imageWrap}>
@@ -52,62 +64,56 @@ export default function AboutPage() {
           <div className={styles.textWrap}>
             <h2>Meet Amz Silver</h2>
             <p>
-              A generational craftsman rooted in West African kingdoms. Amz continues
-              his family’s ancestral tradition in The Gambia and Senegal — each piece is
-              handmade with heritage.
+              The first time I met Amz, I remember thinking — this guy has too much talent to go unseen.
+              His hands moved like he’d done this forever, and in a way, he had. He started learning at age five,
+              guided by generations before him. What I saw wasn’t just skill — it was legacy, precision, and a kind of quiet genius shaped by his environment.
+            </p>
+            <p>
+              Amz isn’t just a craftsman — he’s an artist born from the roots of The Gambia and Senegal. Every piece he makes is handcrafted with depth and dignity, 
+              passed down from a bloodline that’s been creating long before trends. He’s one of the kindest, smartest people I know — and the world deserves to feel what he creates.
             </p>
           </div>
         </div>
       </motion.section>
 
-      {/* Cultural Significance (3 columns) */}
+      {/* Cultural Meaning */}
       <motion.section className={styles.meaningSection}>
-        <h2>What Silver Means</h2>
+        <h2>Yafato Is More Than Products</h2>
         <div className={styles.features}>
           <div className={styles.feature}>
-            <h3>Protection</h3>
-            <p>Silver shields the body and spirit from unseen forces — a tradition passed down generations.</p>
+            <h3>You Are Already Enough</h3>
+            <p>Our generation isn’t here to follow trends. We’re here to feel, to love, to evolve. Every piece is a reminder of your worth — whether you're healing, leading, or just breathing through it all.</p>
           </div>
+
           <div className={styles.feature}>
-            <h3>Identity</h3>
-            <p>Styled to express individuality, silver is a symbol of cultural pride and personal essence.</p>
+            <h3>Fashion That Reflects Energy</h3>
+            <p>We don’t just design. We channel. Our clothes, jewelry, and items speak with intention — each one holding space for your growth, your softness, your fire. This is wearable mindset work.</p>
           </div>
+
           <div className={styles.feature}>
-            <h3>Energy</h3>
-            <p>In our culture, silver reflects energy — even reacting to the changes in your health or aura.</p>
+            <h3>This Is A Movement</h3>
+            <p>Yafato is for the ones doing inner work. For the dreamers, the lovers, the ones building new worlds with heart. We create beauty that speaks back — because style should feel like truth.</p>
           </div>
         </div>
       </motion.section>
 
-      {/* Video (separated) */}
+      {/* Video Section */}
       <motion.section className={styles.videoSection}>
-    <h2>Watch the Story</h2>
-<div className={styles.videoWrapper}>
-  <video className={styles.videoPlayer} controls playsInline>
-    <source src="/Yafatoo.mp4" type="video/mp4" />
-    Your browser does not support the video tag.
-  </video>
-</div>
-      </motion.section>
-
-      {/* Gallery Grid */}
-      <motion.section className={styles.gallerySection}>
-        <h2>Silver In Action</h2>
-        <div className={styles.galleryGrid}>
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className={styles.galleryItem}>
-              <img src={`/images/gallery-placeholder${i}.jpg`} alt={`Gallery ${i}`} />
-            </div>
-          ))}
+        <h2>Watch the Story</h2>
+        <div className={styles.videoWrapper}>
+          <video className={styles.videoPlayer} controls playsInline>
+            <source src="/Yafatoo.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
         </div>
       </motion.section>
 
       {/* Call to Action */}
       <motion.section className={styles.ctaSection}>
-        <h2>Find Your Piece</h2>
-        <Link to="/jewelry" className={styles.shopBtn}>Shop the Collection</Link>
+        <h2>Find What Speaks To You</h2>
+        <Link to="/products" className={styles.shopBtn}>Explore the Collection</Link>
         <p className={styles.instaFollow}>
-          Follow us on <a href="https://instagram.com/yafato" target="_blank" rel="noreferrer">@yafato</a>
+          Follow our energy on <a href="https://instagram.com/yafato" target="_blank" rel="noreferrer">@yafato</a>
         </p>
       </motion.section>
 
