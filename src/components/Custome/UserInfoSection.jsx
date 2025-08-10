@@ -45,7 +45,6 @@ function UserInfoSection({ onUserInfoChange }) {
     <section className={styles.userInfoSection}>
       <div className={styles.sectionTitle}>
         <h2>Your Info</h2>
-        <p>This helps us contact you and craft your size perfectly.</p>
       </div>
 
       <div className={styles.inputGroup}>

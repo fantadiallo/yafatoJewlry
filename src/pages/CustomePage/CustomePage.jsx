@@ -1,9 +1,9 @@
 import { useState } from "react";
 import CustomFormSection from "../../components/Custome/CustomFormSection.jsx";
-import StyleOptionsSection from "../../components/Custome/StyleOptionsSection.jsx";
+import StyleAndAISection from "../../components/Custome/StyleAndAISection.jsx";
 import UserInfoSection from "../../components/Custome/UserInfoSection.jsx";
-import AIImagePreview from "../../components/Custome/AIImagePreview.jsx";
 import SubmitModal from "../../components/Custome/SubmitModal.jsx";
+import styles from "./CustomePage.module.scss";
 
 export function CustomePage() {
   const [formData, setFormData] = useState({
@@ -64,39 +64,69 @@ export function CustomePage() {
     }
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (!formData.email || !formData.size || !formData.confirmSilver) {
+      alert("Please complete your info before submitting.");
+      return;
+    }
+
+    setShowModal(true);
+  };
+
   return (
-    <section>
-      <CustomFormSection
-        description={formData.description}
-        image={formData.patternFile}
-        setDescription={(desc) => handleDescriptionChange(desc, formData.patternFile)}
-        setImage={(file) => handleDescriptionChange(formData.description, file)}
-      />
-
-      <StyleOptionsSection onOptionsChange={handleStyleOptionsChange} />
-
-      <UserInfoSection onUserInfoChange={handleUserInfoChange} />
-
-      <AIImagePreview
-        formData={formData}
-        onPromptGenerated={handleAIPromptGenerated}
-      />
-
-      <div style={{ textAlign: "center", marginTop: "2rem" }}>
-        <button
-          onClick={() => setShowModal(true)}
-          style={{ padding: "1rem 2rem", fontSize: "1rem", marginRight: "1rem" }}
-        >
-          Submit Design
-        </button>
-
-        <button
-          onClick={handleClear}
-          style={{ padding: "1rem 2rem", fontSize: "1rem", background: "#f0f0f0", color: "#333" }}
-        >
-          Clear All
-        </button>
+    <section className={styles.customePage}>
+      <div className={styles.hero}>
+        <div className={styles.heroOverlay}>
+          <h1>Craft Your Custom Silver Piece</h1>
+          <p>Start from scratch or let AI inspire your next unique creation.</p>
+          <p>1 create or 2 use ai to create for you</p>
+        </div>
       </div>
+
+      <form onSubmit={handleSubmit} className={styles.formWrapper}>
+        <div className={styles.dualSection}>
+          <div className={styles.sectionBox}>
+            <h2>Customize your piece yourself</h2>
+            <p>Upload your design idea or describe your dream piece in detail.</p>
+            <CustomFormSection
+              description={formData.description}
+              image={formData.patternFile}
+              setDescription={(desc) =>
+                handleDescriptionChange(desc, formData.patternFile)
+              }
+              setImage={(file) =>
+                handleDescriptionChange(formData.description, file)
+              }
+            />
+          </div>
+
+          <div className={styles.sectionBox}>
+            <h2>Use AI to generate your piece</h2>
+            <p>Describe your idea and let our AI generate a visual concept.</p>
+            <StyleAndAISection
+              formData={formData}
+              onOptionsChange={handleStyleOptionsChange}
+              onPromptGenerated={handleAIPromptGenerated}
+            />
+          </div>
+        </div>
+
+        {/* User info section (outside main form layout) */}
+        <div className={styles.userInfoBox}>
+          <h2>Your Info</h2>
+          <p>Required before submission — tell us how to reach you and size your piece.</p>
+          <UserInfoSection onUserInfoChange={handleUserInfoChange} />
+        </div>
+
+        <div className={styles.actions}>
+          <button type="submit">Submit Design</button>
+          <button type="button" onClick={handleClear} className={styles.clearButton}>
+            Clear All
+          </button>
+        </div>
+      </form>
 
       {showModal && (
         <SubmitModal formData={formData} onClose={() => setShowModal(false)} />
