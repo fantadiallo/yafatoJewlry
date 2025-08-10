@@ -1,78 +1,181 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { FiHeart, FiShoppingBag, FiMenu, FiX } from 'react-icons/fi';
+import { FiHeart, FiShoppingBag, FiX } from 'react-icons/fi';
 import styles from './Header.module.scss';
+import SideCart from '../SideCart/SideCart';
+import FavoritesCart from '../FavoritsCart/FavoritsCart';
+import { ShopifyCartContext } from '../../context/ShopifyCartContext';
 
 export default function Header() {
+  const { cartItems, favorites, addToCart, addToFavorites, removeFromFavorites } = useContext(ShopifyCartContext);
+
   const [menuOpen, setMenuOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false);
   const [hideHeader, setHideHeader] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [cartOpen, setCartOpen] = useState(false);
+  const [favoritesOpen, setFavoritesOpen] = useState(false);
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
-  const closeMenu = () => setMenuOpen(false);
+  const closeMenu = () => {
+    setMenuOpen(false);
+    setMobileDropdownOpen(false);
+  };
+  const toggleDropdown = () => setDropdownOpen(prev => !prev);
+  const closeDropdown = () => setDropdownOpen(false);
+  const toggleMobileDropdown = () => setMobileDropdownOpen(prev => !prev);
 
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-
-      if (window.innerWidth <= 768) {
-        if (currentScrollY > lastScrollY && currentScrollY > 50) {
-          setHideHeader(true);
-        } else {
-          setHideHeader(false);
-        }
-        setLastScrollY(currentScrollY);
-      }
+      setHideHeader(currentScrollY > lastScrollY && currentScrollY > 100);
+      setLastScrollY(currentScrollY);
+      if (dropdownOpen) closeDropdown();
+      if (menuOpen) setMenuOpen(false);
     };
-
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY]);
+  }, [lastScrollY, dropdownOpen, menuOpen]);
+
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? 'hidden' : 'auto';
+    return () => { document.body.style.overflow = 'auto'; };
+  }, [menuOpen]);
 
   return (
     <header className={`${styles.header} ${hideHeader ? styles.hideOnScroll : ''}`}>
+      <div className={styles.topBar}>
+        <p>🌍 Free Shipping Worldwide over 50 £ &nbsp; | &nbsp; Subscribe to our newsletter</p>
+      </div>
+
       <nav className={`${styles.navContainer} container`}>
         <Link to="/" className={styles.logo}>Yafato</Link>
 
         <ul className={styles.navLinks}>
           <li><Link to="/">Home</Link></li>
-          <li><Link to="/products">Jewelry</Link></li>
-          <li><Link to="/about">About us</Link></li>
-          <li><Link to="/contact">Contact</Link></li>
-          <li><Link to="/custom">create it </Link></li>
+          <li className={styles.dropdown}>
+            <button
+              className={styles.dropdownToggle}
+              onClick={toggleDropdown}
+              aria-expanded={dropdownOpen}
+              aria-haspopup="true"
+            >
+              Our Products ▾
+            </button>
+            {dropdownOpen && (
+              <div className={styles.megaMenu}>
+                <div className={styles.megaColumn}>
+                  <p>Jewelry</p>
+                  <Link to="/products" onClick={closeDropdown}>All Jewelry</Link>
+                  <Link to="/custom" onClick={closeDropdown}>Custom Jewelry</Link>
+                </div>
+                <div className={styles.megaColumn}>
+                  <p>Clothing</p>
+                  <Link to="/products/clothing/two-piece" onClick={closeDropdown}>Two-piece Sets</Link>
+                </div>
+                <div className={styles.megaColumn}>
+                  <p>Lifestyle</p>
+                  <Link to="/products/lifestyle/cups" onClick={closeDropdown}>Cups</Link>
+                </div>
+              </div>
+            )}
+          </li>
+          <li><Link to="/about">About</Link></li>
+        <li><Link to="/contact">Contact</Link></li>
         </ul>
 
         <div className={styles.iconBar}>
-          <Link to="/favorites" className={styles.iconBtn} aria-label="Favorites">
-            <FiHeart size={22} />
-          </Link>
-          <Link to="/cart" className={styles.iconBtn} aria-label="Cart">
-            <FiShoppingBag size={22} />
-            <span className={styles.badge}>0</span>
-          </Link>
-          <button className={styles.menuToggle} onClick={toggleMenu}>
-            <FiMenu size={22} />
+<div className={styles.iconWrapper}>
+  <button className={styles.iconBtn} onClick={() => setFavoritesOpen(true)}>
+    <FiHeart
+      size={20}
+      style={{ color: favorites.length > 0 ? 'red' : 'inherit' }}
+    />
+    {favorites.length > 0 && (
+      <span className={styles.badge}>{favorites.length}</span>
+    )}
+  </button>
+</div>
+          <button className={styles.iconBtn} onClick={() => setCartOpen(true)}>
+            <FiShoppingBag size={20} />
+            <span className={styles.badge}>{cartItems.length}</span>
+          </button>
+          <button
+            className={`${styles.hamburger} ${menuOpen ? styles.open : ''}`}
+            onClick={toggleMenu}
+          >
+            <span className={styles.bar}></span>
+            <span className={styles.bar}></span>
+            <span className={styles.bar}></span>
           </button>
         </div>
       </nav>
 
-      <div className={`${styles.mobileMenu} ${menuOpen ? styles.mobileMenuActive : ''}`}>
-        <button className={styles.closeBtn} onClick={closeMenu}>
-          <FiX />
-        </button>
-
-        <div className={styles.menuIntro}>
-          <h2>YAFATO</h2>
-          <p>A light that never leaves</p>
-        </div>
-
-        <Link to="/" onClick={closeMenu}>Home</Link>
-        <Link to="/products" onClick={closeMenu}>Jewelry</Link>
-        <Link to="/about" onClick={closeMenu}>About us</Link>
-        <Link to="/contact" onClick={closeMenu}>Contact</Link>
-        <Link to="/favorites" onClick={closeMenu}>Favorites</Link>
-        <Link to="/cart" onClick={closeMenu}>Cart</Link>
+      <div className={styles.desktopTagline}>
+        <p>No proving. No pretending. Just enough — YAFATO.</p>
+        <h2>YAFATO</h2>
       </div>
+      <SideCart
+        isOpen={cartOpen}
+        onClose={() => setCartOpen(false)}
+        cartItems={cartItems}
+      />
+
+      <FavoritesCart
+        isOpen={favoritesOpen}
+        onClose={() => setFavoritesOpen(false)}
+        favorites={favorites}
+        onAddToCart={addToCart}
+        onRemoveFavorite={removeFromFavorites}
+      />
+
+      {menuOpen && (
+        <div className={styles.sideMenu}>
+          <button className={styles.closeBtn} onClick={closeMenu}>
+            <FiX />
+          </button>
+
+          <Link to="/" className={styles.mobileLogo} onClick={closeMenu}>
+            Yafato
+          </Link>
+
+          <div className={styles.menuIntro}>
+            <p>Silver that reminds you of who you're becoming.</p>
+          </div>
+
+          <div className={styles.mobileLinks}>
+            <Link to="/" onClick={closeMenu}>Home</Link>
+
+            <button
+              className={styles.mobileSubToggle}
+              onClick={toggleMobileDropdown}
+              aria-expanded={mobileDropdownOpen}
+            >
+              Our Products ▾
+            </button>
+
+            {mobileDropdownOpen && (
+              <div className={styles.mobileDropdown}>
+                <p>Jewelry</p>
+                <Link to="/products" onClick={closeMenu}>All Jewelry</Link>
+                <Link to="/custom" onClick={closeMenu}>Custom Jewelry</Link>
+
+                <p>Clothing</p>
+                <Link to="/products/clothing/two-piece" onClick={closeMenu}>Two-piece Sets</Link>
+
+                <p>Lifestyle</p>
+                <Link to="/products/lifestyle/cups" onClick={closeMenu}>YCups</Link>
+              </div>
+            )}
+
+            <hr />
+
+            <Link to="/about" onClick={closeMenu}>About</Link>
+        <Link to="/contact" onClick={closeMenu}>Contact</Link>
+          </div>
+        </div>
+      )}
     </header>
   );
 }
