@@ -1,3 +1,5 @@
+@use "../../styles/variables" as *;
+
 .aboutPage {
   font-family: 'Inter', sans-serif;
   color: #111;
@@ -7,55 +9,77 @@
 
 /* Hero Section */
 .heroSection {
-  position: relative;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
   height: 100vh;
   overflow: hidden;
 
   .heroImages {
-    position: relative;
+    display: flex;
+    flex: 1;
     width: 100%;
     height: 100%;
 
-    .bgImage,
-    .bgImageOverlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
+    .bgImage {
+      width: 50%;
       height: 100%;
       object-fit: cover;
-      filter: brightness(0.9) contrast(1.1) blur(2px) opacity(0.8);
-      mix-blend-mode: lighten;
     }
 
-    .bgImageOverlay {
-      opacity: 0.6;
-      mix-blend-mode: soft-light;
-    }
+    .sliderWrapper {
+      width: 50%;
+      padding: 4rem 3rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background-color: #f8f8f8;
+      color: #111;
+      position: relative;
 
-    .overlayText {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      color: #fff;
-      text-align: center;
-      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      .slide {
+        opacity: 0;
+        transition: opacity 1s ease-in-out;
+        position: absolute;
+        width: 100%;
 
-      h1 {
-        font-size: 2.8rem;
-        margin-bottom: 1rem;
-        letter-spacing: 1px;
-      }
+        &:nth-child(1) {
+          animation: showSlide 16s infinite;
+        }
 
-      p {
-        font-size: 1.1rem;
-        font-weight: 300;
+        &:nth-child(2) {
+          animation: showSlide2 16s infinite;
+        }
+
+        h1 {
+          font-size: 2.8rem;
+          margin-bottom: 1rem;
+          letter-spacing: 1px;
+        }
+
+        p {
+          font-size: 1.25rem;
+          font-weight: 300;
+          line-height: 1.7;
+          max-width: 600px;
+          letter-spacing: 0.3px;
+          margin-bottom: 1rem;
+        }
       }
     }
   }
 }
 
+@keyframes showSlide {
+  0%, 40% { opacity: 1; z-index: 1; }
+  50%, 100% { opacity: 0; z-index: 0; }
+}
+
+@keyframes showSlide2 {
+  0%, 45% { opacity: 0; z-index: 0; }
+  50%, 90% { opacity: 1; z-index: 1; }
+  100% { opacity: 0; z-index: 0; }
+}
 
 /* Quote Section */
 .quoteSection {
@@ -123,6 +147,7 @@
       background: #f0f0f0;
       padding: 2rem;
       border-radius: 0.75rem;
+
       h3 {
         font-size: 1.2rem;
         margin-bottom: 0.5rem;
@@ -131,6 +156,7 @@
   }
 }
 
+/* Video Section */
 .videoSection {
   padding: 4rem 1.5rem;
   text-align: center;
@@ -156,10 +182,10 @@
   }
 }
 
-
 /* Gallery Section */
 .gallerySection {
   padding: 4rem 1.5rem;
+
   h2 {
     text-align: center;
     margin-bottom: 2rem;
@@ -223,10 +249,39 @@
   }
 }
 
-/* Responsive Adjustments */
+/* Responsive */
 @media (max-width: 768px) {
-  .heroSection .overlayText h1 {
-    font-size: 2rem;
+  .heroSection {
+    flex-direction: column;
+
+    .heroImages {
+      flex-direction: column;
+
+      .bgImage {
+        width: 100%;
+        height: 50vh;
+      }
+
+      .sliderWrapper {
+        width: 100%;
+        padding: 2rem 1.5rem;
+        text-align: center;
+
+        .slide {
+          position: relative;
+        }
+
+        h1 {
+          font-size: 2rem;
+        }
+
+        p {
+          font-size: 1rem;
+          line-height: 1.6;
+          padding: 0 1rem;
+        }
+      }
+    }
   }
 
   .makerSection .split {
