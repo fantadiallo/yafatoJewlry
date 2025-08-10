@@ -1,50 +1,67 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import ProductInfo from '../../components/ProductInfo/ProductInfo';
-import styles from './ProductPage.module.scss';
-import ProductRecommendations from '../../components/ProductRecommendations/ProductRecommendations';
 import ProductGallery from '../../components/ProductGallery/ProductGallery';
+import ProductRecommendations from '../../components/ProductRecommendations/ProductRecommendations';
+import styles from './ProductPage.module.scss';
+import { fetchSingleProductById, fetchShopifyProducts } from '../../api/shopify';
+import { useShopifyCart } from '../../context/ShopifyCartContext';
 
 export default function ProductPage() {
-  const { id } = useParams(); // e.g. /product/1
+  const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [recommendations, setRecommendations] = useState([]);
+  const { addToCart, addToFavorites } = useShopifyCart();
+
   const placeholder = 'https://via.placeholder.com/600x600?text=No+Image';
 
   useEffect(() => {
     async function fetchProductData() {
       try {
-        const res = await fetch(`https://your-api.com/products/${id}`);
-        const data = await res.json();
-        setProduct(data);
+        const productResult = await fetchSingleProductById(id);
+        setProduct(productResult);
 
-        // Optional: fetch related/recommended products
-        const recRes = await fetch(`https://your-api.com/products?relatedTo=${id}`);
-        const recData = await recRes.json();
-        setRecommendations(recData);
+        const allProducts = await fetchShopifyProducts();
+        const filtered = allProducts.filter((item) => item.id !== id);
+        const randomSubset = filtered.slice(0, 4);
+        setRecommendations(randomSubset);
       } catch (error) {
-        console.error('Failed to load product', error);
+        console.error('Failed to load product:', error);
       }
     }
 
     fetchProductData();
   }, [id]);
 
-  if (!product) {
-    return <p className={styles.loading}>Loading product...</p>;
-  }
+  if (!product) return <p className={styles.loading}>Loading product...</p>;
 
   const galleryImages =
     product.images && product.images.length > 0 ? product.images : [placeholder];
+
+  const productData = {
+    id: product.id,
+    variantId: product.variants?.[0]?.id,
+    title: product.title,
+    image: product.images?.[0] || placeholder,
+    price: Number(product.variants?.[0]?.price?.amount || 0),
+    size: 'One Size',
+  };
 
   return (
     <section className={styles.productPage}>
       <div className={styles.topSection}>
         <ProductGallery images={galleryImages} title={product.title} />
-        <ProductInfo product={product} />
+
+        <ProductInfo
+          product={product}
+          onAddToCart={() => addToCart(productData)}
+          onAddToFavorites={() => addToFavorites(productData)}
+        />
       </div>
 
-      <ProductRecommendations products={recommendations} />
+      {recommendations.length > 0 && (
+        <ProductRecommendations products={recommendations} />
+      )}
     </section>
   );
 }
