@@ -1,0 +1,154 @@
+.hero-home {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-family: 'Cinzel', serif;
+  color: #3a3a3a;
+
+  /* Background video */
+  .hero-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 80%; // 👈 focus lower (hand visible)
+    filter: brightness(0.7) contrast(1.05) saturate(1.1);
+    animation: slow-zoom 35s ease-in-out infinite alternate;
+    z-index: 0;
+  }
+
+  /* Gradient + peach overlay */
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      rgba(20, 20, 20, 0.65) 0%,
+      rgba(230, 132, 110, 0.25) 55%,
+      rgba(255,255,255,0.05) 100%
+    );
+    z-index: 1;
+  }
+
+  /* Foreground overlay image */
+.hero-overlay {
+  position: absolute;
+  bottom: 2%;
+  right: 2%;
+  width: 28%;
+  opacity: 0.15; // 👈 super faint, barely there
+  mix-blend-mode: lighten; // 👈 blends softly with light areas
+  filter: blur(1px) drop-shadow(0 6px 18px rgba(0, 0, 0, 0.25));
+  z-index: 2;
+  
+  /* no animation — stays still like a cinema overlay */
+  animation: none;
+}
+
+
+  /* Hero content */
+  .hero-content {
+    position: relative;
+    z-index: 3;
+    max-width: 950px;
+    padding: 2rem;
+
+    h1 {
+      font-size: clamp(3.5rem, 7vw, 6rem);
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      background: linear-gradient(90deg, #e6846e, #f9f7f6, #e6846e);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-size: 250%;
+      animation: shimmer 8s infinite linear;
+      text-shadow: 0 2px 18px rgba(0,0,0,0.35);
+    }
+
+    p {
+      margin: 1.5rem auto 3rem;
+      max-width: 680px;
+      font-size: 1.35rem;
+      line-height: 1.9;
+      color: #f2f2f2;
+      font-family: 'Cormorant Garamond', serif;
+      animation: fade-in 2.4s ease forwards;
+    }
+
+    .hero-btn {
+      padding: 1.2rem 3rem;
+      font-size: 1.2rem;
+      border-radius: 50px;
+      background: linear-gradient(135deg, #e6846e, #d86b57);
+      border: none;
+      color: #fff;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      cursor: pointer;
+      text-transform: uppercase;
+      box-shadow: 0 6px 20px rgba(230, 132, 110, 0.45);
+      transition: all 0.35s ease;
+      position: relative;
+      overflow: hidden;
+
+      &:hover {
+        transform: scale(1.08) translateY(-4px);
+        box-shadow: 0 8px 28px rgba(230, 132, 110, 0.55);
+      }
+
+      &:active {
+        transform: scale(0.96);
+      }
+
+      /* ✨ Sparkle effect */
+      &::after {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.35) 0%, transparent 60%);
+        animation: sparkle 6s linear infinite;
+      }
+    }
+  }
+}
+
+/* Animations */
+@keyframes slow-zoom {
+  0% { transform: scale(1.05); }
+  100% { transform: scale(1.15); }
+}
+
+@keyframes floaty {
+  0% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-12px) rotate(0.5deg); }
+  100% { transform: translateY(0) rotate(0deg); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -500px; }
+  100% { background-position: 500px; }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(35px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes sparkle {
+  0% { transform: rotate(0deg); opacity: 0; }
+  25% { opacity: 1; }
+  50% { transform: rotate(180deg); opacity: 0.6; }
+  75% { opacity: 1; }
+  100% { transform: rotate(360deg); opacity: 0; }
+}
