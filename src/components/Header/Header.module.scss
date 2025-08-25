@@ -1,8 +1,7 @@
-@use '../../styles/variables' as *;
 
 // Header container
 .header {
-  background-color: $silver-50;
+  background-color: $color-light;
   border-bottom: 1px solid $silver-100;
   position: sticky;
   top: 0;
@@ -15,16 +14,51 @@
   }
 }
 
-// Top bar
+
 .topBar {
-  background-color: $silver-100;
-  text-align: center;
-  font-size: 0.85rem;
+  background: linear-gradient(
+    90deg,
+    lighten($color-accent, 8%),
+    $color-accent,
+    darken($color-accent, 8%)
+  );
+  font-size: 1.2rem;
   font-weight: 500;
-  color: $silver-600;
+  color: $silver-50;
   padding: 0.4rem 1rem;
+  overflow: hidden;
   border-bottom: 1px solid $silver-200;
+
+  .scrollWrapper {
+    display: flex;
+    width: max-content;   // wrap text tightly
+    animation: scrollText 10s linear infinite;
+
+    span {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding-right: 3rem; // spacing between repeated text
+    }
+  }
+
+  .icon {
+    font-size: 1.1rem;
+  }
 }
+
+@keyframes scrollText {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+
+
+
 
 // Nav container
 .navContainer {
@@ -39,7 +73,7 @@
   font-family: 'Orbitron', sans-serif;
   font-size: 2rem;
   font-weight: 800;
-  color: $silver-300;
+  color: $silver-400;
   text-transform: uppercase;
   letter-spacing: 4px;
   text-decoration: none;
@@ -223,25 +257,28 @@
 }
 
 // Tagline
-.desktopTagline {
-  display: block;
-  text-align: center;
-  padding: 0.5rem 1rem;
 
-  h2 {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 1.5rem;
-    color: $silver-800;
-  }
 
-  p {
-    font-size: 0.95rem;
-    color: $silver-600;
+// Keyframes
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
   }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
-  @media (max-width: 768px) {
-    display: none;
-  }
+@keyframes shimmer {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+@keyframes textPop {
+  0% { letter-spacing: 0; transform: scale(0.95); opacity: 0; }
+  100% { letter-spacing: 1.5px; transform: scale(1); opacity: 1; }
 }
 
 // ======================

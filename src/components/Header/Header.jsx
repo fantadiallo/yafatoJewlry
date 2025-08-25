@@ -1,10 +1,22 @@
+/**
+ * Header component for the Yafato site.
+ *
+ * - Displays the main navigation, logo, and tagline.
+ * - Handles dropdowns, mobile menu, and sticky/hide-on-scroll behavior.
+ * - Shows cart and favorites icons with counts, and opens SideCart and FavoritesCart overlays.
+ * - Uses context (ShopifyCartContext) for cart and favorites state.
+ *
+ * @component
+ * @returns {JSX.Element} The rendered header/navigation bar.
+ */
 import { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { FiHeart, FiShoppingBag, FiX } from 'react-icons/fi';
+import { FiHeart, FiShoppingBag, FiX, } from 'react-icons/fi';
 import styles from './Header.module.scss';
 import SideCart from '../SideCart/SideCart';
 import FavoritesCart from '../FavoritsCart/FavoritsCart';
 import { ShopifyCartContext } from '../../context/ShopifyCartContext';
+import { FaGlobe, FaEnvelopeOpenText } from "react-icons/fa";
 
 export default function Header() {
   const { cartItems, favorites, addToCart, addToFavorites, removeFromFavorites } = useContext(ShopifyCartContext);
@@ -45,9 +57,21 @@ export default function Header() {
 
   return (
     <header className={`${styles.header} ${hideHeader ? styles.hideOnScroll : ''}`}>
-      <div className={styles.topBar}>
-        <p>🌍 Free Shipping Worldwide over 50 £ &nbsp; | &nbsp; Subscribe to our newsletter</p>
-      </div>
+<div className={styles.topBar}>
+  <div className={styles.scrollWrapper}>
+    <span>
+      <FaGlobe className={styles.icon} /> Free Shipping Worldwide over £50
+      &nbsp; | &nbsp;
+      <FaEnvelopeOpenText className={styles.icon} /> Subscribe to our newsletter
+    </span>
+    <span>
+      <FaGlobe className={styles.icon} /> Free Shipping Worldwide over £50
+      &nbsp; | &nbsp;
+      <FaEnvelopeOpenText className={styles.icon} /> Subscribe to our newsletter
+    </span>
+  </div>
+</div>
+
 
       <nav className={`${styles.navContainer} container`}>
         <Link to="/" className={styles.logo}>Yafato</Link>
@@ -71,32 +95,29 @@ export default function Header() {
                   <Link to="/custom" onClick={closeDropdown}>Custom Jewelry</Link>
                 </div>
                 <div className={styles.megaColumn}>
-                  <p>Clothing</p>
-                  <Link to="/products/clothing/two-piece" onClick={closeDropdown}>Two-piece Sets</Link>
-                </div>
-                <div className={styles.megaColumn}>
-                  <p>Lifestyle</p>
-                  <Link to="/products/lifestyle/cups" onClick={closeDropdown}>Cups</Link>
+                  <p>Collection</p>
+                  <Link to="/products/clothing/two-piece" onClick={closeDropdown}>Gen-z</Link>
+                  <Link to="/products/clothing/two-piece" onClick={closeDropdown}>Good Jul</Link>
                 </div>
               </div>
             )}
           </li>
           <li><Link to="/about">About</Link></li>
-        <li><Link to="/contact">Contact</Link></li>
+          <li><Link to="/contact">Contact</Link></li>
         </ul>
 
         <div className={styles.iconBar}>
-<div className={styles.iconWrapper}>
-  <button className={styles.iconBtn} onClick={() => setFavoritesOpen(true)}>
-    <FiHeart
-      size={20}
-      style={{ color: favorites.length > 0 ? 'red' : 'inherit' }}
-    />
-    {favorites.length > 0 && (
-      <span className={styles.badge}>{favorites.length}</span>
-    )}
-  </button>
-</div>
+          <div className={styles.iconWrapper}>
+            <button className={styles.iconBtn} onClick={() => setFavoritesOpen(true)}>
+              <FiHeart
+                size={20}
+                style={{ color: favorites.length > 0 ? 'red' : 'inherit' }}
+              />
+              {favorites.length > 0 && (
+                <span className={styles.badge}>{favorites.length}</span>
+              )}
+            </button>
+          </div>
           <button className={styles.iconBtn} onClick={() => setCartOpen(true)}>
             <FiShoppingBag size={20} />
             <span className={styles.badge}>{cartItems.length}</span>
@@ -112,10 +133,6 @@ export default function Header() {
         </div>
       </nav>
 
-      <div className={styles.desktopTagline}>
-        <p>No proving. No pretending. Just enough — YAFATO.</p>
-        <h2>YAFATO</h2>
-      </div>
       <SideCart
         isOpen={cartOpen}
         onClose={() => setCartOpen(false)}
@@ -141,7 +158,7 @@ export default function Header() {
           </Link>
 
           <div className={styles.menuIntro}>
-            <p>Silver that reminds you of who you're becoming.</p>
+            <p>Menu</p>
           </div>
 
           <div className={styles.mobileLinks}>
@@ -152,7 +169,7 @@ export default function Header() {
               onClick={toggleMobileDropdown}
               aria-expanded={mobileDropdownOpen}
             >
-              Our Products ▾
+              Our Jewelry ▾
             </button>
 
             {mobileDropdownOpen && (
@@ -161,18 +178,19 @@ export default function Header() {
                 <Link to="/products" onClick={closeMenu}>All Jewelry</Link>
                 <Link to="/custom" onClick={closeMenu}>Custom Jewelry</Link>
 
-                <p>Clothing</p>
-                <Link to="/products/clothing/two-piece" onClick={closeMenu}>Two-piece Sets</Link>
+                <p>Collection</p>
+                <Link to="/products/Gen-z" onClick={closeMenu}>Gen-z</Link>
+                <Link to="/products/goodJul" onClick={closeMenu}>Goodjul</Link>
 
                 <p>Lifestyle</p>
-                <Link to="/products/lifestyle/cups" onClick={closeMenu}>YCups</Link>
+                <Link to="/products/lifestyle/cups" onClick={closeMenu}>teaCups</Link>
               </div>
             )}
 
             <hr />
 
             <Link to="/about" onClick={closeMenu}>About</Link>
-        <Link to="/contact" onClick={closeMenu}>Contact</Link>
+            <Link to="/contact" onClick={closeMenu}>Contact</Link>
           </div>
         </div>
       )}
