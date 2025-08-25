@@ -1,10 +1,6 @@
-
+import HeroHome from "../../components/HeroSection/HeroHome";
+import ProductList from "../../components/ProductsList/ProductList";
 
 export default function HomePage() {
-  return (
-    <div>
-      <h1>Home</h1>
-      <p>Welcome to Yafato Jewelry</p>
-    </div>
-  );
+  return <HeroHome />;
 }
