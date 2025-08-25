@@ -4,7 +4,20 @@ $color-light: #F8F5F2;
 $color-accent: #E2725B;        
 $color-muted: #AFAFAF;         
 $color-white: #FFFFFF;         
+$display: "Cormorant Garamond", "Didot", "Bodoni", serif;
+$sans: "Sen", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
+/* cool metallics for subtle luxe accents */
+$metal-1: #C5B358; // champagne (cool)
+$metal-2: #BFC3C6; // silver
+
+
+$ivory:        #F8F5F2;
+$charcoal:     #2A2A2A;
+$champagne:    #C5B358;  /* muted gold with cool undertone */
+$silver:       #BFC3C6;
+$sage:         #AABBA2;
+$light-gray:   #E5E5E5;
 
 $sand-50:  #faf5ef;  
 $sand-100: #f1e8d7;  
@@ -28,7 +41,3 @@ $silver-800:  #464646;
 $primary-silver: #C0C0C0;
 $charcoal-gray: #333333;
 
-
-$warm-gold: #D4AF37;
-$sage-green: #AABBA2;
-$dusty-rose: #D6A7A0;
