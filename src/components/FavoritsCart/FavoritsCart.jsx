@@ -3,6 +3,9 @@ import { FiHeart, FiShoppingBag, FiX, FiTrash2 } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 import { useShopifyCart } from '../../context/ShopifyCartContext';
 
+
+
+
 export default function FavoritesCart({ isOpen, onClose }) {
   const {
     favorites,
@@ -10,13 +13,17 @@ export default function FavoritesCart({ isOpen, onClose }) {
     moveToCartFromFavorites,
   } = useShopifyCart();
 
+
+
+
+
   function handleMoveToCart(item) {
     if (!item.variantId) {
       console.warn('Missing variantId in favorite item');
       return;
     }
 
-    moveToCartFromFavorites(item); // ✅ Send full item object
+    moveToCartFromFavorites(item); 
   }
 
   return (
