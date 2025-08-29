@@ -1,0 +1,17 @@
+@import "../../styles/variables";
+
+.productPage {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  background-color: $color-light;
+}
+
+.loading,
+.empty {
+  text-align: center;
+  font-family: $sans;
+  font-size: 1.2rem;
+  color: $color-muted;
+  margin-top: 4rem;
+}
