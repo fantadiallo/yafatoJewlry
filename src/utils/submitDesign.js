@@ -1,4 +1,5 @@
-import { supabase } from "../supabase/Client";
+
+import { supabase } from "../supabse/Client";
 import { sendCustomDesignEmail } from "./sendCustomDesignEmail";
 import { uploadPatternFile } from "./uploadPatternFile";
 
