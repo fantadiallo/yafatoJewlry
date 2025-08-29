@@ -1,6 +1,6 @@
 .hero-home {
   position: relative;
-  height: 100vh;
+  height: 70vh;
   width: 100%;
   overflow: hidden;
   display: flex;
@@ -78,7 +78,7 @@
       max-width: 680px;
       font-size: 1.35rem;
       line-height: 1.9;
-      color: #f2f2f2;
+      color: $color-dark;
       font-family: 'Cormorant Garamond', serif;
       animation: fade-in 2.4s ease forwards;
     }
@@ -87,9 +87,9 @@
       padding: 1.2rem 3rem;
       font-size: 1.2rem;
       border-radius: 50px;
-      background: linear-gradient(135deg, #e6846e, #d86b57);
+      background: linear-gradient(135deg, $color-accent, #8faec1);
       border: none;
-      color: #fff;
+      color: $color-white;
       font-weight: 700;
       letter-spacing: 1.5px;
       cursor: pointer;
