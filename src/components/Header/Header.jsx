@@ -1,144 +1,157 @@
-/**
- * Header component for the Yafato site.
- *
- * - Displays the main navigation, logo, and tagline.
- * - Handles dropdowns, mobile menu, and sticky/hide-on-scroll behavior.
- * - Shows cart and favorites icons with counts, and opens SideCart and FavoritesCart overlays.
- * - Uses context (ShopifyCartContext) for cart and favorites state.
- *
- * @component
- * @returns {JSX.Element} The rendered header/navigation bar.
- */
-import { useState, useEffect, useContext } from 'react';
-import { Link } from 'react-router-dom';
-import { FiHeart, FiShoppingBag, FiX, } from 'react-icons/fi';
-import styles from './Header.module.scss';
-import SideCart from '../SideCart/SideCart';
-import FavoritesCart from '../FavoritsCart/FavoritsCart';
-import { ShopifyCartContext } from '../../context/ShopifyCartContext';
+import { useState, useContext, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom"; // ✅ useNavigate for redirect
+import { FiHeart, FiShoppingBag, FiSearch, FiMenu, FiX } from "react-icons/fi";
 import { FaGlobe, FaEnvelopeOpenText } from "react-icons/fa";
+import { motion, AnimatePresence } from "framer-motion";
+import { ShopifyCartContext } from "../../context/ShopifyCartContext";
+import SideCart from "../SideCart/SideCart";
+import FavoritesCart from "../FavoritsCart/FavoritsCart";
+import styles from "./Header.module.scss";
+import { fetchShopifyProducts } from "../../api/shopify";
 
 export default function Header() {
-  const { cartItems, favorites, addToCart, addToFavorites, removeFromFavorites } = useContext(ShopifyCartContext);
+  const { cartItems, favorites, addToCart, removeFromFavorites } = useContext(ShopifyCartContext);
+  const navigate = useNavigate();
 
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false);
-  const [hideHeader, setHideHeader] = useState(false);
-  const [lastScrollY, setLastScrollY] = useState(0);
   const [cartOpen, setCartOpen] = useState(false);
   const [favoritesOpen, setFavoritesOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [jewelryOpen, setJewelryOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [showTopBar, setShowTopBar] = useState(true);
 
-  const toggleMenu = () => setMenuOpen(!menuOpen);
-  const closeMenu = () => {
-    setMenuOpen(false);
-    setMobileDropdownOpen(false);
+  // ✅ Search products by first letter
+  const handleSearchSubmit = async (e) => {
+    e.preventDefault();
+    if (!searchTerm.trim()) return;
+
+    try {
+      const products = await fetchShopifyProducts();
+      // ✅ Filter by first letter (case-insensitive)
+      const results = products.filter((p) =>
+        p.title.toLowerCase().startsWith(searchTerm.toLowerCase()[0])
+      );
+
+      if (results.length > 0) {
+        // Navigate to a search results page (optional)
+        navigate("/products", { state: { searchResults: results } });
+      } else {
+        alert("No products found.");
+      }
+    } catch (err) {
+      console.error("Search error:", err);
+    }
+
+    setSearchOpen(false);
+    setSearchTerm("");
   };
-  const toggleDropdown = () => setDropdownOpen(prev => !prev);
-  const closeDropdown = () => setDropdownOpen(false);
-  const toggleMobileDropdown = () => setMobileDropdownOpen(prev => !prev);
 
+  // Hide top bar on scroll
   useEffect(() => {
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      setHideHeader(currentScrollY > lastScrollY && currentScrollY > 100);
-      setLastScrollY(currentScrollY);
-      if (dropdownOpen) closeDropdown();
-      if (menuOpen) setMenuOpen(false);
+      setShowTopBar(window.scrollY <= 50);
     };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY, dropdownOpen, menuOpen]);
-
-  useEffect(() => {
-    document.body.style.overflow = menuOpen ? 'hidden' : 'auto';
-    return () => { document.body.style.overflow = 'auto'; };
-  }, [menuOpen]);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <header className={`${styles.header} ${hideHeader ? styles.hideOnScroll : ''}`}>
-<div className={styles.topBar}>
-  <div className={styles.scrollWrapper}>
-    <span>
-      <FaGlobe className={styles.icon} /> Free Shipping Worldwide over £50
-      &nbsp; | &nbsp;
-      <FaEnvelopeOpenText className={styles.icon} /> Subscribe to our newsletter
-    </span>
-    <span>
-      <FaGlobe className={styles.icon} /> Free Shipping Worldwide over £50
-      &nbsp; | &nbsp;
-      <FaEnvelopeOpenText className={styles.icon} /> Subscribe to our newsletter
-    </span>
-  </div>
-</div>
-
-
-      <nav className={`${styles.navContainer} container`}>
-        <Link to="/" className={styles.logo}>Yafato</Link>
-
-        <ul className={styles.navLinks}>
-          <li><Link to="/">Home</Link></li>
-          <li className={styles.dropdown}>
-            <button
-              className={styles.dropdownToggle}
-              onClick={toggleDropdown}
-              aria-expanded={dropdownOpen}
-              aria-haspopup="true"
-            >
-              Our Products ▾
-            </button>
-            {dropdownOpen && (
-              <div className={styles.megaMenu}>
-                <div className={styles.megaColumn}>
-                  <p>Jewelry</p>
-                  <Link to="/products" onClick={closeDropdown}>All Jewelry</Link>
-                  <Link to="/custom" onClick={closeDropdown}>Custom Jewelry</Link>
-                </div>
-                <div className={styles.megaColumn}>
-                  <p>Collection</p>
-                  <Link to="/products/clothing/two-piece" onClick={closeDropdown}>Gen-z</Link>
-                  <Link to="/products/clothing/two-piece" onClick={closeDropdown}>Good Jul</Link>
-                </div>
-              </div>
-            )}
-          </li>
-          <li><Link to="/about">About</Link></li>
-          <li><Link to="/contact">Contact</Link></li>
-        </ul>
-
-        <div className={styles.iconBar}>
-          <div className={styles.iconWrapper}>
-            <button className={styles.iconBtn} onClick={() => setFavoritesOpen(true)}>
-              <FiHeart
-                size={20}
-                style={{ color: favorites.length > 0 ? 'red' : 'inherit' }}
-              />
-              {favorites.length > 0 && (
-                <span className={styles.badge}>{favorites.length}</span>
-              )}
-            </button>
+    <header className={styles.header}>
+      {/* Top Info Bar */}
+      {showTopBar && (
+        <div className={styles.topBar}>
+          <div className={styles.topContent}>
+            <span className={styles.marquee}>
+              <FaGlobe /> Free Shipping Worldwide over £100 &nbsp;&nbsp;&nbsp;
+              <FaEnvelopeOpenText /> Subscribe to our Newsletter
+            </span>
           </div>
-          <button className={styles.iconBtn} onClick={() => setCartOpen(true)}>
-            <FiShoppingBag size={20} />
-            <span className={styles.badge}>{cartItems.length}</span>
-          </button>
-          <button
-            className={`${styles.hamburger} ${menuOpen ? styles.open : ''}`}
-            onClick={toggleMenu}
-          >
-            <span className={styles.bar}></span>
-            <span className={styles.bar}></span>
-            <span className={styles.bar}></span>
+          <button className={styles.closeBtn} onClick={() => setShowTopBar(false)}>
+            <FiX />
           </button>
         </div>
-      </nav>
+      )}
 
-      <SideCart
-        isOpen={cartOpen}
-        onClose={() => setCartOpen(false)}
-        cartItems={cartItems}
-      />
+      {/* Main Sticky Header */}
+      <div className={styles.inner}>
+        {/* Left Navigation (Desktop) */}
+        <nav className={styles.navLinks}>
+          <Link to="/">Home</Link>
+          <div
+            className={styles.dropdown}
+            onMouseEnter={() => setJewelryOpen(true)}
+            onMouseLeave={() => setJewelryOpen(false)}
+          >
+            <button className={styles.dropdownBtn}>Jewelry</button>
+            {jewelryOpen && (
+              <div className={styles.dropdownMenu}>
+                <Link to="/products">All</Link>
+                <Link to="/products/rings">Rings</Link>
+                <Link to="/products/necklaces">Necklaces</Link>
+                <Link to="/custom">Custom</Link>
+                <Link to="/products/bracelets">Bracelets</Link>
+              </div>
+            )}
+          </div>
+          <Link to="/about">About</Link>
+          <Link to="/contact">Contact</Link>
+        </nav>
 
+        {/* Center Logo */}
+        <Link to="/" className={styles.logo}>
+          <h1>YAFATO</h1>
+        </Link>
+
+        {/* Right Icons */}
+        <div className={styles.rightBar}>
+          {/* Search */}
+          <div className={styles.searchWrapper}>
+            {searchOpen ? (
+              <form onSubmit={handleSearchSubmit} className={styles.searchForm}>
+                <input
+                  type="text"
+                  placeholder="Search by first letter..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  autoFocus
+                />
+              </form>
+            ) : (
+              <button onClick={() => setSearchOpen(true)} className={styles.iconBtn}>
+                <FiSearch size={22} />
+              </button>
+            )}
+          </div>
+
+          {/* Favorites */}
+          <button onClick={() => setFavoritesOpen(true)} className={styles.iconBtn}>
+            <FiHeart size={22} />
+            {favorites.length > 0 && (
+              <span className={styles.badge}>{favorites.length}</span>
+            )}
+          </button>
+
+          {/* Cart */}
+          <button onClick={() => setCartOpen(true)} className={styles.iconBtn}>
+            <FiShoppingBag size={22} />
+            {cartItems.length > 0 && (
+              <span className={styles.badge}>{cartItems.length}</span>
+            )}
+          </button>
+
+          {/* Mobile Hamburger */}
+          <button
+            className={styles.iconBtn + " " + styles.mobileMenuBtn}
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            {menuOpen ? <FiX size={26} /> : <FiMenu size={26} />}
+          </button>
+        </div>
+      </div>
+
+      {/* Side Overlays */}
+      <SideCart isOpen={cartOpen} onClose={() => setCartOpen(false)} cartItems={cartItems} />
       <FavoritesCart
         isOpen={favoritesOpen}
         onClose={() => setFavoritesOpen(false)}
@@ -147,53 +160,45 @@ export default function Header() {
         onRemoveFavorite={removeFromFavorites}
       />
 
-      {menuOpen && (
-        <div className={styles.sideMenu}>
-          <button className={styles.closeBtn} onClick={closeMenu}>
-            <FiX />
-          </button>
+      {/* Mobile Side Menu */}
+      <AnimatePresence>
+        {menuOpen && (
+          <>
+            {/* Dimmed overlay */}
+            <motion.div
+              className={styles.menuOverlay}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.5 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMenuOpen(false)}
+            />
 
-          <Link to="/" className={styles.mobileLogo} onClick={closeMenu}>
-            Yafato
-          </Link>
-
-          <div className={styles.menuIntro}>
-            <p>Menu</p>
-          </div>
-
-          <div className={styles.mobileLinks}>
-            <Link to="/" onClick={closeMenu}>Home</Link>
-
-            <button
-              className={styles.mobileSubToggle}
-              onClick={toggleMobileDropdown}
-              aria-expanded={mobileDropdownOpen}
+            {/* Slide-in mobile menu */}
+            <motion.nav
+              className={styles.mobileMenu}
+              initial={{ x: "-100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "-100%" }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
             >
-              Our Jewelry ▾
-            </button>
-
-            {mobileDropdownOpen && (
-              <div className={styles.mobileDropdown}>
-                <p>Jewelry</p>
-                <Link to="/products" onClick={closeMenu}>All Jewelry</Link>
-                <Link to="/custom" onClick={closeMenu}>Custom Jewelry</Link>
-
-                <p>Collection</p>
-                <Link to="/products/Gen-z" onClick={closeMenu}>Gen-z</Link>
-                <Link to="/products/goodJul" onClick={closeMenu}>Goodjul</Link>
-
-                <p>Lifestyle</p>
-                <Link to="/products/lifestyle/cups" onClick={closeMenu}>teaCups</Link>
+              <div className={styles.menuHeader}>
+                <img src="/yafato.png" alt="Yafato Logo" />
+                <button onClick={() => setMenuOpen(false)}>
+                  <FiX />
+                </button>
               </div>
-            )}
 
-            <hr />
-
-            <Link to="/about" onClick={closeMenu}>About</Link>
-            <Link to="/contact" onClick={closeMenu}>Contact</Link>
-          </div>
-        </div>
-      )}
+              <Link to="/" onClick={() => setMenuOpen(false)}>ALL</Link>
+              <Link to="/products/rings" onClick={() => setMenuOpen(false)}>Rings</Link>
+              <Link to="/products/necklaces" onClick={() => setMenuOpen(false)}>Necklaces</Link>
+              <Link to="/custom" onClick={() => setMenuOpen(false)}>Custom</Link>
+              <Link to="/products/bracelets" onClick={() => setMenuOpen(false)}>Bracelets</Link>
+              <Link to="/about" onClick={() => setMenuOpen(false)}>About</Link>
+              <Link to="/contact" onClick={() => setMenuOpen(false)}>Contact</Link>
+            </motion.nav>
+          </>
+        )}
+      </AnimatePresence>
     </header>
   );
 }
