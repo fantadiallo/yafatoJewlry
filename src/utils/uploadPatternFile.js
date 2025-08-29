@@ -1,4 +1,5 @@
-import { supabase } from "../supabase/Client";
+import { supabase } from "../supabse/Client";
+
 
 export async function uploadPatternFile(file, email) {
   const fileExt = file.name.split(".").pop();
