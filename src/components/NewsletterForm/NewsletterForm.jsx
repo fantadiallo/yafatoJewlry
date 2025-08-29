@@ -1,6 +1,6 @@
 import { useState } from "react";
 import styles from "./NewsletterForm.module.scss";
-import { supabase } from "../../supabase/Client";
+import { supabase } from "../../supabse/Client";
 
 /**
  * NewsletterForm component allows users to subscribe to the newsletter.
@@ -28,7 +28,7 @@ export default function NewsletterForm({ source = "coming-soon" }) {
    */
   async function handleSubmit(e) {
     e.preventDefault();
-    if (loading) return;           // guard: no double submits
+    if (loading) return; // guard: no double submits
     setMessage("");
     const cleanEmail = email.trim().toLowerCase();
     if (!/^\S+@\S+\.\S+$/.test(cleanEmail)) {
@@ -38,43 +38,59 @@ export default function NewsletterForm({ source = "coming-soon" }) {
     setLoading(true);
     try {
       // Call Supabase RPC to subscribe
-      const { data, error } = await supabase.rpc('subscribe_newsletter', {
+      const { data, error } = await supabase.rpc("subscribe_newsletter", {
         p_email: cleanEmail,
-        p_source: source
+        p_source: source,
       });
-      if (error) throw error;
+
+      if (error) {
+        // ✅ Handle duplicate email case (unique violation = 23505)
+        if (error.code === "23505") {
+          setMessage("✅ You're already subscribed with this email.");
+          return;
+        }
+        throw error;
+      }
 
       // Validate response
       const row = Array.isArray(data) ? data[0] : data;
       if (!row?.email) {
         throw new Error("Subscription did not return a record.");
       }
+
       const code = row.discount_code || "YAFATO10la";
 
       // Show user-facing message
       if (code === "SaYafato50#") {
-        setMessage("🎉 Welcome! You're one of the first 5! Use code SaYafato50# at checkout.");
+        setMessage(
+          "🎉 Welcome! You're one of the first 5! Use code SaYafato50# at checkout."
+        );
       } else {
-        setMessage("💌 Welcome! Use code YAFATO10la for 10% off your first order.");
+        setMessage(
+          "💌 Welcome! Use code YAFATO10la for 10% off your first order."
+        );
       }
 
-      // Try to send welcome email (non-blocking)
+      // ✅ Only send welcome email for first-time subscribers
       try {
-        const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-welcome`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: cleanEmail, discount_code: code })
-        });
+        const res = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-welcome`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: cleanEmail, discount_code: code }),
+          }
+        );
         if (!res.ok) {
-          console.warn('send-welcome failed:', await res.text());
+          console.warn("send-welcome failed:", await res.text());
         }
       } catch (mailErr) {
-        console.warn('send-welcome error:', mailErr);
+        console.warn("send-welcome error:", mailErr);
       }
 
       setEmail("");
     } catch (err) {
-      console.error('Subscribe error:', err?.message, err?.code, err);
+      console.error("Subscribe error:", err?.message, err?.code, err);
       setMessage("Something went wrong. Try again later.");
     } finally {
       setLoading(false);
@@ -92,7 +108,11 @@ export default function NewsletterForm({ source = "coming-soon" }) {
         required
         disabled={loading}
       />
-      <button type="submit" className={styles["newsletter-btn"]} disabled={loading}>
+      <button
+        type="submit"
+        className={styles["newsletter-btn"]}
+        disabled={loading}
+      >
         {loading ? "Subscribing..." : "Subscribe"}
       </button>
       {message && <p className={styles["newsletter-message"]}>{message}</p>}
