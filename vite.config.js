@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@styles': path.resolve(__dirname, 'src/Styles')
+      '@styles': path.resolve(__dirname, 'src/styles') // <-- lowercase
     }
   },
   css: {
