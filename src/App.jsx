@@ -1,5 +1,6 @@
 import { Routes, Route } from "react-router-dom";
-import NewsletterPage from "./pages/NewsLetterPage/NewsletterPage";
+import NewsletterPage from "./pages/NewsletterPage/NewsletterPage";
+
 
 function App() {
   return (
