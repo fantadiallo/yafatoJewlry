@@ -9,6 +9,9 @@ lerna-debug.log*
 # Ignore temp and cache files
 *.temp
 .temp/
+# Ignore video files
+IMG_2470.mov
+Yafatoo.mp4
 
 node_modules
 dist
