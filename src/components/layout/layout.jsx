@@ -11,11 +11,16 @@ export default function Layout() {
 
   return (
     <ShopifyCartProvider>
-      {!hideNavAndFooter && <Header />}
-      <main>
-        <Outlet />
-      </main>
-      {!hideNavAndFooter && <Footer />}
+      <div className="layout">
+        {!hideNavAndFooter && <Header />}
+
+        <main className="main-content">
+          <Outlet />
+        </main>
+
+        {!hideNavAndFooter && <Footer />}
+      </div>
+
       <ToastContainer position="top-center" autoClose={5000} />
     </ShopifyCartProvider>
   );

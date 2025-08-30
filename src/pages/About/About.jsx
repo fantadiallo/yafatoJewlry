@@ -115,11 +115,11 @@ export default function AboutPage() {
       <motion.section className={styles.ctaSection}>
         <h2>Carry Your Reminder</h2>
         <Link to="/products" className={styles.shopBtn}>
-          Explore the Collection
+          Explore the Collections
         </Link>
         <p className={styles.instaFollow}>
           Follow the journey on{" "}
-          <a href="https://instagram.com/yafato" target="_blank" rel="noreferrer">
+          <a href="https://instagram.com/yafato_" target="_blank" rel="noreferrer">
             @yafato
           </a>
         </p>

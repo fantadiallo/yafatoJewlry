@@ -1,32 +1,54 @@
-// Follow this setup guide to integrate the Deno language server with your editor:
-// https://deno.land/manual/getting_started/setup_your_environment
-// This enables autocomplete, go to definition, etc.
+/**
+ * Supabase Edge Function: send-welcome
+ *
+ * Sends a welcome email with a discount code to a new newsletter subscriber using the Resend API.
+ */
 
-// Setup type definitions for built-in Supabase Runtime APIs
-import "jsr:@supabase/functions-js/edge-runtime.d.ts"
-
-console.log("Hello from Functions!")
+import { Resend } from "npm:resend@2.0.0";
 
 Deno.serve(async (req) => {
-  const { name } = await req.json()
-  const data = {
-    message: `Hello ${name}!`,
+  let body;
+  try {
+    body = await req.json();
+  } catch {
+    return new Response("Invalid or missing JSON body", { status: 400 });
   }
 
-  return new Response(
-    JSON.stringify(data),
-    { headers: { "Content-Type": "application/json" } },
-  )
-})
+  const { email, discount_code } = body;
+  if (!email) {
+    return new Response("email required", { status: 400 });
+  }
 
-/* To invoke locally:
+  const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+  const from = Deno.env.get("FROM_EMAIL") || "hello@yafato.com";
 
-  1. Run `supabase start` (see: https://supabase.com/docs/reference/cli/supabase-start)
-  2. Make an HTTP request:
+  const subject =
+    discount_code === "SaYafato50#"
+      ? "🎉 You got 50% off!"
+      : "Welcome to Yafato — here’s your code";
 
-  curl -i --location --request POST 'http://127.0.0.1:54321/functions/v1/send-welcome' \
-    --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0' \
-    --header 'Content-Type: application/json' \
-    --data '{"name":"Functions"}'
+  const text = `Hi,
 
-*/
+Thanks for joining the list. Your code: ${discount_code || "YAFATO10la"}
+
+Shop: ${Deno.env.get("SITE_URL") || "https://yafato.com"}
+`;
+
+  try {
+    const response = await resend.emails.send({
+      from,
+      to: email,
+      subject,
+      text,
+    });
+
+    console.log("Resend response:", response);
+
+    return new Response("ok", { status: 200 });
+  } catch (e) {
+    console.error("Error sending email:", e);
+    return new Response(`error: ${e?.message || JSON.stringify(e)}`, {
+      status: 500,
+    });
+  }
+});

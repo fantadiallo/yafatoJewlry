@@ -10,7 +10,7 @@ export default function About() {
         className={styles.bgImage} 
       />
       <div className={styles.overlay}>
-        <h2>More Than Jewelry  A Movement</h2>
+        <h2> Jewelry  A Movement</h2>
         <p>
           Rooted in heritage, healing, and expression — Yafato pieces carry 
           stories from The Gambia and Senegal to the world.
