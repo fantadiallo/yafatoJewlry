@@ -1,0 +1,278 @@
+// ==============================
+// Variables (already defined)
+// ==============================
+// $color-primary: #C0C0C0;     // silver
+// $color-dark: #111111;        // near black
+// $color-light: #F8F5F2;       // soft cream
+// $color-accent: #E2725B;      // warm terracotta
+// $color-muted: #AFAFAF;       // muted gray
+// $color-white: #FFFFFF;       
+// $display: "Cormorant Garamond", "Didot", "Bodoni", serif;
+// $sans: "Sen", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+
+// ==============================
+// Page Container
+// ==============================
+.aboutPage {
+  font-family: $sans;
+  color: $color-dark;
+  background: $color-light;
+  line-height: 1.6;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+
+// ==============================
+// Hero Section
+// ==============================
+.heroSection {
+  position: relative;
+  width: 100%;
+  height: 90vh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: $display;
+
+  .bgImage {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(70%) contrast(105%) saturate(110%);
+    transform: scale(1.05);
+    transition: transform 6s ease;
+  }
+
+  &:hover .bgImage {
+    transform: scale(1.12);
+  }
+
+  .heroOverlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom right,
+      rgba($color-dark, 0.65),
+      rgba($color-dark, 0.35)
+    );
+    z-index: 1;
+  }
+
+  .heroContent {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    max-width: 900px;
+    padding: 2rem;
+    color: $color-white;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .topQuote,
+  .bottomQuote {
+    font-family: $display;
+    font-style: italic;
+    font-size: clamp(1rem, 1.3vw, 1.25rem);
+    color: $color-muted;
+    span {
+      color: $color-accent;
+    }
+  }
+
+  .centerContent {
+    h1 {
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      font-weight: 600;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+      text-shadow: 0 4px 20px rgba($color-dark, 0.8);
+    }
+    p {
+      font-size: clamp(1rem, 1.1vw, 1.25rem);
+      color: $color-light;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+  }
+}
+
+
+// ==============================
+// Meet the Maker
+// ==============================
+.makerSection {
+  padding: 6rem 0;
+  .split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: center;
+  }
+
+  .imageWrap {
+    img {
+      width: 100%;
+      border-radius: 1rem;
+      box-shadow: 0 8px 30px rgba($color-dark, 0.25);
+      object-fit: cover;
+    }
+  }
+
+  .textWrap {
+    h2 {
+      font-family: $display;
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+      color: $color-dark;
+    }
+    p {
+      margin-bottom: 1.2rem;
+      color: $color-dark;
+      font-size: 1.1rem;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .split {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
+
+// ==============================
+// Meaning Section
+// ==============================
+.meaningSection {
+  padding: 6rem 0;
+  text-align: center;
+  h2 {
+    font-family: $display;
+    font-size: 2.2rem;
+    margin-bottom: 3rem;
+    color: $color-dark;
+  }
+
+  .features {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    flex-wrap: wrap;
+
+    .feature {
+      flex: 1;
+      min-width: 220px;
+      padding: 2rem;
+      background: $color-white;
+      border-radius: 1rem;
+      box-shadow: 0 4px 20px rgba($color-dark, 0.1);
+      h3 {
+        font-family: $display;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        color: $color-accent;
+      }
+      p {
+        font-size: 1rem;
+        color: $color-dark;
+      }
+    }
+  }
+}
+
+
+// ==============================
+// Video Section
+// ==============================
+.videoSection {
+  padding: 6rem 0;
+  text-align: center;
+
+  h2 {
+    font-family: $display;
+    font-size: 2.2rem;
+    margin-bottom: 2rem;
+    color: $color-dark;
+  }
+
+  .videoWrapper {
+    position: relative;
+    max-width: 900px;
+    margin: 0 auto;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba($color-dark, 0.25);
+
+    .videoPlayer {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+  }
+}
+
+
+// ==============================
+// CTA Section
+// ==============================
+.ctaSection {
+  padding: 6rem 0;
+  text-align: center;
+  background: $color-dark;
+  color: $color-light;
+  border-radius: 1rem;
+  margin: 4rem 0;
+
+  h2 {
+    font-family: $display;
+    font-size: 2.2rem;
+    margin-bottom: 2rem;
+  }
+
+  .shopBtn {
+    display: inline-block;
+    background: $color-accent;
+    color: $color-white;
+    padding: 1rem 2.5rem;
+    border-radius: 50px;
+    font-weight: 600;
+    font-family: $sans;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    box-shadow: 0 8px 20px rgba($color-accent, 0.35);
+    transition: all 0.35s ease;
+
+    &:hover {
+      background: darken($color-accent, 10%);
+      box-shadow: 0 12px 28px rgba($color-accent, 0.5);
+      transform: translateY(-2px);
+    }
+
+    &:active {
+      transform: translateY(0);
+      box-shadow: 0 6px 16px rgba($color-accent, 0.25);
+    }
+  }
+
+  .instaFollow {
+    margin-top: 1.5rem;
+    font-size: 1rem;
+    a {
+      color: $color-primary;
+      font-weight: 600;
+      text-decoration: none;
+      &:hover {
+        color: $color-accent;
+      }
+    }
+  }
+}

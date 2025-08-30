@@ -1,57 +1,121 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import styles from "./NewsletterForm.module.scss";
-import { motion, AnimatePresence } from "framer-motion";
+import { supabase } from "../../supabse/Client";
 
-export default function NewsletterForm() {
+/**
+ * NewsletterForm component allows users to subscribe to the newsletter.
+ * - Validates email input.
+ * - Calls a Supabase RPC to subscribe the user and get a discount code.
+ * - Displays a message based on the discount code returned.
+ * - Attempts to send a welcome email (does not block UI on failure).
+ *
+ * @param {Object} props
+ * @param {string} [props.source="coming-soon"] - Source identifier for the subscription.
+ * @returns {JSX.Element}
+ */
+export default function NewsletterForm({ source = "coming-soon" }) {
   const [email, setEmail] = useState("");
-  const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
 
-  const handleSubmit = (e) => {
+  /**
+   * Handles the newsletter form submission.
+   * - Prevents double submits.
+   * - Validates email.
+   * - Calls Supabase RPC and handles response.
+   * - Shows user-facing messages.
+   * @param {React.FormEvent<HTMLFormElement>} e
+   */
+  async function handleSubmit(e) {
     e.preventDefault();
-    console.log("Subscribed email:", email);
-    setSubmitted(true);
-    setEmail("");
-  };
+    if (loading) return; // guard: no double submits
+    setMessage("");
+    const cleanEmail = email.trim().toLowerCase();
+    if (!/^\S+@\S+\.\S+$/.test(cleanEmail)) {
+      return setMessage("Please enter a valid email address.");
+    }
+
+    setLoading(true);
+    try {
+      // Call Supabase RPC to subscribe
+      const { data, error } = await supabase.rpc("subscribe_newsletter", {
+        p_email: cleanEmail,
+        p_source: source,
+      });
+
+      if (error) {
+        // ✅ Handle duplicate email case (unique violation = 23505)
+        if (error.code === "23505") {
+          setMessage("✅ You're already subscribed with this email.");
+          return;
+        }
+        throw error;
+      }
+
+      // Validate response
+      const row = Array.isArray(data) ? data[0] : data;
+      if (!row?.email) {
+        throw new Error("Subscription did not return a record.");
+      }
+
+      const code = row.discount_code || "YAFATO10la";
+
+      // Show user-facing message
+      if (code === "SaYafato50#") {
+        setMessage(
+          "🎉 Welcome! You're one of the first 5! Use code SaYafato50# at checkout."
+        );
+      } else {
+        setMessage(
+          "💌 Welcome! Use code YAFATO10la for 10% off your first order."
+        );
+      }
+
+      // ✅ Only send welcome email for first-time subscribers
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-welcome`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: cleanEmail, discount_code: code }),
+          }
+        );
+        if (!res.ok) {
+          console.warn("send-welcome failed:", await res.text());
+        }
+      } catch (mailErr) {
+        console.warn("send-welcome error:", mailErr);
+      }
+
+      setEmail("");
+    } catch (err) {
+      console.error("Subscribe error:", err?.message, err?.code, err);
+      setMessage("Something went wrong. Try again later.");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
-    <form onSubmit={handleSubmit} className={styles.form}>
-      <AnimatePresence mode="wait">
-        {!submitted ? (
-          <motion.div
-            key="form"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className={styles.fields}
-          >
-            <label htmlFor="newsletter" className="visually-hidden">
-              Email address
-            </label>
-            <input
-              id="newsletter"
-              type="email"
-              placeholder="Enter your email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className={styles.input}
-            />
-            <button type="submit" className={styles.button}>
-             subscribe
-            </button>
-          </motion.div>
-        ) : (
-          <motion.p
-            key="success"
-            className={styles.success}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            You're on the list! ✨
-          </motion.p>
-        )}
-      </AnimatePresence>
+    <form onSubmit={handleSubmit} className={styles["newsletter-form"]}>
+      <input
+        type="email"
+        className={styles["newsletter-input"]}
+        placeholder="Enter your email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        required
+        disabled={loading}
+      />
+      <button
+        type="submit"
+        className={styles["newsletter-btn"]}
+        disabled={loading}
+      >
+        {loading ? "Subscribing..." : "Subscribe"}
+      </button>
+      {message && <p className={styles["newsletter-message"]}>{message}</p>}
     </form>
   );
 }

@@ -1,0 +1,44 @@
+
+.faqItem {
+  border: 1px solid $silver-200;
+  border-radius: 8px;
+  background-color: $silver-100;
+  transition: all 0.2s ease;
+  overflow: hidden;
+
+  &.open {
+    background-color: $silver-50;
+    border-color: $color-accent;
+  }
+
+  button {
+    width: 100%;
+    text-align: left;
+    padding: 1rem;
+    background: none;
+    border: none;
+    font-size: 1rem;
+    font-weight: 500;
+    color: $color-dark;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    span {
+      font-size: 1.5rem;
+      color: $color-accent;
+    }
+
+    &:hover {
+      color: $color-accent;
+    }
+  }
+
+  .answer {
+    padding: 0 1rem 1rem;
+    font-size: 0.95rem;
+    color: $color-dark;
+    line-height: 1.6;
+  }
+}

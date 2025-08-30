@@ -1,62 +1,149 @@
-@use "../../styles/variables" as *;
 
-.form {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.25rem;
-  max-width: 500px;
-  width: 100%;
+.newsletter-form {
+  background: $silver-400;
+  border: 1px solid rgba($color-dark, 0.06);
+  border-radius: 1rem;
+  padding: 1rem;
+  max-width: 280px;
   margin: 0 auto;
-}
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch;       
+  gap: .6rem;
 
-.fields {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
+  align-items: center;
   gap: 0.75rem;
-
-  @media (min-width: 500px) {
-    flex-direction: row;
-  }
+}
+.newsletter-input,
+.newsletter-btn {
+  display: block;              // no inline weirdness
+  width: 100%;
 }
 
-.input {
-  flex: 1;
+.newsletter-input {
+  width: 100%;
+  height: 42px;
+  padding: 0 0.75rem;
   text-align: center;
-  padding: 0.75rem 1rem;
+  border-radius: 10px;
   border: 1px solid $color-muted;
-  border-radius: 6px;
-  font-size: 1rem;
-  background-color: white;
+  background-color: $color-white;
   color: $color-dark;
-  transition: border 0.3s ease;
+  font-size: 0.95rem;
+  letter-spacing: 0.2px;
+  transition: border-color .2s ease, box-shadow .2s ease, transform .06s ease;
+
+  &::placeholder { color: rgba($color-dark, .45); }
+
+  &:hover { border-color: rgba($color-dark, .18); }
 
   &:focus {
     outline: none;
-    border-color: $color-accent;
+    border-color: lighten($metal-1, 8%);
+    box-shadow: 0 0 0 3px rgba($metal-1, .18);
+    transform: translateY(-1px);
   }
 }
 
-.button {
-  padding: 0.75rem 1.5rem;
-  background-color: $color-accent;
-  color: $color-white;
-  border: none;
+.newsletter-btn {
+  position: relative;
+  width: 100%;
   border-radius: 6px;
-  font-weight: 500;
-  font-size: 1rem;
+  padding: 10px 12px;
+  border: none;
+  font-size: 15px;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  color: $color-white;
+
+  // subtle metallic gradient that can "slide"
+  background: linear-gradient(135deg, lighten($metal-2, 4%), lighten($metal-1, 10%));
+  background-size: 200% 100%;
+  background-position: 0 0;
+
+  box-shadow: 0 2px 6px rgba(0,0,0,.08);
+  transition:
+    background-position .35s ease,
+    transform .12s ease,
+    box-shadow .25s ease,
+    filter .25s ease;
+
+  // sheen overlay
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      100deg,
+      transparent 0%,
+      rgba(255,255,255,.22) 45%,
+      rgba(255,255,255,.32) 50%,
+      rgba(255,255,255,.22) 55%,
+      transparent 100%
+    );
+    transform: translateX(-120%);
+    pointer-events: none;
+  }
 
   &:hover {
-    background-color: darken($color-accent, 10%);
+    background-position: 100% 0;   // gentle gradient shift
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(0,0,0,.12);
+
+    &::after {
+      animation: sheen .9s ease forwards;
+    }
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(0,0,0,.08);
+    filter: brightness(.98);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba($metal-1, .25);
+  }
+
+  &:disabled {
+    opacity: .65;
+    cursor: not-allowed;
+    box-shadow: none;
   }
 }
 
-.success {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: $color-primary;
+@keyframes sheen {
+  from { transform: translateX(-120%); }
+  to   { transform: translateX(120%); }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .newsletter-input,
+  .newsletter-btn {
+    transition: none;
+  }
+  .newsletter-btn::after { display: none; }
+}
+
+
+
+@media (min-width: 520px) {
+  .newsletter-form {
+    flex-direction: row;
+    align-items: center;
+    gap: .5rem;
+  }
+  .newsletter-btn {
+    width: auto;
+  }
+}
+
+.message {
+  margin-top: .4rem;
+  font-size: .9rem;
+  color: rgba($color-dark, .7);
   text-align: center;
 }

@@ -1,6 +1,56 @@
-$color-primary: #C0C0C0;       // Luxury silver (accents, icons)
-$color-dark: #111111;          // Deep black (main text)
-$color-light: #F8F5F2;         // Soft ivory (backgrounds, header)
-$color-accent: #E2725B;        // Terracotta (accent, hover, highlights)
-$color-muted: #AFAFAF;         // Medium gray (subtle text, borders)
-$color-white: #FFFFFF;         // Pure white (clean backgrounds)
+$color-primary: #C0C0C0;      
+$color-dark: #111111;          
+$color-light: #F8F5F2;       
+$color-accent: #E2725B;        
+$color-muted: #AFAFAF;         
+$color-white: #FFFFFF;         
+$display: "Cormorant Garamond", "Didot", "Bodoni", serif;
+$sans: "Sen", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+/* cool metallics for subtle luxe accents */
+$metal-1: #C5B358; // champagne (cool)
+$metal-2: #BFC3C6; // silver
+
+
+$ivory:        #F8F5F2;
+$charcoal:     #2A2A2A;
+$champagne:    #C5B358;  /* muted gold with cool undertone */
+$silver:       #BFC3C6;
+$sage:         #8aa28d;
+$light-gray:   #E5E5E5;
+
+$sand-50:  #faf5ef;  
+$sand-100: #f1e8d7;  
+$sand-200: #e4d4b8;  
+$sand-300: #d6be98;  
+$sand-400: #c8aa78;  
+$sand-500: #b89759;  
+$sand-600: #9c7f4c;  
+$sand-700: #80663d;  
+
+$silver-50:   #f8f8f8; 
+$silver-100:  #ececec; 
+$silver-200:  #d9d9d9; 
+$silver-300:  #c0c0c0; 
+$silver-400:  #a8a8a8;
+$silver-500:  #8f8f8f; 
+$silver-600:  #767676; 
+$silver-700:  #5e5e5e; 
+$silver-800:  #464646; 
+
+$primary-silver: #C0C0C0;
+$charcoal-gray: #333333;
+
+// 🌿 Sage Palette
+
+// 🌿 True Sage Palette
+$sage-50:  #f8faf8;
+$sage-100: #eef4f0;
+$sage-200: #dfeae3;
+$sage-300: #c8d5cc;
+$sage-400: #aabfae;
+$sage-500: #8aa28d; // balanced sage
+$sage-600: #6d8570;
+$sage-700: #556a58;
+$sage-800: #3d4d40;
+$sage-900: #1f2621;
