@@ -1,23 +1,26 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Home from './pages/Home/Home';
-import Product from './pages/Product/Product';
-import Cart from './pages/Cart/Cart';
-import Checkout from './pages/Checkout/Checkout';
-import About from './pages/About/About';
-import Contact from './pages/Contact/Contact';
+import { Routes, Route } from "react-router-dom";
+import Layout from "./components/layout/layout";
+import HomePage from "./pages/HomePage/HomePage";
+import ContactPage from "./pages/Contact/Contact";
+import AboutPage from "./pages/About/About";
+import { CustomePage } from "./pages/CustomePage/CustomePage";
+import NewsletterPage from "./pages/NewsLetterPage/NewsletterPage";
+import ProductDetailsPage from "./pages/ProductDetailsPage/ProductDetailsPage";
+import ProductPage from "./pages/ProductPage/ProductPage";
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/product/:id" element={<Product />} />
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/checkout" element={<Checkout />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/contact" element={<Contact />} />
-      </Routes>
-    </Router>
+    <Routes>
+      <Route element={<Layout />}>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/newsletter" element={<NewsletterPage />} />
+        <Route path="/about" element={<AboutPage />} />
+   <Route path="/custom" element={<CustomePage />} />
+   <Route path="/products" element={<ProductPage />} />
+   <Route path="/products/:id" element={<ProductDetailsPage />} />
+      </Route>
+    </Routes>
   );
 }
 
