@@ -31,3 +31,4 @@ dist-ssr
 # Ignore specific videos
 IMG_2470.mov
 Yafatoo.mp4
+.env*

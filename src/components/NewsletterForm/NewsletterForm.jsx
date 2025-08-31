@@ -2,33 +2,16 @@ import { useState } from "react";
 import styles from "./NewsletterForm.module.scss";
 import { supabase } from "../../supabse/Client";
 
-/**
- * NewsletterForm component allows users to subscribe to the newsletter.
- * - Validates email input.
- * - Calls a Supabase RPC to subscribe the user and get a discount code.
- * - Displays a message based on the discount code returned.
- * - Attempts to send a welcome email (does not block UI on failure).
- *
- * @param {Object} props
- * @param {string} [props.source="coming-soon"] - Source identifier for the subscription.
- * @returns {JSX.Element}
- */
+
 export default function NewsletterForm({ source = "coming-soon" }) {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
-  /**
-   * Handles the newsletter form submission.
-   * - Prevents double submits.
-   * - Validates email.
-   * - Calls Supabase RPC and handles response.
-   * - Shows user-facing messages.
-   * @param {React.FormEvent<HTMLFormElement>} e
-   */
   async function handleSubmit(e) {
     e.preventDefault();
-    if (loading) return; // guard: no double submits
+    if (loading) return;
+
     setMessage("");
     const cleanEmail = email.trim().toLowerCase();
     if (!/^\S+@\S+\.\S+$/.test(cleanEmail)) {
@@ -36,15 +19,15 @@ export default function NewsletterForm({ source = "coming-soon" }) {
     }
 
     setLoading(true);
+
     try {
-      // Call Supabase RPC to subscribe
+      // ✅ Call Supabase RPC
       const { data, error } = await supabase.rpc("subscribe_newsletter", {
         p_email: cleanEmail,
         p_source: source,
       });
 
       if (error) {
-        // ✅ Handle duplicate email case (unique violation = 23505)
         if (error.code === "23505") {
           setMessage("✅ You're already subscribed with this email.");
           return;
@@ -52,7 +35,6 @@ export default function NewsletterForm({ source = "coming-soon" }) {
         throw error;
       }
 
-      // Validate response
       const row = Array.isArray(data) ? data[0] : data;
       if (!row?.email) {
         throw new Error("Subscription did not return a record.");
@@ -60,18 +42,14 @@ export default function NewsletterForm({ source = "coming-soon" }) {
 
       const code = row.discount_code || "YAFATO10la";
 
-      // Show user-facing message
+      // ✅ User-facing message
       if (code === "SaYafato50#") {
-        setMessage(
-          "🎉 Welcome! You're one of the first 5! Use code SaYafato50# at checkout."
-        );
+        setMessage("🎉 Welcome! You're one of the first 5! Use code SaYafato50# at checkout.");
       } else {
-        setMessage(
-          "💌 Welcome! Use code YAFATO10la for 10% off your first order."
-        );
+        setMessage("💌 Welcome! Use code YAFATO10la for 10% off your first order.");
       }
 
-      // ✅ Only send welcome email for first-time subscribers
+      // ✅ Send welcome email (Edge Function)
       try {
         const res = await fetch(
           `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-welcome`,
