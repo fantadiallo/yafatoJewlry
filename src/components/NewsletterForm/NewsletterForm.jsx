@@ -51,11 +51,13 @@ export default function NewsletterForm({ source = "coming-soon" }) {
       // 3) Success message
       // If using double opt-in, consider:
       // setMessage("🙌 Thanks! Please check your email to confirm your subscription.");
-      if (code === "SaYafato50") {
-        setMessage("🎉 Congrats! You’re one of the first 5 — enjoy 50% off with code SaYafato50#");
-      } else {
-        setMessage("💌 Welcome! Use code YAFATO10la for 10% off your first order.");
-      }
+   // after getting `code` from Supabase:
+if (code === "SAYAFATO50") {
+  setMessage("🎉 Congrats! You’re one of the first 5 — enjoy 50% off with code SAYAFATO50");
+} else {
+  setMessage("💌 Welcome! Use code YAFATO10 for 10% off your first order.");
+}
+
       setEmail("");
     } catch (err) {
       console.error(err);
