@@ -1,0 +1,21 @@
+# never upload these
+node_modules
+.git
+.vercel
+# big media/design
+*.mp4
+*.mov
+*.zip
+*.psd
+*.ai
+*.sketch
+*.rar
+*.7z
+
+# common heavy folders
+public/videos/**
+public/raw/**
+public/uploads/**
+src/assets/raw/**
+src/assets/originals/**
+design/**

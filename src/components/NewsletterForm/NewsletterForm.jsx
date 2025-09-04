@@ -1,75 +1,64 @@
 import { useState } from "react";
 import styles from "./NewsletterForm.module.scss";
+import { supabase } from "../../../supabase/Client";
+
+const API_URL = import.meta.env.VITE_API_URL || "/";
 
 export default function NewsletterForm({ source = "coming-soon" }) {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-
-async function subscribeNewsletterREST(cleanEmail, src) {
-    const url = `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/rpc/subscribe_newsletter`;
-    const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-    const res = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        apikey: key,
-        Authorization: `Bearer ${key}`,
-        Prefer: "return=representation",
-      },
-      body: JSON.stringify({ p_email: cleanEmail, p_source: src }),
-    });
-
-    if (!res.ok) {
-      const text = await res.text().catch(() => "");
-      throw new Error(`RPC ${res.status}: ${text}`);
-    }
-    return res.json(); // row or [row]
-  }
+  const [lastSubmitAt, setLastSubmitAt] = useState(0);
 
   async function handleSubmit(e) {
     e.preventDefault();
     if (loading) return;
 
+    // simple debounce
+    const now = Date.now();
+    if (now - lastSubmitAt < 1200) return;
+    setLastSubmitAt(now);
+
     setMessage("");
     const cleanEmail = email.trim().toLowerCase();
     if (!/^\S+@\S+\.\S+$/.test(cleanEmail)) {
-      return setMessage("Please enter a valid email address.");
+      setMessage("Please enter a valid email address.");
+      return;
     }
 
     setLoading(true);
     try {
-      // ❗ Replace the supabase.rpc(...) call with the REST helper:
-      const data = await subscribeNewsletterREST(cleanEmail, source);
-
+      // 1) Supabase RPC: assigns code & logs
+      const { data, error } = await supabase.rpc("subscribe_newsletter", {
+        p_email: cleanEmail,
+        p_source: source,
+      });
+      if (error) throw error;
       const row = Array.isArray(data) ? data[0] : data;
-      if (!row?.email) throw new Error("Subscription did not return a record.");
+      const code = row?.discount_code;
 
-      const code = row.discount_code || "YAFATO10la";
+      // 2) Shopify (server route)
+      const r = await fetch(`${API_URL}api/subscribe`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: cleanEmail, source }),
+      });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok || !j?.ok) {
+        throw new Error(j?.error || `HTTP ${r.status}`);
+      }
 
-      // Feedback to user
-      if (code === "SaYafato50#") {
-        setMessage("🎉 Welcome! You're one of the first 5! Use code SaYafato50# at checkout.");
+      // 3) Success message
+      // If using double opt-in, consider:
+      // setMessage("🙌 Thanks! Please check your email to confirm your subscription.");
+      if (code === "SaYafato50") {
+        setMessage("🎉 Congrats! You’re one of the first 5 — enjoy 50% off with code SaYafato50#");
       } else {
         setMessage("💌 Welcome! Use code YAFATO10la for 10% off your first order.");
       }
-
-      // Fire the welcome email (Edge Function)
-      try {
-        const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-welcome`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: cleanEmail, discount_code: code }),
-        });
-        if (!res.ok) console.warn("send-welcome failed:", await res.text());
-      } catch (mailErr) {
-        console.warn("send-welcome error:", mailErr);
-      }
-
       setEmail("");
     } catch (err) {
-      console.error("Subscribe error:", err);
+      console.error(err);
       setMessage("Something went wrong. Try again later.");
     } finally {
       setLoading(false);
@@ -86,6 +75,7 @@ async function subscribeNewsletterREST(cleanEmail, src) {
         onChange={(e) => setEmail(e.target.value)}
         required
         disabled={loading}
+        autoComplete="email"
       />
       <button type="submit" className={styles["newsletter-btn"]} disabled={loading}>
         {loading ? "Subscribing..." : "Subscribe"}
