@@ -2,6 +2,8 @@ import { useState } from "react";
 import styles from "./NewsletterForm.module.scss";
 import { supabase } from "../../../supabase/Client";
 
+// Optional feature flag: set VITE_USE_SHOPIFY="true" later to re-enable the API call
+const USE_SHOPIFY = import.meta.env.VITE_USE_SHOPIFY === "true";
 const API_URL = import.meta.env.VITE_API_URL || "/";
 
 export default function NewsletterForm({ source = "coming-soon" }) {
@@ -14,13 +16,15 @@ export default function NewsletterForm({ source = "coming-soon" }) {
     e.preventDefault();
     if (loading) return;
 
-    // simple debounce
+    // Simple debounce to prevent double clicks
     const now = Date.now();
     if (now - lastSubmitAt < 1200) return;
     setLastSubmitAt(now);
 
     setMessage("");
     const cleanEmail = email.trim().toLowerCase();
+
+    // Basic email validation
     if (!/^\S+@\S+\.\S+$/.test(cleanEmail)) {
       setMessage("Please enter a valid email address.");
       return;
@@ -28,35 +32,42 @@ export default function NewsletterForm({ source = "coming-soon" }) {
 
     setLoading(true);
     try {
-      // 1) Supabase RPC: assigns code & logs
+      // 1) Supabase RPC: assigns discount code and logs subscriber
       const { data, error } = await supabase.rpc("subscribe_newsletter", {
         p_email: cleanEmail,
         p_source: source,
       });
       if (error) throw error;
+
       const row = Array.isArray(data) ? data[0] : data;
       const code = row?.discount_code;
 
-      // 2) Shopify (server route)
-      const r = await fetch(`${API_URL}api/subscribe`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: cleanEmail, source }),
-      });
-      const j = await r.json().catch(() => ({}));
-      if (!r.ok || !j?.ok) {
-        throw new Error(j?.error || `HTTP ${r.status}`);
+      // 2) (Optional) Shopify customer create/update — disabled by default
+      if (USE_SHOPIFY) {
+        const r = await fetch(`${API_URL}api/subscribe`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: cleanEmail, source }),
+        });
+        const j = await r.json().catch(() => ({}));
+        if (!r.ok || !j?.ok) {
+          // Don’t fail the whole flow—just log it and continue showing the code
+          // so users don’t see a “something went wrong” for marketing errors.
+          console.warn("Shopify subscribe failed:", j || r.status);
+        }
       }
 
-      // 3) Success message
-      // If using double opt-in, consider:
-      // setMessage("🙌 Thanks! Please check your email to confirm your subscription.");
-   // after getting `code` from Supabase:
-if (code === "SAYAFATO50") {
-  setMessage("🎉 Congrats! You’re one of the first 5 — enjoy 50% off with code SAYAFATO50");
-} else {
-  setMessage("💌 Welcome! Use code YAFATO10 for 10% off your first order.");
-}
+      // 3) Success message using the actual code from Supabase
+      if (code === "SAYAFATO50") {
+        setMessage("🎉 Congrats! You’re one of the first 5 — enjoy 50% off with code SAYAFATO50");
+      } else if (code === "YAFATO10") {
+        setMessage("💌 Welcome! Use code YAFATO10 for 10% off your first order.");
+      } else if (code) {
+        // Fallback in case you change code names later
+        setMessage(`You're in! Your code is: ${code}`);
+      } else {
+        setMessage("You're in! Check your email for your welcome details.");
+      }
 
       setEmail("");
     } catch (err) {
@@ -69,7 +80,11 @@ if (code === "SAYAFATO50") {
 
   return (
     <form onSubmit={handleSubmit} className={styles["newsletter-form"]}>
+      <label htmlFor="newsletter-email" className="sr-only">
+        Email address
+      </label>
       <input
+        id="newsletter-email"
         type="email"
         className={styles["newsletter-input"]}
         placeholder="Enter your email"
@@ -78,11 +93,16 @@ if (code === "SAYAFATO50") {
         required
         disabled={loading}
         autoComplete="email"
+        inputMode="email"
       />
       <button type="submit" className={styles["newsletter-btn"]} disabled={loading}>
         {loading ? "Subscribing..." : "Subscribe"}
       </button>
-      {message && <p className={styles["newsletter-message"]}>{message}</p>}
+      {message && (
+        <p className={styles["newsletter-message"]} role="status" aria-live="polite">
+          {message}
+        </p>
+      )}
     </form>
   );
 }
