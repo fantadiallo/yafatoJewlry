@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import styles from "./NewsletterForm.module.scss";
 import { supabase } from "../../../supabase/Client";
 
@@ -6,15 +6,18 @@ export default function NewsletterForm({ source = "coming-soon" }) {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [lastSubmitAt, setLastSubmitAt] = useState(0);
+  const lastSubmitAtRef = useRef(0);
 
   async function handleSubmit(e) {
+    // 🔒 stop any other listeners from triggering a second submit
     e.preventDefault();
-    if (loading) return;
+    e.stopPropagation();
+    if (e.nativeEvent?.stopImmediatePropagation) e.nativeEvent.stopImmediatePropagation();
 
+    if (loading) return;
     const now = Date.now();
-    if (now - lastSubmitAt < 1200) return;
-    setLastSubmitAt(now);
+    if (now - lastSubmitAtRef.current < 1200) return; // debounce
+    lastSubmitAtRef.current = now;
 
     setMessage("");
     const cleanEmail = email.trim().toLowerCase();
@@ -32,7 +35,7 @@ export default function NewsletterForm({ source = "coming-soon" }) {
       if (error) throw error;
 
       const row = Array.isArray(data) ? data[0] : data;
-      const code = row?.out_discount_code;
+      const code = row?.out_discount_code ?? row?.discount_code ?? null;
 
       if (row?.already_subscribed) {
         setMessage("✅ You’re already subscribed! Welcome back.");
@@ -48,20 +51,27 @@ export default function NewsletterForm({ source = "coming-soon" }) {
 
       setEmail("");
     } catch (err) {
-      console.error("Newsletter RPC error:", {
-        message: err?.message,
-        details: err?.details,
-        hint: err?.hint,
-        code: err?.code,
-      });
-      setMessage("Something went wrong. Try again later.");
+      if (err?.code === "23505") {
+        setMessage("✅ You’re already subscribed! Welcome back.");
+      } else {
+        console.error("Newsletter RPC error:", {
+          message: err?.message, details: err?.details, hint: err?.hint, code: err?.code,
+        });
+        setMessage(prev => prev || "Something went wrong. Try again later.");
+      }
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className={styles["newsletter-form"]}>
+    <form
+      onSubmit={handleSubmit}
+      // 🔒 extra guard so capture-phase listeners don’t fire
+      onSubmitCapture={(e) => e.stopPropagation()}
+      className={styles["newsletter-form"]}
+      noValidate
+    >
       <label htmlFor="newsletter-email" className="sr-only">Email address</label>
       <input
         id="newsletter-email"
