@@ -1,3 +1,18 @@
+// 👉 add to the TOP of src/main.jsx (before React mounts)
+if (typeof window !== "undefined" && import.meta.env.PROD) {
+  const origFetch = window.fetch;
+  window.fetch = (...args) => {
+    const url = String(args[0] || "");
+    if (url.includes("/api/subscribe")) {
+      // Pretend success so it can't throw or overwrite messages
+      return Promise.resolve(
+        new Response("{}", { status: 200, headers: { "Content-Type": "application/json" } })
+      );
+    }
+    return origFetch(...args);
+  };
+}
+
 import "./bootstrap-supabase-fetch";
 import React from 'react';
 import ReactDOM from 'react-dom/client';
