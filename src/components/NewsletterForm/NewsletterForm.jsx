@@ -13,7 +13,7 @@ export default function NewsletterForm({ source = "coming-soon" }) {
     if (loading) return;
 
     const now = Date.now();
-    if (now - lastSubmitAt < 1200) return; // debounce
+    if (now - lastSubmitAt < 1200) return;
     setLastSubmitAt(now);
 
     setMessage("");
@@ -25,7 +25,6 @@ export default function NewsletterForm({ source = "coming-soon" }) {
 
     setLoading(true);
     try {
-      // Only Supabase RPC
       const { data, error } = await supabase.rpc("subscribe_newsletter", {
         p_email: cleanEmail,
         p_source: source,
@@ -33,9 +32,11 @@ export default function NewsletterForm({ source = "coming-soon" }) {
       if (error) throw error;
 
       const row = Array.isArray(data) ? data[0] : data;
-      const code = row?.discount_code;
+      const code = row?.out_discount_code;
 
-      if (code === "SAYAFATO50") {
+      if (row?.already_subscribed) {
+        setMessage("✅ You’re already subscribed! Welcome back.");
+      } else if (code === "SAYAFATO50") {
         setMessage("🎉 Congrats! You’re one of the first 5 — use code SAYAFATO50 at checkout.");
       } else if (code === "YAFATO10") {
         setMessage("💌 Welcome! Use code YAFATO10 for 10% off your first order.");
@@ -47,7 +48,12 @@ export default function NewsletterForm({ source = "coming-soon" }) {
 
       setEmail("");
     } catch (err) {
-      console.error(err);
+      console.error("Newsletter RPC error:", {
+        message: err?.message,
+        details: err?.details,
+        hint: err?.hint,
+        code: err?.code,
+      });
       setMessage("Something went wrong. Try again later.");
     } finally {
       setLoading(false);
