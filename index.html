@@ -1,13 +1,51 @@
+<!-- index.html -->
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Sen:wght@400;600;700&display=swap" rel="stylesheet">
 
-    <title>YafatoJewelry</title>
+    <!-- 🔒 Neutralize legacy /api/subscribe BEFORE app loads -->
+    <script>
+      (function () {
+        // fetch()
+        var origFetch = window.fetch;
+        window.fetch = function () {
+          var url = String(arguments[0] || "");
+          if (url.includes("/api/subscribe")) {
+            console.warn("Neutralized /api/subscribe (bootstrap fetch)");
+            return Promise.resolve(
+              new Response("{}", { status: 200, headers: { "Content-Type": "application/json" } })
+            );
+          }
+          return origFetch.apply(this, arguments);
+        };
+
+        // XHR (just in case)
+        var origOpen = XMLHttpRequest.prototype.open;
+        var origSend = XMLHttpRequest.prototype.send;
+        XMLHttpRequest.prototype.open = function (method, url) {
+          this.__block = String(url || "").includes("/api/subscribe");
+          return origOpen.apply(this, arguments);
+        };
+        XMLHttpRequest.prototype.send = function (body) {
+          if (this.__block) {
+            console.warn("Neutralized /api/subscribe (bootstrap xhr)");
+            var xhr = this;
+            setTimeout(function () {
+              xhr.readyState = 4;
+              xhr.status = 200;
+              xhr.responseText = "{}";
+              xhr.onreadystatechange && xhr.onreadystatechange();
+              xhr.onload && xhr.onload();
+            }, 0);
+            return;
+          }
+          return origSend.apply(this, arguments);
+        };
+      })();
+    </script>
+
+    <!-- … keep the rest of your head … -->
   </head>
   <body>
     <div id="root"></div>

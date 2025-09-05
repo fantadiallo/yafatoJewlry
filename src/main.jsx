@@ -11,7 +11,6 @@ if (typeof window !== "undefined" && import.meta.env.PROD) {
   };
 }
 
-
 import "./bootstrap-supabase-fetch";
 import React from 'react';
 import ReactDOM from 'react-dom/client';
