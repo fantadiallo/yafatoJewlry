@@ -2,34 +2,12 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-
-    <!-- ✅ CSP: block same-origin fetch/XHR (so /api/subscribe can't fire) but allow Supabase + fonts -->
-    <meta http-equiv="Content-Security-Policy" content="
-      default-src 'self';
-      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vitals.vercel-insights.com;
-      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-      font-src 'self' https://fonts.gstatic.com data:;
-      img-src 'self' data: https:;
-      connect-src https://ctfbzgaqjowbattxnyje.supabase.co https://*.supabase.co https://vitals.vercel-insights.com;
-    ">
-
-    <!-- 📝 build tag so you can confirm the right project/branch is live -->
-    <script>console.log('BUILD: coming-soon CSP patch');</script>
-
-    <!-- 🙈 soft-mute any leftover console noise mentioning /api/subscribe -->
-    <script>
-      window.addEventListener("unhandledrejection", (e) => {
-        const msg = String(e?.reason || "");
-        if (msg.includes("/api/subscribe")) e.preventDefault();
-      });
-      window.addEventListener("error", (e) => {
-        const msg = String(e?.message || "");
-        if (msg.includes("/api/subscribe")) e.preventDefault();
-      });
-    </script>
-    <script>console.log('BUILD: coming-soon');</script>
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Sen:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>newsletter</title>
   </head>
-
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
