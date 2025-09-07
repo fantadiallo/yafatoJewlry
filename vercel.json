@@ -1,0 +1,6 @@
+{
+  "version": 2,
+  "redirects": [
+    { "source": "/api/subscribe", "destination": "/", "permanent": false }
+  ]
+}
