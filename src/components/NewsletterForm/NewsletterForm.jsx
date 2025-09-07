@@ -2,6 +2,9 @@ import { useRef, useState } from "react";
 import styles from "./NewsletterForm.module.scss";
 import { supabase } from "../../../supabase/Client";
 
+// Toggle with an env var (set VITE_NEWSLETTER_FORCE_SUCCESS=1 in Vercel)
+const FORCE_SUCCESS = import.meta.env.VITE_NEWSLETTER_FORCE_SUCCESS === "1";
+
 export default function NewsletterForm({ source = "coming-soon" }) {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
@@ -9,7 +12,7 @@ export default function NewsletterForm({ source = "coming-soon" }) {
   const lastSubmitAtRef = useRef(0);
 
   async function handleSubmit(e) {
-    // 🔒 stop any other listeners from triggering a second submit
+    // stop any rogue/global submit handlers
     e.preventDefault();
     e.stopPropagation();
     if (e.nativeEvent?.stopImmediatePropagation) e.nativeEvent.stopImmediatePropagation();
@@ -51,13 +54,17 @@ export default function NewsletterForm({ source = "coming-soon" }) {
 
       setEmail("");
     } catch (err) {
-      if (err?.code === "23505") {
+      if (FORCE_SUCCESS) {
+        // 👇 Force friendly success if anything goes wrong
+        setMessage("You're in! Check your email for your welcome details.");
+        setEmail("");
+      } else if (err?.code === "23505") {
         setMessage("✅ You’re already subscribed! Welcome back.");
       } else {
         console.error("Newsletter RPC error:", {
           message: err?.message, details: err?.details, hint: err?.hint, code: err?.code,
         });
-        setMessage(prev => prev || "Something went wrong. Try again later.");
+        setMessage((prev) => prev || "Something went wrong. Try again later.");
       }
     } finally {
       setLoading(false);
@@ -67,7 +74,6 @@ export default function NewsletterForm({ source = "coming-soon" }) {
   return (
     <form
       onSubmit={handleSubmit}
-      // 🔒 extra guard so capture-phase listeners don’t fire
       onSubmitCapture={(e) => e.stopPropagation()}
       className={styles["newsletter-form"]}
       noValidate
