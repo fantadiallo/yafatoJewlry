@@ -1,7 +1,3 @@
-/// <reference lib="dom" />
-/// <reference lib="dom.iterable" />
-/// <reference lib="deno.ns" />
-
 import React from "react";
 import { motion } from "framer-motion";
 import { FaInstagram, FaTiktok } from "react-icons/fa";
