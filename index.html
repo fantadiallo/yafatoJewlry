@@ -5,45 +5,18 @@
     <meta charset="UTF-8" />
 
     <!-- 🔒 Neutralize legacy /api/subscribe BEFORE app loads -->
-    <script>
-      (function () {
-        // fetch()
-        var origFetch = window.fetch;
-        window.fetch = function () {
-          var url = String(arguments[0] || "");
-          if (url.includes("/api/subscribe")) {
-            console.warn("Neutralized /api/subscribe (bootstrap fetch)");
-            return Promise.resolve(
-              new Response("{}", { status: 200, headers: { "Content-Type": "application/json" } })
-            );
-          }
-          return origFetch.apply(this, arguments);
-        };
+<script>
+  // Soft-mute /api/subscribe errors in the console
+  window.addEventListener("unhandledrejection", (e) => {
+    const msg = String(e?.reason || "");
+    if (msg.includes("/api/subscribe")) e.preventDefault();
+  });
+  window.addEventListener("error", (e) => {
+    const msg = String(e?.message || "");
+    if (msg.includes("/api/subscribe")) e.preventDefault();
+  });
+</script>
 
-        // XHR (just in case)
-        var origOpen = XMLHttpRequest.prototype.open;
-        var origSend = XMLHttpRequest.prototype.send;
-        XMLHttpRequest.prototype.open = function (method, url) {
-          this.__block = String(url || "").includes("/api/subscribe");
-          return origOpen.apply(this, arguments);
-        };
-        XMLHttpRequest.prototype.send = function (body) {
-          if (this.__block) {
-            console.warn("Neutralized /api/subscribe (bootstrap xhr)");
-            var xhr = this;
-            setTimeout(function () {
-              xhr.readyState = 4;
-              xhr.status = 200;
-              xhr.responseText = "{}";
-              xhr.onreadystatechange && xhr.onreadystatechange();
-              xhr.onload && xhr.onload();
-            }, 0);
-            return;
-          }
-          return origSend.apply(this, arguments);
-        };
-      })();
-    </script>
 
     <!-- … keep the rest of your head … -->
   </head>
