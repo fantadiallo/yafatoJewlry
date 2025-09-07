@@ -10,17 +10,20 @@
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
   display: flex !important;
   flex-direction: column !important;
+  align-items: stretch;       
+  gap: .6rem;
+
   align-items: center;
   gap: 0.75rem;
 }
-
 .newsletter-input,
 .newsletter-btn {
-  display: block;
+  display: block;              // no inline weirdness
   width: 100%;
 }
 
 .newsletter-input {
+  width: 100%;
   height: 42px;
   padding: 0 0.75rem;
   text-align: center;
@@ -33,6 +36,7 @@
   transition: border-color .2s ease, box-shadow .2s ease, transform .06s ease;
 
   &::placeholder { color: rgba($color-dark, .45); }
+
   &:hover { border-color: rgba($color-dark, .18); }
 
   &:focus {
@@ -45,6 +49,7 @@
 
 .newsletter-btn {
   position: relative;
+  width: 100%;
   border-radius: 6px;
   padding: 10px 12px;
   border: none;
@@ -52,27 +57,44 @@
   font-weight: 600;
   cursor: pointer;
   color: $color-white;
+
+  // subtle metallic gradient that can "slide"
   background: linear-gradient(135deg, lighten($metal-2, 4%), lighten($metal-1, 10%));
   background-size: 200% 100%;
   background-position: 0 0;
-  box-shadow: 0 2px 6px rgba(0,0,0,.08);
-  transition: background-position .35s ease, transform .12s ease, box-shadow .25s ease, filter .25s ease;
 
+  box-shadow: 0 2px 6px rgba(0,0,0,.08);
+  transition:
+    background-position .35s ease,
+    transform .12s ease,
+    box-shadow .25s ease,
+    filter .25s ease;
+
+  // sheen overlay
   &::after {
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(100deg, transparent 0%, rgba(255,255,255,.22) 45%, rgba(255,255,255,.32) 50%, rgba(255,255,255,.22) 55%, transparent 100%);
+    background: linear-gradient(
+      100deg,
+      transparent 0%,
+      rgba(255,255,255,.22) 45%,
+      rgba(255,255,255,.32) 50%,
+      rgba(255,255,255,.22) 55%,
+      transparent 100%
+    );
     transform: translateX(-120%);
     pointer-events: none;
   }
 
   &:hover {
-    background-position: 100% 0;
+    background-position: 100% 0;   // gentle gradient shift
     transform: translateY(-1px);
     box-shadow: 0 6px 16px rgba(0,0,0,.12);
 
-    &::after { animation: sheen .9s ease forwards; }
+    &::after {
+      animation: sheen .9s ease forwards;
+    }
   }
 
   &:active {
@@ -86,7 +108,11 @@
     box-shadow: 0 0 0 3px rgba($metal-1, .25);
   }
 
-  &:disabled { opacity: .65; cursor: not-allowed; box-shadow: none; }
+  &:disabled {
+    opacity: .65;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
 }
 
 @keyframes sheen {
@@ -94,11 +120,16 @@
   to   { transform: translateX(120%); }
 }
 
+/* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .newsletter-input,
-  .newsletter-btn { transition: none; }
+  .newsletter-btn {
+    transition: none;
+  }
   .newsletter-btn::after { display: none; }
 }
+
+
 
 @media (min-width: 520px) {
   .newsletter-form {
@@ -106,20 +137,14 @@
     align-items: center;
     gap: .5rem;
   }
-  .newsletter-btn { width: auto; }
+  .newsletter-btn {
+    width: auto;
+  }
 }
 
-/* Unified message styles (success by default for your new flow) */
-.newsletter-message {
+.message {
   margin-top: .4rem;
   font-size: .9rem;
+  color: rgba($color-dark, .7);
   text-align: center;
-}
-
-.newsletter-message--success {
-  color: color.mix($metal-1, #2e7d32, 35%);
-}
-
-.newsletter-message--error {
-  color: #b00020;
 }
