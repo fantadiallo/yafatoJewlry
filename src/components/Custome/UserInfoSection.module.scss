@@ -1,0 +1,86 @@
+.userInfoSection {
+  background: $color-light;
+  color: $color-dark;
+  border: 1px solid rgba($color-dark, 0.08);
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 800px;
+  margin: 2rem auto;
+  box-shadow: 0 8px 24px rgba($color-dark, 0.06);
+
+  .sectionTitle {
+    margin-bottom: 1.25rem;
+
+    h2 {
+      font-size: clamp(1.3rem, 2.2vw, 1.6rem);
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      margin: 0;
+      color: $color-dark;
+    }
+  }
+
+  .inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+
+    label {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: $color-dark;
+    }
+
+    input[type="text"],
+    input[type="email"] {
+      width: 100%;
+      border: 1px solid rgba($color-dark, 0.15);
+      background: $color-white;
+      color: $color-dark;
+      border-radius: 12px;
+      padding: 0.85rem 0.95rem;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border 0.25s ease, box-shadow 0.25s ease;
+
+      &::placeholder {
+        color: rgba($color-dark, 0.45);
+      }
+
+      &:focus {
+        border-color: $color-accent;
+        box-shadow: 0 0 0 4px rgba($color-accent, 0.18);
+      }
+    }
+  }
+
+  .checkboxGroup {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: start;
+    gap: 0.75rem 0.75rem;
+    margin-top: 0.75rem;
+
+    input[type="checkbox"] {
+      width: 1.1rem;
+      height: 1.1rem;
+      margin-top: 0.15rem;
+      accent-color: $color-accent;
+      cursor: pointer;
+    }
+
+    label {
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: $color-dark;
+      cursor: pointer;
+    }
+  }
+}
+
+@media (max-width: 720px) {
+  .userInfoSection {
+    padding: 1.25rem;
+  }
+}
