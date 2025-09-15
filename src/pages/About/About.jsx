@@ -90,11 +90,11 @@ export default function AboutPage() {
   <div className={styles.feature}>
     <Mountain className={styles.icon} />
     <h3>Scandinavia</h3>
-    <p>Founded and branded, influenced by norwegian heart </p>
+    <p>Founded and branded, norwegian heart </p>
   </div>
   <div className={styles.feature}>
     <h3>One Voice</h3>
-    <p>Yafato brings these worlds together in each piece.</p>
+    <p>Yafato brings these worlds together in each piece. by being from two worlds</p>
   </div>
 </div>
 
