@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import CustomFormSection from "../../components/Custome/CustomFormSection.jsx";
 import StyleAndAISection from "../../components/Custome/StyleAndAISection.jsx";
 import UserInfoSection from "../../components/Custome/UserInfoSection.jsx";
@@ -59,52 +59,47 @@ export function CustomePage() {
   };
 
   const handleClear = () => {
-    if (confirm("Are you sure you want to clear everything?")) {
-      resetForm();
-    }
+    if (window.confirm("Are you sure you want to clear everything?")) resetForm();
   };
+
+  const isValid = useMemo(() => {
+    const emailOk = /^\S+@\S+\.\S+$/.test(formData.email.trim());
+    const sizeOk = formData.size.trim().length > 0;
+    return emailOk && sizeOk && formData.confirmSilver;
+  }, [formData.email, formData.size, formData.confirmSilver]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    if (!formData.email || !formData.size || !formData.confirmSilver) {
-      alert("Please complete your info before submitting.");
-      return;
-    }
-
+    if (!isValid) return;
     setShowModal(true);
   };
 
   return (
     <section className={styles.customePage}>
-      <div className={styles.hero}>
+      <div className={styles.hero} role="img" aria-label="Custom jewelry hero">
         <div className={styles.heroOverlay}>
           <h1>Craft Your Custom Silver Piece</h1>
           <p>Start from scratch or let AI inspire your next unique creation.</p>
-          <p>1 create or 2 use ai to create for you</p>
+          <p className={styles.helper}>1. Create yourself or 2. Let AI draft a concept</p>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className={styles.formWrapper}>
+      <form onSubmit={handleSubmit} className={styles.formWrapper} noValidate>
         <div className={styles.dualSection}>
           <div className={styles.sectionBox}>
-            <h2>Customize your piece yourself</h2>
-            <p>Upload your design idea or describe your dream piece in detail.</p>
+            <h2>Customize Your Piece</h2>
+            <p>Upload a reference or describe your dream design.</p>
             <CustomFormSection
               description={formData.description}
               image={formData.patternFile}
-              setDescription={(desc) =>
-                handleDescriptionChange(desc, formData.patternFile)
-              }
-              setImage={(file) =>
-                handleDescriptionChange(formData.description, file)
-              }
+              setDescription={(desc) => handleDescriptionChange(desc, formData.patternFile)}
+              setImage={(file) => handleDescriptionChange(formData.description, file)}
             />
           </div>
 
           <div className={styles.sectionBox}>
-            <h2>Use AI to generate your piece</h2>
-            <p>Describe your idea and let our AI generate a visual concept.</p>
+            <h2>Use AI To Generate</h2>
+            <p>Set options and generate a concept preview.</p>
             <StyleAndAISection
               formData={formData}
               onOptionsChange={handleStyleOptionsChange}
@@ -113,24 +108,23 @@ export function CustomePage() {
           </div>
         </div>
 
-        {/* User info section (outside main form layout) */}
         <div className={styles.userInfoBox}>
           <h2>Your Info</h2>
-          <p>Required before submission — tell us how to reach you and size your piece.</p>
+          <p>Required before submission.</p>
           <UserInfoSection onUserInfoChange={handleUserInfoChange} />
         </div>
 
         <div className={styles.actions}>
-          <button type="submit">Submit Design</button>
+          <button type="submit" disabled={!isValid} aria-disabled={!isValid}>
+            Submit Design
+          </button>
           <button type="button" onClick={handleClear} className={styles.clearButton}>
             Clear All
           </button>
         </div>
       </form>
 
-      {showModal && (
-        <SubmitModal formData={formData} onClose={() => setShowModal(false)} />
-      )}
+      {showModal && <SubmitModal formData={formData} onClose={() => setShowModal(false)} />}
     </section>
   );
 }
