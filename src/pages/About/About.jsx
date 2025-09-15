@@ -10,7 +10,7 @@ export default function AboutPage() {
       {/* Hero Section */}
       <section className={styles.heroSection}>
         <img
-          src="./imagetest1.jpg"
+          src="./heroimg2.jpg"
           alt="Yafato Jewelry"
           className={styles.bgImage}
         />
@@ -61,7 +61,7 @@ export default function AboutPage() {
       <motion.section className={styles.makerSection}>
         <div className={styles.split}>
           <div className={styles.imageWrap}>
-            <img src="/images/amz-placeholder.jpg" alt="Amz Silver at work" />
+            <img src="/amzface.jpg" alt="Amz Silver at work" />
           </div>
           <div className={styles.textWrap}>
             <h2>Meet Amz Silver</h2>
@@ -90,7 +90,7 @@ export default function AboutPage() {
   <div className={styles.feature}>
     <Mountain className={styles.icon} />
     <h3>Scandinavia</h3>
-    <p>Minimalism, clarity, and timeless design.</p>
+    <p>Founded and branded, influenced by norwegian heart </p>
   </div>
   <div className={styles.feature}>
     <h3>One Voice</h3>
