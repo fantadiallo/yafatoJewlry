@@ -1,3 +1,7 @@
+
+$border-subtle: rgba($color-dark, 0.10);
+$hover-row: mix($color-light, $color-primary, 85%);
+
 .header {
   position: sticky;
   top: 0;
@@ -5,253 +9,206 @@
   right: 0;
   z-index: 1000;
   background: $color-light;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 6px rgba($color-dark, 0.05);
 
-  /* 🔹 Top Info Bar */
-.topBar {
-  background: linear-gradient(90deg, $color-accent, darken($color-accent, 8%));
-  color: $silver-50;
-  font-size: 0.85rem;
-  font-weight: 500;
-  letter-spacing: 0.5px;
-  padding: 0.5rem 1rem;
-  position: relative;
-  display: flex;
-  align-items: center;
-  overflow: hidden;
-
-  .topContent {
-    flex: 1;
+  .topBar {
+    background: $color-white;
+    color: $color-dark;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
     overflow: hidden;
-    position: relative;
+
+    .topContent { flex: 1; overflow: hidden; }
+    .marquee { display: inline-block; white-space: nowrap; animation: marquee 20s linear infinite; min-width: 100%; }
+
+    .closeBtn {
+      background: none; border: none; color: inherit; font-size: 1.2rem; margin-left: 1rem; cursor: pointer;
+      &:hover { opacity: .9; }
+      &:focus { outline: 3px solid rgba($color-white,.6); outline-offset: 2px; }
+    }
   }
 
-  .marquee {
-    display: inline-block;
-    white-space: nowrap;
-    animation: marquee 20s linear infinite;
-    min-width: 100%;
-  }
+  @keyframes marquee { 0% { transform: translateX(100%);} 100% { transform: translateX(-100%);} }
 
-  .closeBtn {
-    background: none;
-    border: none;
-    color: inherit;
-    font-size: 1.2rem;
-    margin-left: 1rem;
-    cursor: pointer;
-    z-index: 2;
-  }
-}
-
-@keyframes marquee {
-  0% {
-    transform: translateX(100%);
-  }
-  100% {
-    transform: translateX(-100%);
-  }
-}
-
-
+  /* ▶ main row: nav | logo | right (search is inside right) */
   .inner {
     max-width: 1280px;
     margin: 0 auto;
-    padding: 0.75rem 2rem;
-    display: flex;
+    padding: 0.75rem 1rem;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas: "nav logo right";
     align-items: center;
-    justify-content: space-between;
+    gap: 1rem;
+
+    @media (max-width: 768px) { padding: 0.6rem 0.85rem; }
   }
 
-  /* 🔹 Desktop Nav */
   .navLinks {
-    display: flex;
-    gap: 2rem;
-    align-items: center;
+    grid-area: nav;
+    display: flex; gap: 1.5rem; align-items: center;
 
     a, button {
-      font-size: 0.95rem;
-      font-weight: 500;
-      color: $color-dark;
-      background: none;
-      border: none;
-      cursor: pointer;
-      text-transform: uppercase;
-      transition: color 0.3s ease;
-
-      &:hover {
-        color: $color-accent;
-      }
+      font-size: 0.95rem; font-weight: 600; color: $color-dark; background: none; border: none; cursor: pointer;
+      text-transform: uppercase; letter-spacing: 0.4px; transition: color 0.25s ease;
+      &:hover { color: $color-accent; }
+      &:focus { outline: 3px solid rgba($color-accent,.35); outline-offset: 2px; }
     }
 
-    /* 🔹 Dropdown */
-    .dropdown {
-      position: relative;
-
-      .dropdownBtn {
-        display: flex;
-        align-items: center;
-        gap: 0.25rem;
-      }
-
+    .dropdown { position: relative;
+      .dropdownBtn { display: flex; align-items: center; gap: 0.25rem; }
       .dropdownMenu {
-        position: absolute;
-        top: 100%;
-        left: 0;
-        min-width: 180px;
-        background: $color-light;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.08);
-        border-radius: 4px;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        padding: 0.5rem 0;
-        z-index: 1200;
+        position: absolute; top: calc(100% + 8px); left: 0; min-width: 200px; background: $color-light;
+        border: 1px solid $border-subtle; box-shadow: 0 8px 20px rgba($color-dark, 0.08);
+        border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; padding: 0.35rem 0; z-index: 1200;
 
-        a {
-          padding: 0.75rem 1rem;
-          font-size: 0.9rem;
-          color: $color-dark;
-          transition: background 0.2s ease;
-
-          &:hover {
-            background: $light-gray;
-            color: $color-accent;
-          }
+        a { padding: 0.75rem 1rem; font-size: 0.92rem; color: $color-dark; transition: background .2s, color .2s;
+          &:hover { background: $hover-row; color: $color-accent; }
         }
       }
     }
 
-    @media (max-width: 768px) {
-      display: none;
-    }
+    @media (max-width: 768px) { display: none; }
   }
 
-  /* 🔹 Center Logo */
   .logo {
-   font-family: 'Orbitron', sans-serif;
-  font-size: 2rem;
-  font-weight: 800;
-  color: $silver-400;
-  text-transform: uppercase;
-  letter-spacing: 4px;
-  text-decoration: none;
-
-  &:hover {
-    color: $color-accent;
-  }
+    grid-area: logo; text-decoration: none; display: inline-flex; align-items: center; justify-content: center;
+    h1 {
+      font-family: 'Orbitron', sans-serif; font-size: clamp(1.4rem, 3vw, 2rem); font-weight: 800;
+      color: $color-primary; text-transform: uppercase; letter-spacing: 4px; margin: 0; transition: color .25s ease;
+      &:hover { color: $color-accent; }
     }
-
-    img {
-      max-height: 40px;
-    }
+    img { max-height: 40px; }
   }
 
-  /* 🔹 Right bar icons */
+  /* ▶ right side holds icons + SearchBar */
   .rightBar {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
+    grid-area: right;
+    display: flex; align-items: center; gap: 1rem;
+    justify-self: end;
+    min-width: 0; /* allows children to shrink without overflow */
+
+    /* search wrapper slot INSIDE rightBar */
+    .searchWrapper {
+      /* 40px when closed (icon only), grows to input width when open */
+      flex: 0 1 clamp(40px, 32vw, 420px);
+      min-width: 40px;
+      max-width: 420px;
+      display: flex;
+    }
+
+    /* on midsize screens, move the search below the icons so it never overflows */
+    @media (max-width: 1100px) {
+      flex-wrap: wrap;
+      justify-content: flex-end;
+
+      .searchWrapper {
+        order: 2;            /* put search on the next line */
+        flex: 1 1 100%;
+        max-width: none;
+      }
+    }
   }
 
   .iconBtn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: $color-dark; // default icon color
-    position: relative;
+    background: none; border: none; cursor: pointer; color: $color-dark; position: relative;
+    padding: .25rem; border-radius: 10px;
+    &:hover { color: $color-accent; background: rgba($color-dark,.04); }
+    &:focus { outline: 3px solid rgba($color-accent,.35); outline-offset: 2px; }
 
     .badge {
-      position: absolute;
-      top: -6px;
-      right: -6px;
-      background: $color-accent; // accent color for counter
-      color: #fff;
-      font-size: 0.75rem;
-      font-weight: 700;
-      border-radius: 50%;
-      padding: 2px 7px;
-      min-width: 22px;
-      min-height: 22px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      position: absolute; top: -6px; right: -6px; background: $color-accent; color: $color-white;
+      font-size: 0.72rem; font-weight: 800; border-radius: 999px; padding: 2px 7px; min-width: 22px; min-height: 22px;
+      display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba($color-dark,0.12);
       border: 2px solid $color-light;
-      z-index: 1;
-    }
-
-    &:hover {
-      color: $color-accent;
     }
   }
 
-  /* 🔹 Mobile menu button (hamburger / X) */
-  .mobileMenuBtn {
-    display: none;
+  .mobileMenuBtn { display: none; @media (max-width: 768px) { display: inline-flex; } }
 
-    @media (max-width: 768px) {
-      display: inline-flex;
-    }
-  }
+  .menuOverlay { position: fixed; inset: 0; background: rgba($color-dark, 0.45); z-index: 1090; }
 
-  /* 🔹 Overlay for mobile menu */
-  .menuOverlay {
-    position: fixed;
-    top: 0; 
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    background: rgba(0,0,0,0.45);
-    z-index: 1090;
-  }
-
-  /* 🔹 Mobile Menu (Drawer) */
   .mobileMenu {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 280px;
-    height: 100vh;
-    background: $color-light;
-    display: flex;
-    flex-direction: column;
-    z-index: 1100;
+    position: fixed; top: 0; left: 0; width: min(86vw, 320px); height: 100dvh; background: $color-light;
+    display: flex; flex-direction: column; z-index: 1100; border-right: 1px solid $border-subtle;
 
-    /* Logo at top */
     .menuHeader {
-      position: relative;
-      padding: 1.5rem 1rem;
-      text-align: center;
-
-      img {
-        max-width: 140px;
-        height: auto;
-      }
-
+      position: relative; padding: 1.25rem 1rem 1rem; text-align: center; border-bottom: 1px solid $border-subtle;
+      img { max-width: 140px; height: auto; }
       button {
-        position: absolute;
-        top: 1rem;
-        right: 1rem;
-        background: none;
-        border: none;
-        color: $color-dark;
-        font-size: 1.5rem;
-        cursor: pointer;
+        position: absolute; top: 0.9rem; right: 0.9rem; background: none; border: none; color: $color-dark; font-size: 1.5rem; cursor: pointer;
+        &:hover { color: $color-accent; }
+        &:focus { outline: 3px solid rgba($color-accent,.35); outline-offset: 2px; }
       }
     }
 
     a {
-      padding: 1rem 1.5rem;
-      border-bottom: 1px solid $light-gray;
-      text-transform: uppercase;
-      font-weight: 500;
-      color: $color-dark;
-      transition: color 0.3s ease;
-
-      &:hover {
-        color: $color-accent;
-      }
+      padding: 1rem 1.25rem; border-bottom: 1px solid $border-subtle; text-transform: uppercase;
+      font-weight: 600; letter-spacing: .4px; color: $color-dark; transition: color .25s, background .2s;
+      &:hover { color: $color-accent; background: $hover-row; }
+      &:focus { outline: 3px solid rgba($color-accent,.35); outline-offset: -3px; }
     }
   }
+}
+.accountWrapper { position: relative; }
 
+.accountAnchor { position: relative; }
+
+.accountMenu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 220px;
+  background: $color-light;
+  border: 1px solid rgba($color-dark,.12);
+  border-radius: 12px;
+  box-shadow: 0 12px 28px rgba($color-dark,.12);
+  padding: .5rem;
+  z-index: 1400;
+  display: grid;
+  gap: .25rem;
+
+  .accountHeader {
+    padding: .4rem .5rem .5rem;
+    border-bottom: 1px solid rgba($color-dark,.08);
+    margin-bottom: .25rem;
+    strong { display: block; }
+    span { font-size: .85rem; color: $color-muted; }
+  }
+
+  a, button {
+    text-align: left;
+    background: none; border: none; color: $color-dark; cursor: pointer;
+    padding: .55rem .6rem; border-radius: 10px; font-weight: 600;
+    &:hover { background: rgba($color-dark,.05); color: $color-accent; }
+  }
+
+  .logoutBtn { color: $color-accent; }
+}
+/* inactive / coming soon links */
+.inactive {
+  opacity: 0.5;
+  pointer-events: none;
+  cursor: default;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  span {
+    display: inline-block;
+  }
+
+  .status {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: $color-muted;
+    margin-left: 0.5rem;
+  }
+}
