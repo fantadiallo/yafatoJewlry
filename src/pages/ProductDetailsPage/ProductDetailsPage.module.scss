@@ -1,1 +1,83 @@
 
+.productDetails {
+  width: 100%;
+  padding: clamp(1.25rem, 2.5vw, 2rem);
+animation: fadeIn 0.5s ease both;
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
+
+.detailsWrapper {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: clamp(1.5rem, 3vw, 3rem);
+  align-items: start;
+}
+
+/* Left: gallery */
+.imageGallery {
+  padding: clamp(0.75rem, 1.8vw, 1.25rem);
+}
+
+/* Right: info panel wrapper */
+.info {
+  position: sticky;
+  top: 96px;
+  align-self: start;
+  border-radius: 4px;
+  padding: clamp(1rem, 2vw, 1.5rem);
+}
+
+/* Loading / Error */
+.loading,
+.error {
+  max-width: 980px;
+  margin: 6vh auto;
+  text-align: center;
+  padding: 1rem 1.25rem;
+  border-radius: 14px;
+  border: 1px solid rgba($color-primary, 0.3);
+  background: $color-white;
+  color: $color-dark;
+  box-shadow: 0 10px 26px rgba($color-dark, 0.06);
+}
+
+.error {
+  border-color: rgba(200, 60, 60, 0.25);
+}
+
+/* Small tweaks to child components inside the wrappers */
+.imageGallery :global(.gallery) {
+  width: 100%;
+}
+.info :global(.info) {
+  /* Tighten spacing when ProductInfo is inside the panel */
+  gap: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .detailsWrapper {
+    grid-template-columns: 1fr;
+  }
+  .info {
+    position: static;
+    margin-top: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .productDetails {
+    padding: 1rem;
+  }
+  .imageGallery,
+  .info {
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba($color-dark, 0.08);
+  }
+}
