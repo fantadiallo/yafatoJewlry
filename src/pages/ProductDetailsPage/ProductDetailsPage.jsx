@@ -1,60 +1,58 @@
-
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { fetchSingleProductById } from "../../api/shopify";
-
+import { fetchSingleProductById, fetchProductByHandle } from "../../api/shopify";
+import ProductGallery from "../../components/ProductGallery/ProductGallery";
+import ProductRecommendations from "../../components/ProductRecommendations/ProductRecommendations";
+import ProductInfo from "../../components/ProductInfo/ProductInfo";
+import styles from "./ProductDetailsPage.module.scss";
 
 export default function ProductDetailsPage() {
-  const { id } = useParams(); // /products/:id
+  const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [err, setErr] = useState("");
 
   useEffect(() => {
-    async function loadProduct() {
+    let alive = true;
+    async function load() {
+      setLoading(true);
+      setErr("");
       try {
-        const data = await fetchSingleProductById(id);
+        const looksLikeHandle = id && !String(id).startsWith("gid://shopify/") && !/^\d+$/.test(String(id));
+        const data = looksLikeHandle ? await fetchProductByHandle(id) : await fetchSingleProductById(id);
+        if (!alive) return;
         setProduct(data);
-      } catch (err) {
-        console.error("Error fetching product:", err);
+      } catch (e) {
+        if (!alive) return;
+        setErr("Product not found.");
       } finally {
-        setLoading(false);
+        if (alive) setLoading(false);
       }
     }
-    loadProduct();
+    load();
+    return () => { alive = false; };
   }, [id]);
 
-  if (loading) {
-    return <p className="loading">Loading product...</p>;
-  }
+  if (loading) return <main className="productDetails"><p className="loading">Loading product…</p></main>;
+  if (err || !product) return <main className="productDetails"><p className="error">{err || "Product not found."}</p></main>;
 
-  if (!product) {
-    return <p className="error">Product not found.</p>;
-  }
+  const images = (product.images || []).map((img, i) =>
+    typeof img === "string" ? { url: img, alt: `${product.title} ${i + 1}` } : img
+  );
 
   return (
-    <main className="productDetails">
-      <div className="detailsWrapper">
-        {/* Product Images */}
-        <div className="imageGallery">
-          {product.images.map((img, idx) => (
-            <img key={idx} src={img} alt={product.title} />
-          ))}
-        </div>
+<main className={styles.productDetails}>
+  <div className={styles.detailsWrapper}>
+    <section className={styles.imageGallery}>
+      <ProductGallery images={images} title={product.title} />
+    </section>
+    <section className={styles.info}>
+      <ProductInfo product={product} />
+    </section>
+  </div>
+  <ProductRecommendations productId={product.id} currentId={product.id} />
+</main>
 
-        {/* Product Info */}
-        <div className="info">
-          <h1>{product.title}</h1>
-          <p className="price">${product.price}</p>
-          <p className="description">{product.description}</p>
 
-          <button
-            className="addToCartBtn"
-            onClick={() => console.log("Add to cart:", product.variantId)}
-          >
-            Add to Cart
-          </button>
-        </div>
-      </div>
-    </main>
   );
 }
