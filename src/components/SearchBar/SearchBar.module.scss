@@ -1,0 +1,78 @@
+
+.searchWrapper {
+  display: flex;
+  align-items: center;
+  width: 100%;         /* let it stretch */
+  max-width: 100%;
+}
+
+.iconBtn {
+  border: none;
+  background: transparent;
+  color: $color-dark;
+  padding: .4rem;
+  border-radius: 10px;
+  cursor: pointer;
+
+  &:hover { background: rgba($color-dark, .06); }
+  &:focus { outline: 3px solid rgba($color-accent, .35); outline-offset: 2px; }
+}
+
+/* fluid by default (mobile/tablet) */
+.searchForm {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: $color-white;
+  border: 1px solid rgba($color-dark, .15);
+  border-radius: 12px;
+  padding: 2px;
+
+  width: 100%;         /* take full line */
+  max-width: 100%;
+  min-width: 0;        /* prevents overflow in flex/grid parents */
+  box-shadow: 0 8px 20px rgba($color-dark, .06);
+
+  input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: .95rem;
+    color: $color-dark;
+    background: transparent;
+
+    &::placeholder { color: rgba($color-dark, .45); }
+  }
+
+  &:focus-within {
+    border-color: $color-accent;
+    box-shadow: 0 0 0 4px rgba($color-accent, .18);
+  }
+}
+
+/* place the lens icon nicely */
+.leadingIcon {
+  position: absolute;
+  left: .6rem;
+  pointer-events: none;
+  opacity: .7;
+}
+
+.closeBtn {
+  border: none;
+  background: transparent;
+  color: $color-dark;
+  padding: .3rem;
+  border-radius: 8px;
+  cursor: pointer;
+
+  &:hover { background: rgba($color-dark, .06); }
+  &:focus { outline: 3px solid rgba($color-accent, .35); outline-offset: 2px; }
+}
+
+/* On wide screens, cap the width so it doesn't get too large */
+@media (min-width: 1110px) {
+  .searchForm {
+    width: clamp(260px, 32vw, 640px); /* was 340px; now wider cap */
+  }
+}
