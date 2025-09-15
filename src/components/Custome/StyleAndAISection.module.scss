@@ -1,0 +1,178 @@
+.styleAndAI {
+  background: $color-light;
+  color: $color-dark;
+  border: 1px solid rgba($color-dark, 0.08);
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 980px;
+  margin: 2rem auto;
+  box-shadow: 0 8px 24px rgba($color-dark, 0.06);
+
+  h2 {
+    font-size: clamp(1.4rem, 2.5vw, 1.8rem);
+    font-weight: 800;
+    letter-spacing: 0.4px;
+    margin: 0 0 0.75rem 0;
+    color: $color-dark;
+  }
+
+  .note {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: $color-muted;
+    margin-bottom: 1.5rem;
+
+    strong {
+      color: $color-dark;
+    }
+  }
+
+  .formSection {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem 1.25rem;
+
+    @media (max-width: 720px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .selectBox,
+  .inputRow,
+  .patternBox {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    label {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: $color-dark;
+    }
+
+    select,
+    input[type="text"],
+    textarea,
+    input[type="file"] {
+      width: 100%;
+      border: 1px solid rgba($color-dark, 0.15);
+      background: $color-white;
+      color: $color-dark;
+      border-radius: 12px;
+      padding: 0.8rem 0.9rem;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border 0.25s ease, box-shadow 0.25s ease;
+
+      &:focus {
+        border-color: $color-accent;
+        box-shadow: 0 0 0 4px rgba($color-accent, 0.18);
+      }
+    }
+
+    select {
+      appearance: none;
+      background-image: linear-gradient(45deg, transparent 50%, $color-muted 50%),
+        linear-gradient(135deg, $color-muted 50%, transparent 50%);
+      background-position: calc(100% - 18px) calc(1.05rem), calc(100% - 13px) calc(1.05rem);
+      background-size: 6px 6px, 6px 6px;
+      background-repeat: no-repeat;
+      padding-right: 2.25rem;
+      cursor: pointer;
+    }
+
+    input[type="file"] {
+      padding: 0.65rem 0.9rem;
+      cursor: pointer;
+      &::file-selector-button {
+        margin-right: 0.75rem;
+        border: 0;
+        background: $color-primary;
+        color: $color-dark;
+        padding: 0.55rem 0.9rem;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.25s ease, color 0.25s ease;
+      }
+      &:hover::file-selector-button {
+        background: $color-accent;
+        color: $color-white;
+      }
+    }
+
+    textarea {
+      min-height: 88px;
+      resize: vertical;
+    }
+  }
+
+  .patternBox {
+    grid-column: span 2;
+    @media (max-width: 720px) {
+      grid-column: span 1;
+    }
+  }
+
+  .previewArea {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+
+    button {
+      border: none;
+      border-radius: 14px;
+      padding: 0.9rem 1.4rem;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      background: linear-gradient(135deg, $color-primary, lighten($color-primary, 8%));
+      color: $color-dark;
+      box-shadow: 0 6px 16px rgba($color-dark, 0.08);
+      transition: transform 0.15s ease, box-shadow 0.25s ease, background 0.25s ease;
+
+      &:hover {
+        background: $color-accent;
+        color: $color-white;
+        box-shadow: 0 10px 24px rgba($color-accent, 0.25);
+        transform: translateY(-1px);
+      }
+
+      &:disabled {
+        cursor: not-allowed;
+        background: lighten($color-primary, 18%);
+        color: rgba($color-dark, 0.6);
+        box-shadow: none;
+        transform: none;
+      }
+    }
+
+    .imageBox {
+      background: $color-white;
+      border: 1px solid rgba($color-dark, 0.08);
+      border-radius: 16px;
+      padding: 0.75rem;
+      display: grid;
+      gap: 0.5rem;
+      text-align: center;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: 0 8px 22px rgba($color-dark, 0.06);
+
+      img {
+        width: 100%;
+        height: auto;
+        display: block;
+        border-radius: 12px;
+      }
+
+      p {
+        font-size: 0.9rem;
+        color: $color-muted;
+        margin: 0.2rem 0 0;
+      }
+    }
+  }
+}
