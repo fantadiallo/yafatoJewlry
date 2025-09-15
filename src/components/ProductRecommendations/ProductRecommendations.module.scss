@@ -1,21 +1,160 @@
-
 .recommendations {
   margin-top: 4rem;
   padding: 2rem 1rem;
-  max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
+  background: linear-gradient(180deg, $color-light 0%, $color-white 100%);
+  border-radius: 20px;
+  box-shadow: 0 8px 28px rgba($color-dark, 0.08);
+  animation: fadeUp 0.6s ease both;
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
 }
 
 .heading {
-  font-size: 1.4rem;
-  margin-bottom: 1.5rem;
+  font-size: clamp(1.2rem, 2vw, 1.5rem);
   font-weight: 600;
+  letter-spacing: 0.3px;
   text-align: center;
+  color: $color-dark;
+  margin-bottom: 1.75rem;
 }
 
+/* ---------------- Desktop / Tablet Grid ---------------- */
 .grid {
+  --card-min: 240px;
+  --card-max: 300px;
+
   display: grid;
-  gap: 2rem;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fit, minmax(var(--card-min), var(--card-max)));
+  justify-content: center;   /* centers the whole grid */
+}
+
+
+/* A wrapper that enforces identical sizing for every card */
+.cardWrap {
+  width: 100%;
+  max-width: var(--card-max);
+  aspect-ratio: 4 / 5;       /* keeps uniform height automatically */
+  display: grid;
+}
+
+/* Make cards fill the wrapper and behave consistently */
+:global(.productCard) {
+  display: grid;
+  grid-template-rows: auto 1fr auto; /* media / body / footer(price) */
+  border-radius: 16px;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: $color-white;
+  box-shadow: 0 4px 16px rgba($color-dark, 0.06);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+
+  &:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 28px rgba($color-dark, 0.12);
+  }
+}
+
+/* Media stays stable */
+:global(.productCard .card-media),
+:global(.productCard img) {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  display: block;
+}
+
+/* Titles clamp to avoid jumpy heights */
+:global(.productCard .title) {
+  margin: 0.5rem 0.75rem 0;
+  font-size: 0.98rem;
+  line-height: 1.35;
+  color: $color-dark;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Price area: tabular nums = cleaner alignment */
+:global(.productCard .price) {
+  margin: 0.5rem 0.75rem 0.75rem;
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1.2;
+  font-feature-settings: "tnum" 1, "lnum" 1; /* tabular, lining */
+  letter-spacing: 0.2px;
+  color: $color-dark;
+}
+
+:global(.productCard .oldPrice) {
+  margin: 0 0.75rem 0.85rem;
+  color: $color-muted;
+  font-size: 0.9rem;
+  text-decoration: line-through;
+}
+
+/* ---------------- Skeletons match card size ---------------- */
+.skeleton {
+  width: 100%;
+  max-width: var(--card-max);
+  aspect-ratio: 4 / 5;
+  border-radius: 16px;
+  background: linear-gradient(
+    90deg,
+    rgba($color-muted, 0.18) 25%,
+    rgba($color-muted, 0.34) 37%,
+    rgba($color-muted, 0.18) 63%
+  );
+  background-size: 400% 100%;
+  animation: shimmer 1.4s infinite linear;
+
+  @keyframes shimmer {
+    0% { background-position: -400% 0; }
+    100% { background-position: 400% 0; }
+  }
+}
+
+/* ---------------- Mobile: Snap Slider ---------------- */
+/* ---------------- Larger Desktop: force single row ---------------- */
+@media (min-width: 1280px) {
+  .grid {
+    /* one horizontal row of equal-width columns */
+    display: grid;
+    grid-auto-flow: column;                 /* lay items left→right */
+    grid-auto-columns: var(--card-max);     /* each card same width */
+    grid-template-columns: none;            /* ignore previous grid template */
+    gap: 1.25rem;
+    justify-content: center;                /* center row if it fits */
+    overflow-x: auto;                       /* scroll if too many items */
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;          /* nice scroll feel */
+    padding-inline: .5rem;
+  }
+
+  .grid::-webkit-scrollbar { height: 10px; }
+  .grid::-webkit-scrollbar-thumb { background: rgba(0,0,0,.12); border-radius: 10px; }
+  .grid { scrollbar-color: rgba(0,0,0,.12) transparent; scrollbar-width: thin; }
+
+  .cardWrap,
+  .skeleton {
+    width: var(--card-max);
+    max-width: none;        /* ensure consistent width */
+    aspect-ratio: 4 / 5;
+    scroll-snap-align: center;
+  }
+
+  /* slightly bigger cards on big screens if you want */
+  .grid { --card-max: 320px; }
+}
+
+/* ---------------- Larger Desktop: slightly bigger cards ---------------- */
+@media (min-width: 1280px) {
+  .grid {
+    --card-max: 320px;
+  }
 }
