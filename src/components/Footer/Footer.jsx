@@ -1,18 +1,17 @@
 import React from "react";
 import { FiInstagram, FiTwitter, FiMail, FiPhone } from "react-icons/fi";
+import { SiVisa, SiMastercard, SiApplepay, SiPaypal } from "react-icons/si"; // ⬅️ add this
 import styles from "./Footer.module.scss";
 
 export default function Footer() {
   return (
     <footer className={styles.footer}>
       <div className={styles.top}>
-        {/* Brand */}
         <div className={styles.brand}>
           <h2>YAFATO</h2>
           <p>light that never leaves!</p>
         </div>
 
-        {/* Quick Links */}
         <nav className={styles.links}>
           <a href="/jewelry">Jewelry</a>
           <a href="/about">About</a>
@@ -20,7 +19,6 @@ export default function Footer() {
           <a href="/faq">FAQ</a>
         </nav>
 
-        {/* Contact & Social */}
         <div className={styles.contact}>
           <p><FiMail /> support@yafato.com</p>
           <p><FiPhone /> +47 944 64 132</p>
@@ -31,14 +29,23 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Payment Methods */}
       <div className={styles.bottom}>
         <p>© {new Date().getFullYear()} Yafato. All rights reserved.</p>
-        <div className={styles.payments}>
-          <img src="/assets/payments/visa.svg" alt="Visa" />
-          <img src="/assets/payments/mastercard.svg" alt="Mastercard" />
-          <img src="/assets/payments/applepay.svg" alt="Apple Pay" />
-          <img src="/assets/payments/paypal.svg" alt="PayPal" />
+
+        {/* Payment Methods via react-icons */}
+        <div className={styles.payments} aria-label="Payment methods">
+          <span className={styles.paymentIcon} data-brand="visa" aria-label="Visa" title="Visa">
+            <SiVisa aria-hidden="true" />
+          </span>
+          <span className={styles.paymentIcon} data-brand="mastercard" aria-label="Mastercard" title="Mastercard">
+            <SiMastercard aria-hidden="true" />
+          </span>
+          <span className={styles.paymentIcon} data-brand="applepay" aria-label="Apple Pay" title="Apple Pay">
+            <SiApplepay aria-hidden="true" />
+          </span>
+          <span className={styles.paymentIcon} data-brand="paypal" aria-label="PayPal" title="PayPal">
+            <SiPaypal aria-hidden="true" />
+          </span>
         </div>
       </div>
     </footer>
