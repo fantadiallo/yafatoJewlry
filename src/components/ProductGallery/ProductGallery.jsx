@@ -1,27 +1,36 @@
-import { useState } from 'react';
-import styles from './ProductGallery.module.scss';
+import { useState } from "react";
+import styles from "./ProductGallery.module.scss";
 
-export default function ProductGallery({ images = [], title = 'Product' }) {
-  const [mainImage, setMainImage] = useState(images[0]);
+export default function ProductGallery({ images = [], title = "Product" }) {
+  // Normalize: ensure each item is { url, alt }
+  const normalized = images.map((img, i) =>
+    typeof img === "string" ? { url: img, alt: `${title} image ${i + 1}` } : img
+  );
 
-  if (!images.length) return null;
+  const [main, setMain] = useState(normalized[0]);
+
+  if (!normalized.length) return null;
 
   return (
     <div className={styles.gallery}>
       <div className={styles.mainImage}>
-        <img src={mainImage} alt={title} />
+        <img src={main.url} alt={main.alt || title} />
       </div>
-      <div className={styles.thumbnailRow}>
-        {images.map((img, index) => (
-          <img
-            key={index}
-            src={img}
-            alt={`${title} view ${index + 1}`}
-            onClick={() => setMainImage(img)}
-            className={mainImage === img ? styles.active : ''}
-          />
-        ))}
-      </div>
+
+      {normalized.length > 1 && (
+        <div className={styles.thumbnailRow}>
+          {normalized.map((img, index) => (
+            <button
+              key={index}
+              type="button"
+              onClick={() => setMain(img)}
+              className={`${styles.thumb} ${main.url === img.url ? styles.active : ""}`}
+            >
+              <img src={img.url} alt={img.alt || `${title} ${index + 1}`} />
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
