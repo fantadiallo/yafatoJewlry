@@ -1,0 +1,98 @@
+
+.results {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.25rem;
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  gap: .5rem;
+  margin-bottom: .75rem;
+}
+.title {
+  margin: 0;
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  color: $color-dark;
+}
+.subtle {
+  color: rgba($color-dark, .6);
+  font-size: .95rem;
+}
+
+.error { color: #c33; margin: .5rem 0 1rem; }
+.empty { color: rgba($color-dark, .7); margin: .5rem 0 1rem; }
+
+/* uniform card sizing */
+.grid {
+  --card-w: 260px;
+  --card-h: 360px;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(var(--card-w), 1fr));
+  justify-items: center;
+}
+
+.cardWrap {
+  width: 100%;
+  max-width: var(--card-w);
+  height: var(--card-h);
+  display: grid;
+}
+
+/* optional: if your ProductCard exposes these classes, they’ll look consistent */
+:global(.productCard) {
+  height: 100%;
+  border-radius: 14px;
+  background: $color-white;
+  box-shadow: 0 2px 10px rgba($color-dark, .06);
+  transition: transform .2s ease, box-shadow .2s ease;
+  display: grid;
+
+  &:hover { transform: translateY(-4px); box-shadow: 0 10px 24px rgba($color-dark,.12); }
+}
+:global(.productCard .card-media),
+:global(.productCard img) {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  display: block;
+}
+
+/* skeletons aligned to card size */
+.skeleton {
+  width: 100%;
+  max-width: var(--card-w);
+  height: var(--card-h);
+  border-radius: 14px;
+  background: linear-gradient(
+    90deg,
+    rgba($color-muted, .2) 25%,
+    rgba($color-muted, .35) 37%,
+    rgba($color-muted, .2) 63%
+  );
+  background-size: 400% 100%;
+  animation: shimmer 1.4s infinite linear;
+}
+@keyframes shimmer {
+  0% { background-position: -400% 0; }
+  100% { background-position: 400% 0; }
+}
+
+.loadMoreRow {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+.loadMore {
+  padding: .75rem 1rem;
+  border-radius: 10px;
+  border: 1px solid rgba($color-dark, .16);
+  background: $color-white;
+  color: $color-dark;
+  cursor: pointer;
+  transition: transform .12s ease, background-color .12s ease, border-color .12s ease;
+
+  &:hover { transform: translateY(-1px); background-color: $color-light; border-color: rgba($color-dark, .28); }
+}
