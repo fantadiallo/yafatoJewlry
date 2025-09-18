@@ -4,18 +4,21 @@ import { FiHeart, FiShoppingBag, FiMenu, FiX, FiUser } from "react-icons/fi";
 import { FaGlobe, FaEnvelopeOpenText } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import SideCart from "../SideCart/SideCart";
-import FavoritesCart from "../FavoritsCart/FavoritsCart";
-import styles from "./Header.module.scss";
 import { useShopifyCart } from "../../context/ShopifyCartContext";
 import SearchBar from "../SearchBar/SearchBar";
 import AuthModal from "../AuthModal/AuthModal";
 import { customerMe, customerLogout } from "../../api/shopify";
+import FavoritesCart from "../FavoritsCart/FavoritsCart";
+import styles from "./Header.module.scss";
 
 const TOKEN_KEY = "customerToken";
 const EXP_KEY = "customerTokenExpires";
 
 export default function Header() {
-  const { cartItems, favorites } = useShopifyCart();
+  // ✅ Use native Shopify cart + keep your favorites as-is (with a safe default)
+const { cart, favorites } = useShopifyCart();
+const cartCount = cart?.totalQuantity ?? 0;
+
   const navigate = useNavigate();
 
   const [cartOpen, setCartOpen] = useState(false);
@@ -51,18 +54,20 @@ export default function Header() {
     }
 
     setToken(t);
-    customerMe(t).then((c) => {
-      if (c) setCustomer(c);
-      else {
-        localStorage.removeItem(TOKEN_KEY);
-        localStorage.removeItem(EXP_KEY);
+    customerMe(t)
+      .then((c) => {
+        if (c) setCustomer(c);
+        else {
+          localStorage.removeItem(TOKEN_KEY);
+          localStorage.removeItem(EXP_KEY);
+          setToken(null);
+          setCustomer(null);
+        }
+      })
+      .catch(() => {
         setToken(null);
         setCustomer(null);
-      }
-    }).catch(() => {
-      setToken(null);
-      setCustomer(null);
-    });
+      });
   }, []);
 
   // close dropdown on outside click / Esc
@@ -100,8 +105,8 @@ export default function Header() {
   async function handleLogout() {
     try {
       if (token) await customerLogout(token);
-    } catch (e) {
-      // ignore network or API errors on logout
+    } catch (_) {
+      // ignore network/API errors on logout
     } finally {
       localStorage.removeItem(TOKEN_KEY);
       localStorage.removeItem(EXP_KEY);
@@ -135,14 +140,13 @@ export default function Header() {
           <div
             className={styles.dropdown}
             ref={dropdownRef}
-            onMouseEnter={() => setJewelryOpen(true)}   // open on hover
-            // no mouseLeave auto-close; user will click-outside / press Esc / click an item
+            onMouseEnter={() => setJewelryOpen(true)}
           >
             <button
               className={styles.dropdownBtn}
               aria-haspopup="true"
               aria-expanded={jewelryOpen}
-              onClick={() => setJewelryOpen(v => !v)}    // toggle on click (touch-friendly)
+              onClick={() => setJewelryOpen((v) => !v)}
               type="button"
             >
               Jewelry
@@ -154,7 +158,7 @@ export default function Header() {
                 <Link to="/products/rings" onClick={() => setJewelryOpen(false)}>Rings</Link>
                 <Link to="/products/bracelets" onClick={() => setJewelryOpen(false)}>Bracelets</Link>
 
-                {/* Dimmed items (coming soon) still route to /products (all) */}
+                {/* Coming soon */}
                 <Link
                   to="/products"
                   className={styles.inactive}
@@ -239,16 +243,18 @@ export default function Header() {
           </div>
 
           {/* Favorites */}
-          <button onClick={() => setFavoritesOpen(true)} className={styles.iconBtn} aria-label="Open favorites">
-            <FiHeart size={22} />
-            {!!favorites.length && <span className={styles.badge}>{favorites.length}</span>}
-          </button>
+      {/* Favorites */}
+<button onClick={() => setFavoritesOpen(true)} className={styles.iconBtn} aria-label="Open favorites">
+  <FiHeart size={22} />
+  {!!(favorites?.length ?? 0) && <span className={styles.badge}>{favorites.length}</span>}
+</button>
 
-          {/* Cart */}
-          <button onClick={() => setCartOpen(true)} className={styles.iconBtn} aria-label="Open cart">
-            <FiShoppingBag size={22} />
-            {!!cartItems.length && <span className={styles.badge}>{cartItems.length}</span>}
-          </button>
+{/* Cart */}
+<button onClick={() => setCartOpen(true)} className={styles.iconBtn} aria-label="Open cart">
+  <FiShoppingBag size={22} />
+  {!!cartCount && <span className={styles.badge}>{cartCount}</span>}
+</button>
+
 
           {/* Mobile */}
           <button
