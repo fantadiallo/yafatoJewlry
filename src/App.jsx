@@ -8,6 +8,7 @@ import NewsletterPage from "./pages/NewsLetterPage/NewsletterPage";
 import ProductDetailsPage from "./pages/ProductDetailsPage/ProductDetailsPage";
 import ProductPage from "./pages/ProductPage/ProductPage";
 import SearchResults from "./pages/SearchResults/SearchResults";
+import { ShopifyCartProvider } from "./context/ShopifyCartContext";
 
 function App() {
   return (
