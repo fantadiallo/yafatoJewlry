@@ -6,21 +6,16 @@ import { useShopifyCart } from '../../context/ShopifyCartContext';
 
 function formatMoney(amount, currency = "GBP") {
   const n = Number(amount || 0);
-  try {
-    return new Intl.NumberFormat("en-GB", { style: "currency", currency }).format(n);
-  } catch {
-    return `${n.toFixed(2)} ${currency}`;
-  }
+  try { return new Intl.NumberFormat("en-GB", { style: "currency", currency }).format(n); }
+  catch { return `${n.toFixed(2)} ${currency}`; }
 }
 
-// Extract a numeric product id from a Shopify GID if possible
 function productIdFromGID(id) {
   if (!id) return null;
   const m = String(id).match(/Product\/(\d+)/);
   return m ? m[1] : null;
 }
 
-// Build a canonical product path from favorite payload
 function productPath(item) {
   if (item?.handle) return `/products/${item.handle}`;
   const numeric = productIdFromGID(item?.id);
@@ -29,7 +24,6 @@ function productPath(item) {
   return `/products`;
 }
 
-// Pick the best image URL available
 function favoriteImage(item) {
   const candidates = [
     item?.image,
@@ -37,7 +31,6 @@ function favoriteImage(item) {
     Array.isArray(item?.images) ? item.images[0] : null,
     item?.images?.edges?.[0]?.node?.url,
   ].filter(Boolean);
-
   let first = candidates[0];
   if (first && typeof first === 'object' && 'url' in first) first = first.url;
   return typeof first === 'string' ? first : '';
@@ -47,24 +40,17 @@ const PLACEHOLDER = 'https://via.placeholder.com/600x600?text=No+Image';
 
 export default function FavoritesCart({ isOpen, onClose }) {
   const { favorites = [], removeFromFavorites, moveToCartFromFavorites } = useShopifyCart();
+  const [busy, setBusy] = useState({});
+  const currency = favorites?.[0]?.currency || "GBP";
 
-  // prevent double actions per-item
-  const [busy, setBusy] = useState({}); // { [variantId]: true }
-
-  function handleMoveToCart(item) {
+  async function handleMoveToCart(item) {
     const vId = item?.variantId;
-    if (!vId) {
-      console.warn('Missing variantId in favorite item', item);
-      return;
-    }
-    if (busy[vId]) return;
-
-    setBusy((b) => ({ ...b, [vId]: true }));
+    if (!vId || busy[vId]) return;
+    setBusy(b => ({ ...b, [vId]: true }));
     try {
-      // Pass the whole product; context will add to cart and remove from favorites
-      moveToCartFromFavorites({ ...item, quantity: item.quantity || 1 });
+      await moveToCartFromFavorites({ ...item, quantity: item.quantity || 1 });
     } finally {
-      setBusy((b) => {
+      setBusy(b => {
         const clone = { ...b };
         delete clone[vId];
         return clone;
@@ -77,8 +63,6 @@ export default function FavoritesCart({ isOpen, onClose }) {
     if (!vId) return;
     removeFromFavorites(vId);
   }
-
-  const currency = favorites?.[0]?.currency || "GBP";
 
   return (
     <div
@@ -99,12 +83,13 @@ export default function FavoritesCart({ isOpen, onClose }) {
           <p className={styles.empty}>No favorites yet</p>
         ) : (
           favorites.map((item) => {
+            const vId = item?.variantId;
             const to = productPath(item);
             const img = favoriteImage(item) || PLACEHOLDER;
-            const vId = item.variantId;
+            const key = vId || item.id || to;
 
             return (
-              <div key={vId || item.id} className={styles.favoriteItem}>
+              <div key={key} className={styles.favoriteItem}>
                 <Link
                   to={to}
                   onClick={onClose}
@@ -129,15 +114,27 @@ export default function FavoritesCart({ isOpen, onClose }) {
                   </p>
 
                   <div className={styles.buttons}>
-                    <button
-                      onClick={() => handleMoveToCart(item)}
-                      className={styles.addBtn}
-                      disabled={!vId || busy[vId]}
-                      aria-disabled={!vId || busy[vId]}
-                    >
-                      <FiShoppingBag />
-                      {busy[vId] ? 'Moving…' : 'Move to Cart'}
-                    </button>
+                    {vId ? (
+                      <button
+                        onClick={() => handleMoveToCart(item)}
+                        className={styles.addBtn}
+                        disabled={busy[vId]}
+                        aria-disabled={busy[vId]}
+                      >
+                        <FiShoppingBag />
+                        {busy[vId] ? 'Moving…' : 'Move to Cart'}
+                      </button>
+                    ) : (
+                      <Link
+                        to={`${to}?select=1`}
+                        onClick={onClose}
+                        className={styles.selectBtn}
+                        aria-label="Select options"
+                        title="Select options"
+                      >
+                        Select options
+                      </Link>
+                    )}
 
                     <button
                       onClick={() => handleRemove(item)}
