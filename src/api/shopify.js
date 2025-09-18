@@ -1,4 +1,3 @@
-// shopify.js
 const DOMAIN = import.meta.env.VITE_SHOPIFY_DOMAIN;
 const TOKEN = import.meta.env.VITE_SHOPIFY_STOREFRONT_TOKEN;
 const API_URL = `https://${DOMAIN}/api/2024-04/graphql.json`;
@@ -12,6 +11,7 @@ async function gql(query, variables = {}) {
     },
     body: JSON.stringify({ query, variables }),
   });
+
   if (!r.ok) {
     const text = await r.text().catch(() => "");
     throw new Error(`HTTP ${r.status}: ${text || r.statusText}`);
@@ -33,7 +33,7 @@ function mapNodeToItem(node, cursor = null) {
     description: node.description || "",
     image: node.featuredImage?.url || node.images?.edges?.[0]?.node?.url || "",
     price: v?.price?.amount || "",
-    currency: v?.price?.currencyCode || "GBP", // fallback GBP
+    currency: v?.price?.currencyCode || "GBP",
     productType: node.productType || "",
     tags: node.tags || [],
   };
@@ -41,7 +41,6 @@ function mapNodeToItem(node, cursor = null) {
 
 function mapProduct(p) {
   if (!p) return null;
-  // variants -> rich objects
   const variants = (p.variants?.edges || []).map(({ node }) => ({
     id: node.id,
     title: node.title,
@@ -52,10 +51,7 @@ function mapProduct(p) {
     price: node.price?.amount || "",
     currency: node.price?.currencyCode || "GBP",
   }));
-
-  // choose a default variant to seed price/currency
   const v0 = variants[0];
-
   return {
     id: p.id,
     title: p.title,
@@ -67,12 +63,9 @@ function mapProduct(p) {
       url: e.node.url,
       alt: e.node.altText || p.title,
     })),
-    // keep original quick fields for components that expect them
     variantId: v0?.id || "",
     price: v0?.price || "",
     currency: v0?.currency || "GBP",
-
-    // NEW fields your UI needs:
     options: (p.options || []).map(o => ({
       id: o.id,
       name: o.name,
@@ -140,6 +133,47 @@ export async function fetchShopifyProductsPaged(first = 20, after = null) {
     hasNextPage: d.products?.pageInfo?.hasNextPage || false,
     endCursor: edges.at(-1)?.cursor || null,
   };
+}
+
+/* ----- Rich list for cards (options + variants) ----- */
+export async function fetchShopifyProductsForCards(first = 20, after = null) {
+  const query = `
+    query ($first:Int!, $after:String) {
+      products(first:$first, after:$after) {
+        edges {
+          cursor
+          node {
+            id
+            handle
+            title
+            description
+            productType
+            tags
+            featuredImage { url altText }
+            images(first: 4) { edges { node { url altText } } }
+            priceRange { minVariantPrice { amount currencyCode } }
+            options { id name values }
+            variants(first: 50) {
+              edges {
+                node {
+                  id
+                  title
+                  availableForSale
+                  sku
+                  image { url }
+                  selectedOptions { name value }
+                  price { amount currencyCode }
+                }
+              }
+            }
+          }
+        }
+        pageInfo { hasNextPage }
+      }
+    }`;
+  const d = await gql(query, { first, after });
+  const edges = d.products?.edges || [];
+  return edges.map(({ node }) => mapProduct(node));
 }
 
 /* -------------------- Single product (RICH) -------------------- */
@@ -229,7 +263,6 @@ function buildShopifyQuery(input) {
   return parts.join(" OR ");
 }
 
-// NOTE: returns an ARRAY (keep as-is for lightweight usage)
 export async function searchShopifyProducts(q, first = 20, after = null) {
   const query = `
     query ($q:String!, $first:Int!, $after:String) {
@@ -257,7 +290,6 @@ export async function searchShopifyProducts(q, first = 20, after = null) {
   return edges.map(({ node, cursor }) => mapNodeToItem(node, cursor));
 }
 
-// Paged helper (object w/ items, hasNextPage, endCursor)
 export async function searchShopifyProductsPaged(q, first = 20, after = null) {
   const query = `
     query ($q:String!, $first:Int!, $after:String) {
@@ -403,4 +435,133 @@ export async function fetchRecommendationsByHandle(handle) {
   const id = d.product?.id;
   if (!id) return [];
   return fetchRecommendationsById(id);
+}
+
+/* -------------------- Cart (native Shopify) -------------------- */
+const CART_FRAGMENT = `
+fragment CartFields on Cart {
+  id
+  checkoutUrl
+  totalQuantity
+  cost {
+    subtotalAmount { amount currencyCode }
+    totalAmount    { amount currencyCode }
+    totalTaxAmount { amount currencyCode }
+  }
+  lines(first: 100) {
+    edges {
+      node {
+        id
+        quantity
+        cost {
+          amountPerQuantity { amount currencyCode }
+          totalAmount { amount currencyCode }
+        }
+        merchandise {
+          ... on ProductVariant {
+            id
+            title
+            availableForSale
+            selectedOptions { name value }   # needed for option display
+            price { amount currencyCode }
+            image { url altText }
+            product {
+              handle
+              title
+              featuredImage { url altText }
+              variants(first: 50) {          # used to change variant in cart
+                edges {
+                  node {
+                    id
+                    title
+                    availableForSale
+                    selectedOptions { name value }
+                    price { amount currencyCode }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+`;
+
+export async function cartCreate() {
+  const mutation = `
+    mutation CartCreate($input: CartInput) {
+      cartCreate(input: $input) {
+        cart { ...CartFields }
+        userErrors { field message }
+      }
+    }
+    ${CART_FRAGMENT}
+  `;
+  const d = await gql(mutation, { input: {} });
+  const err = d.cartCreate?.userErrors?.[0]?.message;
+  if (err) throw new Error(err);
+  return d.cartCreate.cart;
+}
+
+export async function cartGet(id) {
+  const query = `
+    query CartGet($id: ID!) {
+      cart(id: $id) { ...CartFields }
+    }
+    ${CART_FRAGMENT}
+  `;
+  const d = await gql(query, { id });
+  return d.cart || null;
+}
+
+export async function cartLinesAdd(cartId, lines) {
+  const mutation = `
+    mutation CartLinesAdd($cartId: ID!, $lines: [CartLineInput!]!) {
+      cartLinesAdd(cartId: $cartId, lines: $lines) {
+        cart { ...CartFields }
+        userErrors { field message }
+      }
+    }
+    ${CART_FRAGMENT}
+  `;
+  const d = await gql(mutation, { cartId, lines });
+  const err = d.cartLinesAdd?.userErrors?.[0]?.message;
+  if (err) throw new Error(err);
+  return d.cartLinesAdd.cart;
+}
+
+export async function cartLinesRemove(cartId, lineIds) {
+  const mutation = `
+    mutation CartLinesRemove($cartId: ID!, $lineIds: [ID!]!) {
+      cartLinesRemove(cartId: $cartId, lineIds: $lineIds) {
+        cart { ...CartFields }
+        userErrors { field message }
+      }
+    }
+    ${CART_FRAGMENT}
+  `;
+  const d = await gql(mutation, { cartId, lineIds });
+  const err = d.cartLinesRemove?.userErrors?.[0]?.message;
+  if (err) throw new Error(err);
+  return d.cartLinesRemove.cart;
+}
+
+/* ----- NEW: update qty or change variant on a line ----- */
+export async function cartLinesUpdate(cartId, lines) {
+  // lines: [{ id, quantity?, merchandiseId? }]
+  const mutation = `
+    mutation CartLinesUpdate($cartId: ID!, $lines: [CartLineUpdateInput!]!) {
+      cartLinesUpdate(cartId: $cartId, lines: $lines) {
+        cart { ...CartFields }
+        userErrors { field message }
+      }
+    }
+    ${CART_FRAGMENT}
+  `;
+  const d = await gql(mutation, { cartId, lines });
+  const err = d.cartLinesUpdate?.userErrors?.[0]?.message;
+  if (err) throw new Error(err);
+  return d.cartLinesUpdate.cart;
 }
