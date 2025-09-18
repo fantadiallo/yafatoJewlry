@@ -2,11 +2,13 @@ import styles from "./ProductInfo.module.scss";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { useEffect, useMemo, useState } from "react";
 import { useShopifyCart } from "../../context/ShopifyCartContext";
+import toast from "react-hot-toast";
 
 function money(amount, currency = "GBP") {
-  if (!amount) return "";
-  const n = typeof amount === "string" ? parseFloat(amount) : amount;
-  return new Intl.NumberFormat("en-GB", { style: "currency", currency }).format(n);
+  if (!amount && amount !== 0) return "";
+  const n = typeof amount === "string" ? parseFloat(amount) : Number(amount);
+  try { return new Intl.NumberFormat("en-GB", { style: "currency", currency }).format(n); }
+  catch { return `${n.toFixed(2)} ${currency}`; }
 }
 
 function isColorOption(name) {
@@ -27,39 +29,59 @@ export default function ProductInfo({ product }) {
     sku,
     variantId,
     variants = [],
-    options = [], // [{id,name,values:[]}]
+    options = [],
+    handle,
+    images = [],
+    featuredImage
   } = product;
 
-  // Default selection from variantId or first variant/options
-  const initialVariant = useMemo(
-    () => variants.find(v => v.id === variantId) || variants[0] || null,
-    [variants, variantId]
+  const normVariants = useMemo(() => (
+    variants.map(v => ({
+      ...v,
+      selectedOptions: (v.selectedOptions || []).map(o => ({
+        name: o.name?.toLowerCase?.() || "",
+        value: o.value
+      }))
+    }))
+  ), [variants]);
+
+  const optionNames = useMemo(
+    () => options.map(o => o.name?.toLowerCase?.() || ""),
+    [options]
   );
 
-  const [selectedOptions, setSelectedOptions] = useState(() => {
-    const base = {};
-    if (initialVariant?.selectedOptions) {
-      initialVariant.selectedOptions.forEach(o => (base[o.name] = o.value));
-    } else {
-      options.forEach(o => (base[o.name] = o.values?.[0]));
-    }
-    return base;
-  });
+  const initialVariant = useMemo(
+    () => normVariants.find(v => v.id === variantId) || normVariants[0] || null,
+    [normVariants, variantId]
+  );
 
-  // Find exact matching variant for current selection
+  const [selectedOptions, setSelectedOptions] = useState({});
+
+  useEffect(() => {
+    const base = {};
+    if (initialVariant?.selectedOptions?.length) {
+      initialVariant.selectedOptions.forEach(o => { base[o.name] = o.value; });
+    } else {
+      options.forEach(o => { base[o.name.toLowerCase()] = o.values?.[0]; });
+    }
+    setSelectedOptions(base);
+  }, [product?.id, optionNames.join("|")]);
+
   const activeVariant = useMemo(() => {
-    if (!variants.length) return null;
+    if (!normVariants.length) return null;
     const entries = Object.entries(selectedOptions);
-    const exact = variants.find(v =>
+    const exact = normVariants.find(v =>
       (v.selectedOptions || []).every(o =>
         entries.some(([n, val]) => n === o.name && val === o.value)
       )
     );
-    return exact || variants[0] || null;
-  }, [variants, selectedOptions]);
+    return exact || null;
+  }, [normVariants, selectedOptions]);
 
-  const selectedVariantId = activeVariant?.id || variantId || "";
+  const selectedVariantId = activeVariant?.id || "";
+
   const [quantity, setQuantity] = useState(1);
+  useEffect(() => { if (quantity < 1) setQuantity(1); }, [selectedVariantId]);
 
   const displayPrice = useMemo(() => {
     const amt = activeVariant?.price ?? price;
@@ -67,49 +89,91 @@ export default function ProductInfo({ product }) {
     return money(amt, cur);
   }, [activeVariant, price, currency]);
 
+  const primaryImage =
+    (Array.isArray(images) && (typeof images[0] === "string" ? images[0] : images[0]?.url)) ||
+    featuredImage?.url ||
+    product.image ||
+    "";
+
   const isFav = favorites.some(item => item.variantId === selectedVariantId);
 
-  function toggleFavorite() {
-    if (!selectedVariantId) return;
-    if (isFav) removeFromFavorites(selectedVariantId);
-    else addToFavorites({ ...product, variantId: selectedVariantId, quantity: 1 });
-  }
-
-  function add() {
-    if (!selectedVariantId || quantity < 1) return;
-    addToCart({ ...product, variantId: selectedVariantId, quantity });
-  }
-
   function onSelectOption(name, value) {
-    setSelectedOptions(prev => ({ ...prev, [name]: value }));
+    const key = name.toLowerCase();
+    setSelectedOptions(prev => ({ ...prev, [key]: value }));
   }
 
-  // Compute which values are valid per option given current partial selection
   const availabilityByOption = useMemo(() => {
-    const result = new Map(); // name -> Set(values)
-    options.forEach(opt => result.set(opt.name, new Set()));
-
-    variants.forEach(v => {
+    const map = new Map();
+    options.forEach(opt => map.set(opt.name.toLowerCase(), new Set()));
+    normVariants.forEach(v => {
       options.forEach(opt => {
+        const key = opt.name.toLowerCase();
         const matchesOthers = Object.entries(selectedOptions).every(([n, val]) => {
-          if (n === opt.name) return true;
+          if (n === key) return true;
           const vo = (v.selectedOptions || []).find(o => o.name === n);
           return val ? vo?.value === val : true;
         });
         if (matchesOthers) {
-          const val = (v.selectedOptions || []).find(o => o.name === opt.name)?.value;
-          if (val) result.get(opt.name).add(val);
+          const val = (v.selectedOptions || []).find(o => o.name === key)?.value;
+          if (val) map.get(key).add(val);
         }
       });
     });
+    return map;
+  }, [normVariants, options, selectedOptions]);
 
-    return result;
-  }, [variants, options, selectedOptions]);
+  async function toggleFavorite() {
+    if (!selectedVariantId) {
+      toast.error("Select options first");
+      return;
+    }
+    const unitPrice = activeVariant?.price ?? price ?? 0;
+    const cur = activeVariant?.currency ?? currency ?? "GBP";
+    const payload = {
+      ...product,
+      title,
+      handle,
+      image: primaryImage || null,
+      price: Number(unitPrice),
+      currency: cur,
+      variantId: selectedVariantId,
+      quantity: 1
+    };
+    if (isFav) {
+      removeFromFavorites(selectedVariantId);
+      toast("Removed from favorites");
+    } else {
+      addToFavorites(payload);
+      toast.success("Saved to favorites");
+    }
+  }
 
-  // Keep quantity valid (optional)
-  useEffect(() => {
-    if (quantity < 1) setQuantity(1);
-  }, [selectedVariantId]); // eslint-disable-line
+  async function add() {
+    if (!selectedVariantId) {
+      toast.error("Please select options first");
+      return;
+    }
+    if (!activeVariant?.available) {
+      toast.error("This option is out of stock");
+      return;
+    }
+    const unitPrice = activeVariant?.price ?? price ?? 0;
+    const cur = activeVariant?.currency ?? currency ?? "GBP";
+    const res = await addToCart({
+      title,
+      handle,
+      image: primaryImage || null,
+      price: Number(unitPrice),
+      currency: cur,
+      variantId: selectedVariantId,
+      quantity
+    });
+    if (res?.ok) toast.success("Added to cart");
+    else if (res?.error === "VARIANT_REQUIRED") toast.error("Please select options first");
+    else toast.error("Couldn’t add to cart");
+  }
+
+  const addDisabled = !activeVariant || activeVariant.available === false;
 
   return (
     <section className={styles.info}>
@@ -121,6 +185,7 @@ export default function ProductInfo({ product }) {
           aria-pressed={isFav}
           aria-label={isFav ? "Remove from favorites" : "Add to favorites"}
           onClick={toggleFavorite}
+          disabled={!selectedVariantId}
         >
           {isFav ? <FaHeart /> : <FaRegHeart />}
         </button>
@@ -139,22 +204,23 @@ export default function ProductInfo({ product }) {
         {sku ? <li><strong>SKU:</strong> {sku}</li> : null}
       </ul>
 
-      {/* Option selectors (Color, Size, Gender, Material, Age, etc.) */}
       {options?.length > 0 && (
         <div className={styles.variants}>
           {options.map(opt => {
-            const enabled = availabilityByOption.get(opt.name) || new Set();
+            const key = opt.name.toLowerCase();
+            const enabled = availabilityByOption.get(key) || new Set();
             const isColor = isColorOption(opt.name);
+            const currentVal = selectedOptions[key];
 
             return (
               <div key={opt.id || opt.name} className={styles.optionBlock}>
                 <div className={styles.optionLabel}>
-                  {opt.name}: <b>{selectedOptions[opt.name]}</b>
+                  {opt.name}: <b>{currentVal}</b>
                 </div>
 
                 <div className={isColor ? styles.swatches : styles.pills}>
                   {(opt.values || []).map(val => {
-                    const active = selectedOptions[opt.name] === val;
+                    const active = currentVal === val;
                     const disabled = !enabled.has(val);
 
                     return isColor ? (
@@ -202,9 +268,10 @@ export default function ProductInfo({ product }) {
         <button
           className={styles.addBtn}
           onClick={add}
-          disabled={activeVariant ? !activeVariant.available : false}
+          disabled={addDisabled}
+          aria-disabled={addDisabled}
         >
-          {activeVariant?.available === false ? "Out of stock" : "Add to Cart"}
+          {addDisabled ? "Out of stock" : "Add to Cart"}
         </button>
       </div>
     </section>
