@@ -4,10 +4,14 @@ import Footer from "../Footer/Footer";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ShopifyCartProvider } from "../../context/ShopifyCartContext";
+import NewsletterPopup from "../NewsletterPopup/NewsletterPopup";
 
 export default function Layout() {
   const location = useLocation();
   const hideNavAndFooter = location.pathname === "/newsletter";
+
+  const hidePopupRoutes = ["/checkout", "/newsletter"];
+  const hidePopup = hidePopupRoutes.includes(location.pathname);
 
   return (
     <ShopifyCartProvider>
@@ -20,6 +24,8 @@ export default function Layout() {
 
         {!hideNavAndFooter && <Footer />}
       </div>
+
+      {!hidePopup && <NewsletterPopup />}
 
       <ToastContainer position="top-center" autoClose={5000} />
     </ShopifyCartProvider>
