@@ -66,7 +66,7 @@ export default function NewsletterPage() {
 
             <motion.h2 className={styles.heading} variants={item}>
               <p>Welcome to early access Official Launch</p>
-              <p className={styles.launchDate}>SEPTEMBER 18.</p>
+              <p className={styles.launchDate}>SEPTEMBER 20. Kl:18:00</p>
             </motion.h2>
 
             <motion.div variants={item}>
