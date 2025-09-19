@@ -1,37 +1,30 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import styles from "./AuthModal.module.scss";
-import { customerLogin, customerRegister } from "../../api/shopify";
 
-export default function AuthModal({ isOpen, onClose, onSuccess }) {
+export default function AuthModal({ isOpen, onClose }) {
   const [tab, setTab] = useState("login"); // "login" | "register"
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [err, setErr] = useState("");
 
-  async function onSubmit(e) {
-    e.preventDefault();
-    setErr("");
-    setLoading(true);
-    try {
-      if (tab === "login") {
-        const token = await customerLogin(email, password);
-        onSuccess?.(token);
-        onClose();
-      } else {
-        await customerRegister({ email, password, firstName, lastName });
-        const token = await customerLogin(email, password);
-        onSuccess?.(token);
-        onClose();
-      }
-    } catch (e) {
-      setErr(e?.message || "Something went wrong");
-    } finally {
-      setLoading(false);
-    }
+  // Domain from your existing env (used in api/shopify.js)
+  const SHOP_DOMAIN = import.meta.env.VITE_SHOPIFY_DOMAIN; // e.g. "your-store.myshopify.com" or "shop.yourdomain.com"
+  const SHOP_BASE = useMemo(() => {
+    const d = String(SHOP_DOMAIN || "").replace(/^https?:\/\//i, "");
+    return d ? `https://${d}` : "";
+  }, [SHOP_DOMAIN]);
+
+  // Where to send users back after login/register
+  const returnUrl = useMemo(() => {
+    const here = window.location.pathname + window.location.search + window.location.hash;
+    return encodeURIComponent(here || "/");
+  }, []);
+
+  const loginUrl = SHOP_BASE ? `${SHOP_BASE}/account/login?return_url=${returnUrl}` : "#";
+  const registerUrl = SHOP_BASE ? `${SHOP_BASE}/account/register?return_url=${returnUrl}` : "#";
+  const recoverUrl = SHOP_BASE ? `${SHOP_BASE}/account/login#recover` : "#";
+
+  function go() {
+    if (!SHOP_BASE) return;
+    window.location.href = tab === "login" ? loginUrl : registerUrl;
   }
 
   return (
@@ -70,53 +63,22 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
               <button className={styles.close} onClick={onClose} aria-label="Close">×</button>
             </div>
 
-            <form onSubmit={onSubmit} className={styles.form}>
-              {tab === "register" && (
-                <div className={styles.row2}>
-                  <input
-                    type="text"
-                    placeholder="First name"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    autoComplete="given-name"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Last name"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    autoComplete="family-name"
-                  />
-                </div>
-              )}
+            {/* Simple explainer + continue button */}
+            <div className={styles.body}>
+              <p className={styles.note}>
+                You’ll be redirected to our secure Shopify {tab === "login" ? "login" : "registration"} page.
+              </p>
 
-              <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autoComplete="email"
-                required
-              />
-              <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete={tab === "login" ? "current-password" : "new-password"}
-                required
-              />
-
-              {err && <p className={styles.error} role="alert">{err}</p>}
-
-              <button type="submit" className={styles.submit} disabled={loading}>
-                {loading ? "Please wait…" : tab === "login" ? "Sign in" : "Create account"}
+              <button type="button" className={styles.submit} onClick={go}>
+                {tab === "login" ? "Continue to Shopify Login" : "Continue to Shopify Register"}
               </button>
-            </form>
 
-            <p className={styles.note}>
-              We never share your details. You can view orders and manage your account after signing in.
-            </p>
+              {tab === "login" && (
+                <p className={styles.subtle}>
+                  <a href={recoverUrl}>Forgot your password?</a>
+                </p>
+              )}
+            </div>
           </motion.div>
         </>
       )}
