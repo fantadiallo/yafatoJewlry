@@ -1,4 +1,10 @@
 
+
+/* local gold for the heading */
+$gold-1: #d4af37; // classic gold
+$gold-2: #f5d57b; // lighter highlight
+
+
 .splitHero {
   display: flex;
   height: 100vh;
@@ -13,7 +19,7 @@
 
 .leftSide {
   flex: 1;
-  background-color: #fffcf7;
+  background-color: lighten($color-light, 2%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -38,7 +44,6 @@
   background-color: rgba($color-muted, 0.9);
   color: $color-light;
   display: flex;
-
   align-items: center;
   justify-content: center;
   padding: 4rem 2rem;
@@ -64,14 +69,14 @@
   }
 }
 
-// ───────────── Typography ─────────────
+/* ——— Typography ——— */
 
 .logo {
   font-size: 4rem;
   font-weight: 500;
   letter-spacing: 0.25rem;
   text-transform: uppercase;
-  font-family: "Cormorant Garamond", serif; // or a custom brand font
+  font-family: "Cormorant Garamond", serif;
   color: $color-dark;
   background: linear-gradient(90deg, #ccc, #fefefe, #ccc);
   background-size: 200%;
@@ -85,63 +90,48 @@
   }
 }
 
-
+/* GOLD shimmer for the line "A light that never leaves" */
 .heading {
   font-size: 2rem;
   font-weight: 800;
-  color: $color-light;
   margin-top: 1.2rem;
   letter-spacing: 0.05rem;
+  text-align: center;
+
+  background: linear-gradient(90deg, $gold-1, $gold-2, $gold-1);
+  background-size: 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmerText 12s ease-in-out infinite;
 
   @media (max-width: 576px) {
     font-size: 1.6rem;
   }
 }
 
+/* supporting line */
 .subheading {
   font-size: 1.2rem;
-  font-weight: 800;
-  color: $color-accent;
+  font-weight: 700;
+  color: $color-dark;
   margin-top: 0.5rem;
   line-height: 1.4;
+  text-align: center;
 }
-
 
 .notice {
   font-size: 1rem;
-  margin-top: 1.5rem;
+  margin-top: 1.2rem;
   font-style: italic;
   letter-spacing: 0.03rem;
   text-align: center;
-
-  // Soft light silver gradient
-  background: linear-gradient(
-    90deg,
-    #bfbfbf,
-    #d9d9d9,
-    #ffffff,
-    #d9d9d9,
-    #bfbfbf
-  );
-  background-size: 200% auto;
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-
-  animation: shimmerText 15s ease-in-out infinite;
-
-  // Gentle glowing edge
-  text-shadow: 0 0 2px rgba(255, 255, 255, 0.2),
-               0 0 3px rgba(192, 192, 192, 0.15);
+  color: $color-accent;
 }
 
-
-
-
-// ───────────── Form ─────────────
+/* ——— Form ——— */
 
 .formWrapper {
-  margin: 2.5rem 0 1rem;
+  margin: 2.2rem 0 1rem;
   display: flex;
   justify-content: center;
 
@@ -153,24 +143,26 @@
 
 .newsletter-form {
   background-color: $color-white;
-  padding: 2rem;
-  border-radius: 2rem;
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+  padding: 1.8rem;
+  border-radius: 1.25rem;
+  box-shadow: 0 8px 24px rgba($color-dark, 0.08);
   animation: fadeUp 0.6s ease-out both;
 
   .newsletter-input {
-    border: 1px solid $color-muted;
+    border: 1px solid rgba($color-dark, 0.15);
     background-color: $color-light;
     color: $color-dark;
-    border-radius: 3rem;
-    padding: 0.75rem 1.5rem;
+    border-radius: 999px;
+    padding: 0.75rem 1.25rem;
     font-size: 1rem;
     width: 100%;
-    transition: border-color 0.3s ease;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
 
     &:focus {
       border-color: $color-accent;
-      outline: none;
+      outline: 3px solid rgba($color-accent, 0.25);
+      outline-offset: 2px;
+      background-color: $color-white;
     }
 
     &::placeholder {
@@ -180,19 +172,28 @@
   }
 
   .newsletter-btn {
-    margin-top: 1rem;
+    margin-top: 0.9rem;
     background-color: $color-accent;
     color: $color-white;
-    padding: 0.65rem 2.5rem;
-    font-weight: 600;
-    border-radius: 3rem;
+    padding: 0.65rem 2rem;
+    font-weight: 700;
+    border-radius: 999px;
     border: none;
-    transition: all 0.3s ease;
+    transition: transform 0.12s ease, box-shadow 0.2s ease, background 0.2s ease;
 
     &:hover {
-      background-color: darken($color-accent, 7%);
+      background-color: darken($color-accent, 6%);
+      box-shadow: 0 8px 16px rgba($color-accent, 0.25);
+      transform: translateY(-1px);
     }
-
+    &:active {
+      transform: translateY(0);
+      box-shadow: 0 4px 8px rgba($color-accent, 0.18);
+    }
+    &:focus-visible {
+      outline: 3px solid rgba($color-accent, 0.4);
+      outline-offset: 2px;
+    }
     &:disabled {
       opacity: 0.5;
       cursor: not-allowed;
@@ -200,7 +201,7 @@
   }
 
   .message {
-    margin-top: 1rem;
+    margin-top: 0.9rem;
     color: $color-muted;
     font-style: italic;
     font-size: 0.95rem;
@@ -208,125 +209,62 @@
   }
 }
 
+/* ——— Socials ——— */
 
 .socials {
   display: flex;
   justify-content: center;
-  gap: 1.5rem;
-  margin-top: 2rem;
+  gap: 1.2rem;
+  margin-top: 1.4rem;
   flex-wrap: wrap;
 
   a {
-    color: $color-light;
+    color: $color-dark;
     text-decoration: none;
-    font-weight: 500;
-    display: flex;
+    font-weight: 600;
+    display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    font-size: 1.05rem;
-    transition: all 0.3s ease;
+    gap: 0.45rem;
+    font-size: 1rem;
+    padding: 0.35rem 0.6rem;
+    border-radius: 8px;
+    transition: color 0.2s ease, background 0.2s ease, transform 0.1s ease;
 
     &:hover {
-      color: $color-accent;
-      transform: translateY(-2px);
+      color: $color-white;
+      background: $color-accent;
+      transform: translateY(-1px);
+    }
+
+    &:focus-visible {
+      outline: 3px solid rgba($color-accent, 0.4);
+      outline-offset: 2px;
     }
   }
 }
 
+/* ——— Animations ——— */
 
-
-@keyframes fadeIn {
-  to {
-    opacity: 1;
-  }
-}
-
+@keyframes fadeIn { to { opacity: 1; } }
 @keyframes fadeUp {
-  0% {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  0% { opacity: 0; transform: translateY(30px); }
+  100% { opacity: 1; transform: translateY(0); }
 }
 @keyframes shimmerText {
-  0% {
-    background-position: 0% center;
-  }
-  100% {
-    background-position: 200% center;
-  }
+  0%   { background-position: 0% center; }
+  100% { background-position: 200% center; }
 }
 @keyframes shimmerLogo {
-  0% {
-    background-position: 0% center;
-  }
-  100% {
-    background-position: 200% center;
-  }
+  0%   { background-position: 0% center; }
+  100% { background-position: 200% center; }
 }
+
+/* ——— Popup Overlay + Card ——— */
 
 .popupOverlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(4px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 999;
-}
-
-.popupContent {
-  background: $silver-50;
-  border: 1px solid $silver-200;
-  border-radius: 12px;
-  padding: 2rem;
-  width: 90%;
-  max-width: 400px;
-  text-align: center;
-  position: relative;
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-
-  h3 {
-    font-size: 1.5rem;
-    margin-bottom: 0.5rem;
-  }
-
-  p {
-    font-size: 1rem;
-    color: $silver-700;
-    margin-bottom: 1rem;
-  }
-}
-
-.closePopup {
-  position: absolute;
-  top: 0.8rem;
-  right: 1rem;
-  background: none;
-  border: none;
-  font-size: 1.4rem;
-  color: $silver-600;
-  cursor: pointer;
-
-  &:hover {
-    color: $color-accent;
-  }
-}
-
-.popupOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.6);
+  inset: 0;
+  background: rgba($color-dark, 0.6);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
@@ -335,75 +273,61 @@
 }
 
 .popupContent {
-  background: #ffffff;
+  background: $color-light;
+  border: 1px solid rgba($color-dark, 0.08);
+  border-radius: 16px;
   padding: 2rem;
-  border-radius: 1rem;
-  width: 90%;
-  max-width: 500px;
+  width: min(92vw, 520px);
   text-align: center;
   position: relative;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-}
+  box-shadow: 0 24px 64px rgba($color-dark, 0.25);
 
-.logoImage {
-  width: 100px;
-  margin: 0 auto 1rem;
-}
+  .logoImage {
+    width: 96px;
+    height: auto;
+    margin: 0 auto 0.75rem;
+    display: block;
+  }
 
-.logo {
-  font-size: 2rem;
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-  color: #111;
-}
+  h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: $color-dark;
+  }
 
-.heading {
-  font-size: 1.4rem;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 0.5rem;
-}
-
-.subheading {
-  font-size: 1rem;
-  color: #555;
-  margin-bottom: 1rem;
-}
-
-.notice {
-  font-size: 0.95rem;
-  color: #e2725b;
-  margin-bottom: 1.5rem;
+  p {
+    font-size: 1rem;
+    color: $color-dark;
+    margin-bottom: 1rem;
+  }
 }
 
 .closePopup {
   position: absolute;
-  top: 1rem;
+  top: 0.9rem;
   right: 1rem;
-  background: none;
+  background: rgba($color-dark, 0.06);
   border: none;
-  font-size: 1.5rem;
-  color: #333;
+  font-size: 1.4rem;
+  color: $color-dark;
   cursor: pointer;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  transition: background 0.18s ease, transform 0.1s ease;
+
+  &:hover {
+    background: rgba($color-dark, 0.1);
+    transform: scale(1.03);
+    color: $color-accent;
+  }
+  &:focus-visible {
+    outline: 3px solid rgba($color-accent, 0.4);
+    outline-offset: 2px;
+  }
 }
 
-.socials {
-  display: flex;
-  justify-content: center;
-  gap: 1.2rem;
-  margin-top: 1.5rem;
-
-  a {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    text-decoration: none;
-    color: #111;
-    font-size: 0.9rem;
-    transition: color 0.3s;
-
-    &:hover {
-      color: #e2725b;
-    }
-  }
+/* small screens */
+@media (max-width: 576px) {
+  .popupContent { padding: 1.5rem; border-radius: 14px; }
 }
