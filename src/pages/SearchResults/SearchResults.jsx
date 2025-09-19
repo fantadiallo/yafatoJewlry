@@ -1,16 +1,61 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
-import { useCatalog } from "../../context/CatalogContext";
-import flattenProducts, { searchProducts } from "../../utils/flattenProducts";
+import { useCatalog } from "../../context/CatalogContext.jsx";
 import styles from "./SearchResults.module.scss";
+import { searchShopifyProducts } from "../../api/shopify.js";
+
+const norm = (s) => (s || "").toString().toLowerCase().trim();
+const byPrefixThenContains = (list, q) => {
+  const needle = norm(q);
+  if (!needle) return [];
+  const starts = [], contains = [];
+  for (const p of list) {
+    const title = norm(p.title);
+    const handle = norm(p.handle);
+    const vendor = norm(p.vendor);
+    const tags = norm((p.tags || []).join(" "));
+    const hay = `${title} ${handle} ${vendor} ${tags}`;
+    if (!hay) continue;
+    if (title.startsWith(needle)) starts.push(p);
+    else if (hay.includes(needle)) contains.push(p);
+  }
+  const seen = new Set();
+  return [...starts, ...contains].filter(x => (seen.has(x.id) ? false : (seen.add(x.id), true)));
+};
 
 export default function SearchResults() {
   const { search } = useLocation();
-  const { products } = useCatalog();
   const q = new URLSearchParams(search).get("q") || "";
-  const list = useMemo(() => flattenProducts(products), [products]);
-  const items = useMemo(() => searchProducts(list, q), [list, q]);
+  const { products } = useCatalog();
+  const [remote, setRemote] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const local = useMemo(() => byPrefixThenContains(products, q), [products, q]);
+
   useEffect(() => { window.scrollTo(0, 0); }, [q]);
+
+  // Fallback to server if no local matches
+  useEffect(() => {
+    let alive = true;
+    async function run() {
+      if (local.length > 0) { setRemote([]); return; }
+      const needle = norm(q);
+      if (!needle) { setRemote([]); return; }
+      try {
+        setLoading(true);
+        const items = await searchShopifyProducts(q, 50); // more results on the page
+        if (alive) setRemote(items || []);
+      } catch (e) {
+        if (alive) setRemote([]);
+      } finally {
+        if (alive) setLoading(false);
+      }
+    }
+    run();
+    return () => { alive = false; };
+  }, [q, local.length]);
+
+  const items = local.length ? local : remote;
 
   return (
     <section className={styles.wrap}>
@@ -21,25 +66,23 @@ export default function SearchResults() {
         </h2>
       </header>
 
-      {items.length === 0 && <p className={styles.empty}>No products found.</p>}
+      {loading && <p className={styles.empty}>Searching…</p>}
+      {!loading && items.length === 0 && <p className={styles.empty}>No products found.</p>}
 
       <div className={styles.grid}>
-        {items.map((p) => {
-          const path = p.handle ? `/products/${p.handle}` : `/products/${(p.id || "").split("/").pop()}`;
-          return (
-            <Link key={p.id || p.handle} to={path} className={styles.card}>
-              <div className={styles.media}>
-                {p.image ? <img src={p.image} alt={p.title} /> : <div className={styles.placeholder} />}
-              </div>
-              <div className={styles.meta}>
-                <h4 className={styles.title}>{p.title}</h4>
-                <p className={styles.price}>
-                  {p.price ? `${Number(p.price).toFixed(2)} ${p.currency || "GBP"}` : ""}
-                </p>
-              </div>
-            </Link>
-          );
-        })}
+        {items.map((p) => (
+          <Link key={p.id} to={`/products/${p.handle}`} className={styles.card}>
+            <div className={styles.media}>
+              {p.image ? <img src={p.image} alt={p.title} /> : <div className={styles.placeholder} />}
+            </div>
+            <div className={styles.meta}>
+              <h4 className={styles.title}>{p.title}</h4>
+              <p className={styles.price}>
+                {p.price ? `${Number(p.price).toFixed(2)} ${p.currency || "GBP"}` : ""}
+              </p>
+            </div>
+          </Link>
+        ))}
       </div>
     </section>
   );
