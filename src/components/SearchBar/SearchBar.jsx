@@ -1,46 +1,52 @@
-import { useState, useEffect } from "react";
+// SearchBar.jsx
+import { useState, useMemo } from "react";
 import { FiSearch, FiX } from "react-icons/fi";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import styles from "./SearchBar.module.scss";
-import { searchShopifyProducts } from "../../api/shopify";
 
-export default function SearchBar({ placeholder = "Search products…" }) {
+export default function SearchBar({ products = [], placeholder = "Search products…" }) {
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
-  const [results, setResults] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  // live search
-  useEffect(() => {
-    let alive = true;
-    async function run() {
-      if (q.trim().length < 1) {
-        setResults([]);
-        return;
-      }
-      setLoading(true);
-      try {
-        const res = await searchShopifyProducts(q, 5); // limit 5 quick results
-        if (!alive) return;
-        setResults(Array.isArray(res) ? res : res.items || []);
-      } finally {
-        if (alive) setLoading(false);
-      }
-    }
-    run();
-    return () => { alive = false; };
-  }, [q]);
+  const norm = (s) => (s || "").toString().toLowerCase().trim();
+  const results = useMemo(() => {
+    const needle = norm(q);
+    if (!needle) return [];
+    return products
+      .filter((p) => {
+        const title = norm(p.title);
+        const handle = norm(p.handle);
+        const vendor = norm(p.vendor);
+        const tags = Array.isArray(p.tags) ? norm(p.tags.join(" ")) : "";
+        return (
+          title.startsWith(needle) ||
+          title.includes(needle) ||
+          handle.includes(needle) ||
+          vendor.includes(needle) ||
+          tags.includes(needle)
+        );
+      })
+      .slice(0, 5);
+  }, [q, products]);
 
   function handleClose() {
     setOpen(false);
     setQ("");
-    setResults([]);
+  }
+
+  function goToResults(e) {
+    e.preventDefault();
+    const query = q.trim();
+    if (!query) return;
+    navigate(`/search?q=${encodeURIComponent(query)}`);
+    handleClose();
   }
 
   return (
     <div className={styles.searchWrapper}>
       {open ? (
-        <div className={styles.searchBox}>
+        <form className={styles.searchForm} onSubmit={goToResults}>
           <div className={styles.inputRow}>
             <FiSearch className={styles.leadingIcon} aria-hidden="true" />
             <input
@@ -61,13 +67,9 @@ export default function SearchBar({ placeholder = "Search products…" }) {
             </button>
           </div>
 
-          {/* dropdown results */}
-          {q && (
+          {!!q && (
             <div className={styles.dropdown}>
-              {loading && <p className={styles.loading}>Searching…</p>}
-              {!loading && results.length === 0 && (
-                <p className={styles.empty}>No results</p>
-              )}
+              {results.length === 0 && <p className={styles.empty}>No results</p>}
               {results.map((p) => (
                 <Link
                   key={p.id}
@@ -75,20 +77,23 @@ export default function SearchBar({ placeholder = "Search products…" }) {
                   className={styles.resultItem}
                   onClick={handleClose}
                 >
-                  {p.image && (
-                    <img src={p.image} alt={p.title} className={styles.thumb} />
-                  )}
+                  {p.image && <img src={p.image} alt={p.title} className={styles.thumb} />}
                   <span>{p.title}</span>
                 </Link>
               ))}
+              {results.length > 0 && (
+                <button type="submit" className={styles.viewAllBtn}>
+                  View all results for “{q}”
+                </button>
+              )}
             </div>
           )}
-        </div>
+        </form>
       ) : (
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className={styles.iconBtn}
+          className={styles.iconTrigger}
           aria-label="Open search"
         >
           <FiSearch size={22} />
