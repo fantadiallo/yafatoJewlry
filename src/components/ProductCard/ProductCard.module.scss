@@ -88,3 +88,193 @@
     margin: 0.25rem 0 0;
   }
 }
+
+/* palette (from globals)
+$color-primary: #C0C0C0;
+$color-dark:    #111111;
+$color-light:   #F8F5F2;
+$color-accent:  #37697d;
+$color-muted:   #AFAFAF;
+$color-white:   #FFFFFF;
+*/
+
+/* ——— ICONS (heart / + cart) ——— */
+.iconBar {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  z-index: 3;
+}
+
+.iconButton {
+  all: unset;                       /* remove default button chrome */
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+
+  /* soft glassy chip over the image */
+  background: rgba($color-white, 0.85);
+  backdrop-filter: saturate(130%) blur(3px);
+  color: $color-dark;
+
+  box-shadow: 0 2px 10px rgba($color-dark, 0.15);
+  transition: transform .12s ease, box-shadow .18s ease, background .18s ease, color .18s ease;
+
+  &:hover {
+    background: $color-accent;
+    color: $color-white;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba($color-accent, 0.35);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 3px 10px rgba($color-accent, 0.25);
+  }
+
+  &:focus-visible {
+    outline: 3px solid rgba($color-accent, 0.45);
+    outline-offset: 2px;
+  }
+
+  /* when the second button is the "+ Cart" text, keep padding tidy */
+  &:has(> :not(svg)) {
+    width: auto;
+    min-width: 36px;
+    padding: 0 .6rem;
+    border-radius: 18px; /* pill */
+    font-weight: 700;
+    font-size: .85rem;
+  }
+
+  /* make filled heart pop even at rest */
+  :global(svg) {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+/* ——— OPTIONS (Ring size select) ——— */
+.optionsBar {
+  display: grid;
+  gap: .6rem;
+  margin-top: .6rem;
+}
+
+.optionGroup {
+  display: grid;
+  gap: .35rem;
+  position: relative; /* for caret */
+}
+
+.optionLabel {
+  font-weight: 700;
+  color: $color-dark;
+  font-size: .95rem;
+}
+
+/* elegant native-like select with custom caret */
+.optionSelect {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  width: 100%;
+  padding: .65rem .9rem;
+  padding-right: 2.2rem;                /* space for caret */
+  border-radius: 12px;
+  border: 1px solid rgba($color-dark, .16);
+  background: $color-white;
+  color: $color-dark;
+  font-size: .95rem;
+  line-height: 1.2;
+  cursor: pointer;
+  box-shadow: 0 1px 0 rgba($color-dark, .04);
+
+  &:hover {
+    border-color: rgba($color-accent, .45);
+  }
+  &:focus {
+    border-color: $color-accent;
+    outline: 3px solid rgba($color-accent, .35);
+    outline-offset: 2px;
+  }
+}
+
+/* slim caret */
+.optionGroup::after {
+  content: "▾";
+  position: absolute;
+  right: .7rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: $color-muted;
+  font-size: .9rem;
+}
+
+/* price + badge under selector */
+.variantPrice {
+  margin-top: .2rem;
+  font-weight: 700;
+  color: $color-dark;
+
+  .badge {
+    margin-left: .45rem;
+    padding: .15rem .45rem;
+    font-size: .72rem;
+    border-radius: 999px;
+    background: rgba($color-dark, .06);
+    color: $color-dark;
+    font-weight: 700;
+  }
+}
+
+/* ——— CARD BASICS (keep your structure, just polish) ——— */
+.productCard {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.imageWrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border-radius: 12px;                  /* soft corners */
+  background: $color-light;
+
+  .productImage {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: opacity .4s ease;
+  }
+
+  .defaultImage { opacity: 1; z-index: 1; }
+  .hoverImage   { opacity: 0; z-index: 2; }
+
+  &:hover {
+    .defaultImage { opacity: 0; }
+    .hoverImage   { opacity: 1; }
+  }
+}
+
+.info {
+  margin-top: .75rem;
+  text-align: center;
+
+  .title { font-size: .98rem; font-weight: 600; margin: 0; line-height: 1.25; }
+  .price { font-size: .95rem; font-weight: 700; color: $color-dark; opacity: .9; margin: .3rem 0 0; }
+}
