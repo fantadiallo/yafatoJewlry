@@ -1,10 +1,16 @@
+// src/context/CatalogContext.js
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 
-const CatalogContext = createContext({ products: [], setProducts: () => {}, loading: false, error: null });
+const CatalogContext = createContext({
+  products: [],
+  setProducts: () => {},
+  loading: false,
+  error: null,
+});
 
 export function CatalogProvider({ children, loader }) {
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(!!loader);
+  const [loading, setLoading] = useState(Boolean(loader));
   const [error, setError] = useState(null);
   const didLoad = useRef(false);
 
@@ -16,13 +22,14 @@ export function CatalogProvider({ children, loader }) {
     (async () => {
       try {
         const data = await loader();
-        if (alive) setProducts(data || []);
+        if (alive) setProducts(Array.isArray(data) ? data : []);
       } catch (e) {
         if (alive) setError(e);
       } finally {
         if (alive) setLoading(false);
       }
     })();
+
     return () => { alive = false; };
   }, [loader]);
 
