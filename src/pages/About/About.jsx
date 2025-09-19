@@ -101,15 +101,29 @@ export default function AboutPage() {
       </motion.section>
 
       {/* Video Section */}
-      <motion.section className={styles.videoSection}>
-        <h2>Our Story in Motion</h2>
-        <div className={styles.videoWrapper}>
-          <video className={styles.videoPlayer} controls playsInline>
-            <source src="/Yafatoo.mp4" type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
-        </div>
-      </motion.section>
+ <motion.section className={styles.videoSection}>
+  <h2>Our Story in Motion</h2>
+  <div className={styles.videoWrapper}>
+    <video 
+      className={styles.videoPlayer} 
+      controls 
+      playsInline 
+      preload="none" 
+      poster="https://cdn.shopify.com/videos/c/o/v/3a9635282e544649b927150a4134fb00-poster.jpg" // optional thumbnail
+    >
+      <source 
+        src="https://cdn.shopify.com/videos/c/o/v/3a9635282e544649b927150a4134fb00.mp4" 
+        type="video/mp4" 
+      />
+      <source 
+        src="https://cdn.shopify.com/videos/c/o/v/896e9e67b0eb472e8a9c7e7fa38e3900.mov" 
+        type="video/quicktime" 
+      />
+      Your browser does not support the video tag.
+    </video>
+  </div>
+</motion.section>
+
 
       {/* CTA */}
       <motion.section className={styles.ctaSection}>
