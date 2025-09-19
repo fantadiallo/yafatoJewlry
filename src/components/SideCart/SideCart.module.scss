@@ -1,3 +1,6 @@
+
+@use "sass:color";
+
 .sideCart {
   position: fixed;
   top: 0;
@@ -147,4 +150,122 @@
 
 @media (prefers-reduced-motion: reduce) {
   .sideCart { transition: none; }
+}
+/* Generic small label used in rows */
+.label {
+  font-size: .78rem;
+  color: $color-muted;
+  margin-right: .4rem;
+}
+
+/* Row wrapper for price + qty */
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+}
+
+/* ---- Variant selector ---- */
+.variantSelectWrap {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: .5rem .65rem;
+  margin: .2rem 0 .35rem;
+
+  .label {
+    grid-column: 1 / 2;
+    align-self: center;
+  }
+
+  .variantSelect {
+    grid-column: 2 / 3;
+    width: 100%;
+  }
+}
+
+.variantSelect {
+  appearance: none;
+  border: 1px solid rgba($color-dark, 0.12);
+  background: $color-white;
+  color: $color-dark;
+  border-radius: 10px;
+  padding: .5rem .75rem;
+  font-size: .9rem;
+  line-height: 1.1;
+  cursor: pointer;
+  transition: border-color 120ms ease;
+
+  &:hover { border-color: rgba($color-accent, .55); }
+  &:focus { outline: 3px solid rgba($color-accent, .35); outline-offset: 2px; }
+  &:disabled { opacity: .55; cursor: not-allowed; }
+}
+
+/* Fallback variant text (when only one variant) */
+.variant {
+  font-size: .86rem;
+  color: $color-muted;
+
+  strong {
+    color: $color-dark;
+    font-weight: 700;
+  }
+}
+
+/* ---- Quantity stepper ---- */
+.qtyWrap {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  border: 1px solid rgba($color-dark, 0.12);
+  border-radius: 10px;
+  padding: .25rem .35rem;
+  background: $color-white;
+
+  .label {
+    margin: 0 .25rem 0 .15rem;
+  }
+}
+
+.qtyBtn {
+  border: 1px solid rgba($color-dark, 0.12);
+  background: $color-light;
+  color: $color-dark;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  font-size: 1rem;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: transform 80ms ease, border-color 120ms ease;
+
+  &:hover { border-color: rgba($color-accent, .55); }
+  &:active { transform: scale(0.98); }
+  &:focus { outline: 3px solid rgba($color-accent, .35); outline-offset: 2px; }
+}
+
+.qtyInput {
+  width: 44px;
+  text-align: center;
+  border: 1px solid rgba($color-dark, 0.12);
+  background: $color-white;
+  color: $color-dark;
+  border-radius: 8px;
+  padding: .35rem .4rem;
+  font-size: .9rem;
+
+  &:focus { outline: 3px solid rgba($color-accent, .35); outline-offset: 2px; }
+  /* remove spinners for number inputs (optional) */
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  -moz-appearance: textfield;
+}
+
+/* ---- Buttons / colors: replace deprecated lighten() ---- */
+.checkoutBtn {
+  /* keep your existing rules… */
+  &:hover { background: color.adjust($color-dark, $lightness: 6%); }
 }
