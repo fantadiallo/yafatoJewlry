@@ -1,42 +1,43 @@
-import { useEffect, useState } from "react";
-import ProductList from "../../components/ProductsList/ProductList";
+// ProductsPage.jsx
+import { useLocation } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
 import { fetchShopifyProductsForCards } from "../../api/shopify";
-import styles from "./ProductPage.module.scss";
+import ProductList from "../../components/ProductsList/ProductList";
 
-export default function ProductPage() {
-  const [products, setProducts] = useState([]);
+export default function ProductsPage() {
+  const { search } = useLocation();
+  const type = new URLSearchParams(search).get("type") || ""; // e.g. rings
+  const [all, setAll] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [err, setErr] = useState("");
 
-  async function load() {
-    setLoading(true);
-    setErr("");
-    try {
-      const data = await fetchShopifyProductsForCards(24);
-      setProducts(data || []);
-    } catch (e) {
-      console.error(e);
-      setErr("Couldn’t load products. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  }
+  // fetch once (or refetch when type changes if you prefer)
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        setLoading(true);
+        const products = await fetchShopifyProductsForCards(60);
+        if (alive) setAll(products || []);
+      } finally {
+        if (alive) setLoading(false);
+      }
+    })();
+    return () => { alive = false; };
+  }, []);
 
-  useEffect(() => { load(); }, []);
+  const items = useMemo(() => {
+    if (!type) return all;
+    const needle = type.toLowerCase().trim();
+    return all.filter((p) => {
+      const byType = (p.productType || "").toLowerCase() === needle;
+      const byTag  = (p.tags || []).some(t => (t || "").toLowerCase() === needle);
+      return byType || byTag;
+    });
+  }, [all, type]);
 
-  if (loading) return <p className={styles.loading}>Loading products…</p>;
-  if (err) return (
-    <div className={styles.errorWrap}>
-      <p className={styles.error}>{err}</p>
-      <button onClick={load} className={styles.retry}>Retry</button>
-    </div>
-  );
-  if (!products.length) return <p className={styles.empty}>No products found.</p>;
+  if (loading && all.length === 0) return <p style={{padding:"1rem"}}>Loading…</p>;
+  if (!loading && items.length === 0)
+    return <p style={{padding:"1rem"}}>No products found for “{type}”.</p>;
 
-  return (
-    <main className={styles.productPage}>
-      <ProductList products={products} />
-    </main>
-  );
+  return <ProductList products={items} />;
 }
-
