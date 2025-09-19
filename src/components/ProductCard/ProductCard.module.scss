@@ -278,3 +278,82 @@ $color-white:   #FFFFFF;
   .title { font-size: .98rem; font-weight: 600; margin: 0; line-height: 1.25; }
   .price { font-size: .95rem; font-weight: 700; color: $color-dark; opacity: .9; margin: .3rem 0 0; }
 }
+.optionsBar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, max-content));
+  gap: .6rem;
+  justify-content: center;
+  margin-top: .6rem;
+}
+
+.optionGroup {
+  display: grid;
+  gap: .35rem;
+  position: relative;
+  width: max-content;
+}
+
+.optionLabel {
+  font-weight: 700;
+  color: $color-dark;
+  font-size: .9rem;
+  text-align: left;
+}
+
+.optionSelect {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  width: 160px;
+  max-width: 200px;
+  min-width: 140px;
+
+  padding: .55rem .9rem;
+  padding-right: 2rem;
+  border-radius: 12px;
+  border: 1px solid rgba($color-dark, .16);
+  background: $color-white;
+  color: $color-dark;
+  font-size: .9rem;
+  line-height: 1.2;
+  cursor: pointer;
+  box-shadow: 0 1px 0 rgba($color-dark, .04);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+
+  &:hover { border-color: rgba($color-accent, .45); }
+  &:focus {
+    border-color: $color-accent;
+    outline: 3px solid rgba($color-accent, .35);
+    outline-offset: 2px;
+  }
+}
+
+.optionGroup::after {
+  content: "▾";
+  position: absolute;
+  right: .6rem;
+  top: calc(50% + .2rem);
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: $color-muted;
+  font-size: .85rem;
+}
+
+.variantPrice {
+  margin-top: .2rem;
+  font-weight: 700;
+  color: $color-dark;
+
+  .badge {
+    margin-left: .45rem;
+    padding: .15rem .45rem;
+    font-size: .72rem;
+    border-radius: 999px;
+    background: rgba($color-dark, .06);
+    color: $color-dark;
+    font-weight: 700;
+  }
+}
