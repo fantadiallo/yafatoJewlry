@@ -1,98 +1,92 @@
+/* SearchResults.module.scss
+$color-primary: #C0C0C0;
+$color-dark:    #111111;
+$color-light:   #F8F5F2;
+$color-accent:  #37697d;
+$color-muted:   #AFAFAF;
+$color-white:   #FFFFFF;
+*/
 
-.results {
+.wrap {
   max-width: 1200px;
   margin: 0 auto;
   padding: 1.25rem;
 }
 
-.header {
-  display: flex;
-  align-items: baseline;
-  gap: .5rem;
-  margin-bottom: .75rem;
+.header h2 {
+  margin: 0 0 .75rem;
+  font-weight: 800;
+  .query { color: $color-accent; }
+  .count { opacity: .6; font-weight: 500; margin-left: .5rem; }
 }
+
+.empty { color: $color-muted; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  text-decoration: none;
+  color: inherit;
+  background: $color-white;
+  border: 1px solid rgba($color-dark,.08);
+  border-radius: 14px;
+  overflow: hidden;
+  transition: transform 120ms ease, box-shadow 180ms ease, border-color 180ms ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: rgba($color-accent,.35);
+    box-shadow: 0 12px 28px rgba($color-dark,.12);
+  }
+  &:focus-visible {
+    outline: 3px solid rgba($color-accent,.4);
+    outline-offset: 3px;
+  }
+}
+
+.media {
+  position: relative;
+  width: 100%;
+  /* 4:5-ish portrait works well for jewelry; adjust as needed */
+  aspect-ratio: 4 / 5;
+  background: $color-light;
+
+  img {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
+}
+
+.placeholder {
+  width: 100%; height: 100%;
+  background: repeating-linear-gradient(
+    45deg,
+    lighten($color-light, 3%) 0 10px,
+    lighten($color-light, 7%) 10px 20px
+  );
+}
+
+.meta {
+  padding: .7rem .8rem .9rem;
+  display: grid; gap: .25rem;
+}
+
 .title {
   margin: 0;
-  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.price {
+  margin: 0;
   color: $color-dark;
-}
-.subtle {
-  color: rgba($color-dark, .6);
-  font-size: .95rem;
-}
-
-.error { color: #c33; margin: .5rem 0 1rem; }
-.empty { color: rgba($color-dark, .7); margin: .5rem 0 1rem; }
-
-/* uniform card sizing */
-.grid {
-  --card-w: 260px;
-  --card-h: 360px;
-  display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(var(--card-w), 1fr));
-  justify-items: center;
-}
-
-.cardWrap {
-  width: 100%;
-  max-width: var(--card-w);
-  height: var(--card-h);
-  display: grid;
-}
-
-/* optional: if your ProductCard exposes these classes, they’ll look consistent */
-:global(.productCard) {
-  height: 100%;
-  border-radius: 14px;
-  background: $color-white;
-  box-shadow: 0 2px 10px rgba($color-dark, .06);
-  transition: transform .2s ease, box-shadow .2s ease;
-  display: grid;
-
-  &:hover { transform: translateY(-4px); box-shadow: 0 10px 24px rgba($color-dark,.12); }
-}
-:global(.productCard .card-media),
-:global(.productCard img) {
-  width: 100%;
-  aspect-ratio: 4 / 5;
-  object-fit: cover;
-  display: block;
-}
-
-/* skeletons aligned to card size */
-.skeleton {
-  width: 100%;
-  max-width: var(--card-w);
-  height: var(--card-h);
-  border-radius: 14px;
-  background: linear-gradient(
-    90deg,
-    rgba($color-muted, .2) 25%,
-    rgba($color-muted, .35) 37%,
-    rgba($color-muted, .2) 63%
-  );
-  background-size: 400% 100%;
-  animation: shimmer 1.4s infinite linear;
-}
-@keyframes shimmer {
-  0% { background-position: -400% 0; }
-  100% { background-position: 400% 0; }
-}
-
-.loadMoreRow {
-  display: flex;
-  justify-content: center;
-  margin-top: 1rem;
-}
-.loadMore {
-  padding: .75rem 1rem;
-  border-radius: 10px;
-  border: 1px solid rgba($color-dark, .16);
-  background: $color-white;
-  color: $color-dark;
-  cursor: pointer;
-  transition: transform .12s ease, background-color .12s ease, border-color .12s ease;
-
-  &:hover { transform: translateY(-1px); background-color: $color-light; border-color: rgba($color-dark, .28); }
+  opacity: .8;
+  font-weight: 600;
 }
