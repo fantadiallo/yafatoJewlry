@@ -14,3 +14,16 @@ padding: 0 !important;
 $header-height: 40px;
 $z-header: 1000;
 $z-overlay: 999;
+
+/* Hide any native Shopify product form that appears after our ProductInfo */
+#productInfoRoot ~ form[action*="cart"],
+#productInfoRoot ~ .product-form,
+#productInfoRoot ~ .shopify-product-form,
+#productInfoRoot ~ * select[name*="size" i],
+#productInfoRoot ~ * label[for*="size" i],
+#productInfoRoot ~ * button[name="add"],
+#productInfoRoot ~ * button[type="submit"],
+#productInfoRoot ~ * .shopify-buy__quantity,
+#productInfoRoot ~ * .shopify-buy__btn {
+  display: none !important;
+}
