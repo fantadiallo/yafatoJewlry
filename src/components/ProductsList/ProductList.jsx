@@ -1,26 +1,23 @@
-import ProductCard from '../ProductCard/ProductCard';
-import styles from './ProductList.module.scss';
+import ProductCard from "../ProductCard/ProductCard";
+import styles from "./ProductList.module.scss";
 
-export default function ProductList({ products }) {
+export default function ProductList({ products = [] }) {
   return (
     <div className={styles.grid}>
-      {products.map((product) => {
-        console.log('Product:', product);
-        console.log('Variants:', product.variants);
+      {products.map((p) => {
+        const primaryImage   = p.images?.[0]?.url || "/placeholder.png";
+        const secondaryImage = p.images?.[1]?.url || "/placeholder.png";
 
         return (
           <ProductCard
-            key={product.id} // ✅ important for list rendering
-            id={product.id}
-            image={product.featuredImage?.url}
-            secondaryImage={product.images?.edges?.[1]?.node?.url}
-            title={product.title}
-            price={product.priceRange?.minVariantPrice?.amount}
-            options={product.options?.map((o) => ({
-              name: o.name,
-              values: o.values,
-            })) || []}
-            variants={product.variants?.edges?.map((e) => e.node) || []}
+            key={p.id}
+            id={p.id}
+            image={primaryImage}
+            secondaryImage={secondaryImage}
+            title={p.title}
+            price={p.price}       // single normalized price
+            options={p.options}   // normalized options
+            variants={p.variants} // normalized variants
             requireSelection
           />
         );
