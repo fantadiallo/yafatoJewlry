@@ -155,8 +155,8 @@ const cartCount = cart?.totalQuantity ?? 0;
             {jewelryOpen && (
               <div className={styles.dropdownMenu} role="menu">
                 <Link to="/products" onClick={() => setJewelryOpen(false)}>All</Link>
-                <Link to="/products/rings" onClick={() => setJewelryOpen(false)}>Rings</Link>
-                <Link to="/products/bracelets" onClick={() => setJewelryOpen(false)}>Bracelets</Link>
+               <Link to="/products?type=rings" onClick={() => setJewelryOpen(false)}>Rings</Link>
+                <Link to="/products?type=bracelets" onClick={() => setJewelryOpen(false)}>Bracelets</Link>
 
                 {/* Coming soon */}
                 <Link
@@ -304,9 +304,9 @@ const cartCount = cart?.totalQuantity ?? 0;
               </div>
 
               <Link to="/products" onClick={() => setMenuOpen(false)}>All</Link>
-              <Link to="/products/rings" onClick={() => setMenuOpen(false)}>Rings</Link>
-              <Link to="/products/bracelets" onClick={() => setMenuOpen(false)}>Bracelets</Link>
-              <Link to="/products" className={styles.inactive} onClick={() => setMenuOpen(false)}>
+<Link to="/products?type=rings" onClick={() => setJewelryOpen(false)}>Rings</Link>
+<Link to="/products?type=bracelets" onClick={() => setJewelryOpen(false)}>Bracelets</Link>
+ <Link to="/products" className={styles.inactive} onClick={() => setMenuOpen(false)}>
                 Necklaces <span className={styles.status}>Coming soon</span>
               </Link>
               <Link to="/products" className={styles.inactive} onClick={() => setMenuOpen(false)}>
