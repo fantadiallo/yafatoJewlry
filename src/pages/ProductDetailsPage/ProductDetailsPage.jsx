@@ -1,10 +1,11 @@
+// ProductDetailsPage.jsx
 import { useEffect, useRef, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { fetchSingleProductById, fetchProductByHandle } from "../../api/shopify";
 import ProductGallery from "../../components/ProductGallery/ProductGallery";
 import ProductRecommendations from "../../components/ProductRecommendations/ProductRecommendations";
 import ProductInfo from "../../components/ProductInfo/ProductInfo";
-import ProductBuyBox from "../../components/ProductBuyBox/ProductBuyBox";
+// ⛔️ removed ProductBuyBox import
 import styles from "./ProductDetailsPage.module.scss";
 
 export default function ProductDetailsPage() {
@@ -13,7 +14,7 @@ export default function ProductDetailsPage() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
-  const buyRef = useRef(null);
+  const buyRef = useRef(null); // still used for ?select=1 scroll
 
   useEffect(() => {
     let alive = true;
@@ -21,8 +22,11 @@ export default function ProductDetailsPage() {
       setLoading(true);
       setErr("");
       try {
-        const looksLikeHandle = id && !String(id).startsWith("gid://shopify/") && !/^\d+$/.test(String(id));
-        const data = looksLikeHandle ? await fetchProductByHandle(id) : await fetchSingleProductById(id);
+        const looksLikeHandle =
+          id && !String(id).startsWith("gid://shopify/") && !/^\d+$/.test(String(id));
+        const data = looksLikeHandle
+          ? await fetchProductByHandle(id)
+          : await fetchSingleProductById(id);
         if (!alive) return;
         setProduct(data);
       } catch {
@@ -32,15 +36,30 @@ export default function ProductDetailsPage() {
         if (alive) setLoading(false);
       }
     })();
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
   }, [id]);
 
+  // keep the deep-link to options (?select=1)
   useEffect(() => {
-    if (search.get("select") && buyRef.current) buyRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    if (search.get("select") && buyRef.current) {
+      buyRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
   }, [search, product]);
 
-  if (loading) return <main className="productDetails"><p className="loading">Loading product…</p></main>;
-  if (err || !product) return <main className="productDetails"><p className="error">{err || "Product not found."}</p></main>;
+  if (loading)
+    return (
+      <main className="productDetails">
+        <p className="loading">Loading product…</p>
+      </main>
+    );
+  if (err || !product)
+    return (
+      <main className="productDetails">
+        <p className="error">{err || "Product not found."}</p>
+      </main>
+    );
 
   const images = (product.images || []).map((img, i) =>
     typeof img === "string" ? { url: img, alt: `${product.title} ${i + 1}` } : img
@@ -52,13 +71,15 @@ export default function ProductDetailsPage() {
         <section className={styles.imageGallery}>
           <ProductGallery images={images} title={product.title} />
         </section>
+
         <section className={styles.info}>
-          <ProductInfo product={product} />
+          {/* anchor the scroll target to YOUR UI (no duplicate buy box) */}
           <div ref={buyRef}>
-            <ProductBuyBox product={product} />
+            <ProductInfo product={product} />
           </div>
         </section>
       </div>
+
       <ProductRecommendations productId={product.id} currentId={product.id} />
     </main>
   );
