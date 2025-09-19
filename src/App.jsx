@@ -1,4 +1,3 @@
-// src/App.jsx
 import { Routes, Route } from "react-router-dom";
 import Layout from "./components/layout/layout";
 import HomePage from "./pages/HomePage/HomePage";
@@ -17,14 +16,14 @@ async function loadCatalog() {
   const pageSize = 100;
   let after = null;
   let items = [];
-  for (let i = 0; i < 3; i++) {               // up to ~300 products
+  for (let i = 0; i < 3; i++) {             
     const { items: page, hasNextPage, endCursor } =
       await fetchShopifyProductsPaged(pageSize, after);
     items = items.concat(page);
     if (!hasNextPage) break;
     after = endCursor;
   }
-  return items; // already flat via mapNodeToItem
+  return items; 
 }
 
 function App() {
