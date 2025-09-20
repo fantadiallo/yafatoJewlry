@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaInstagram, FaTiktok } from "react-icons/fa";
-import NewsletterForm from "../NewsletterForm/NewsletterForm";
 import styles from "./NewsletterPopup.module.scss";
 
 const LS_KEY = "newsletterPopupPrefs";
