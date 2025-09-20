@@ -17,7 +17,6 @@ function getPrefs() {
 function setPrefs(next) {
   localStorage.setItem(LS_KEY, JSON.stringify(next));
 }
-
 function daysBetween(a, b) {
   return Math.floor((b.getTime() - a.getTime()) / (1000 * 60 * 60 * 24));
 }
@@ -33,32 +32,25 @@ export default function NewsletterPopup({
   const canShow = useCallback(() => {
     const prefs = getPrefs();
     if (prefs.subscribed) return false;
-
     const seenThisSession = sessionStorage.getItem(SS_KEY) === "true";
     if (seenThisSession) return false;
-
     if ((prefs.dismissCount || 0) >= maxDismissals) return false;
-
     if (prefs.lastShown) {
       const last = new Date(prefs.lastShown);
       if (daysBetween(last, new Date()) < cooldownDays) return false;
     }
-
     return true;
   }, [cooldownDays, maxDismissals]);
 
   useEffect(() => {
     if (!canShow()) return;
-
     let timer;
     let onScroll;
-
     if (trigger === "delay") {
       timer = setTimeout(() => setShowPopup(true), delayMs);
     } else if (trigger === "scroll50") {
       onScroll = () => {
-        const scrolled =
-          (window.scrollY + window.innerHeight) / document.body.scrollHeight;
+        const scrolled = (window.scrollY + window.innerHeight) / document.body.scrollHeight;
         if (scrolled >= 0.5) {
           setShowPopup(true);
           window.removeEventListener("scroll", onScroll);
@@ -66,7 +58,6 @@ export default function NewsletterPopup({
       };
       window.addEventListener("scroll", onScroll, { passive: true });
     }
-
     return () => {
       if (timer) clearTimeout(timer);
       if (onScroll) window.removeEventListener("scroll", onScroll);
@@ -83,10 +74,7 @@ export default function NewsletterPopup({
   const close = () => {
     setShowPopup(false);
     const prefs = getPrefs();
-    setPrefs({
-      ...prefs,
-      dismissCount: (prefs.dismissCount || 0) + 1,
-    });
+    setPrefs({ ...prefs, dismissCount: (prefs.dismissCount || 0) + 1 });
   };
 
   const onSubscribed = () => {
@@ -106,41 +94,31 @@ export default function NewsletterPopup({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          onClick={(e) => {
-            if (e.target === e.currentTarget) close();
-          }}
+          onClick={(e) => { if (e.target === e.currentTarget) close(); }}
         >
           <motion.div
             className={styles.popupContent}
-            initial={{ scale: 0.9, opacity: 0 }}
+            initial={{ scale: 0.94, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
+            exit={{ scale: 0.94, opacity: 0 }}
+            transition={{ duration: 0.35, ease: "easeOut" }}
             tabIndex={-1}
           >
-            <button className={styles.closePopup} onClick={close} aria-label="Close">
-              ✕
-            </button>
-
-            <img src="/yafato.png" alt="Yafato Logo" className={styles.logoImage} />
-            <h1 className={styles.logo}>YAFATO</h1>
-            <h2 className={styles.heading}>A light that never leaves</h2>
-            <p className={styles.subheading}>
-              A new era of silver is coming. Launching August 25.
-            </p>
-            <p className={styles.notice}>
-              Be first. First 5 get 50% off — 10% for all new signups.
-            </p>
-
-            <NewsletterForm onSuccess={onSubscribed} />
-
-            <div className={styles.socials}>
-              <a href="https://instagram.com/Yafato_" target="_blank" rel="noreferrer">
-                <FaInstagram /> Instagram
-              </a>
-              <a href="https://tiktok.com/@Yafato_" target="_blank" rel="noreferrer">
-                <FaTiktok /> TikTok
-              </a>
+            <button className={styles.closePopup} onClick={close} aria-label="Close">✕</button>
+            <div className={styles.popupInner}>
+              <img src="/yafato.png" alt="Yafato" className={styles.logoImage} />
+              <h1 className={styles.logo}>YAFATO</h1>
+              <h2 className={styles.heading}>A light that never leaves</h2>
+              <p className={styles.notice}>First 5 get 50% off — 10% for all new signups.</p>
+              <NewsletterForm onSuccess={onSubscribed} />
+              <div className={styles.socials}>
+                <a href="https://instagram.com/Yafato_" target="_blank" rel="noreferrer">
+                  <FaInstagram /> Instagram
+                </a>
+                <a href="https://tiktok.com/@Yafato_" target="_blank" rel="noreferrer">
+                  <FaTiktok /> TikTok
+                </a>
+              </div>
             </div>
           </motion.div>
         </motion.div>
