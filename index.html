@@ -1,16 +1,92 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Sen:wght@400;600;700&display=swap" rel="stylesheet">
+    <meta charset="utf-8" />
 
-    <title>Vite + React</title>
+    <!-- Primary SEO -->
+    <title>Yafato Jewelry</title>
+    <meta name="description" content="Yafato Jewelry crafts timeless silver 925 pieces with optional gold accents. Custom designs, resizing, and worldwide shipping. A light that never leaves." />
+    <meta name="keywords" content="Yafato, jewelry, silver 925, custom jewelry, handmade rings, necklaces, earrings, gifts" />
+    <link rel="canonical" href="https://www.your-domain.com/" />
+    <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
+
+    <!-- Viewport / PWA basics -->
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#111111" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Icons -->
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#111111" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Yafato Jewelry" />
+    <meta property="og:title" content="Yafato Jewelry — Handcrafted Silver 925" />
+    <meta property="og:description" content="Custom silver jewelry, made to last. Discover rings, necklaces, and more — crafted with care." />
+    <meta property="og:url" content="https://www.your-domain.com/" />
+    <meta property="og:image" content="https://www.your-domain.com/og/yafato-hero.jpg" />
+    <meta property="og:image:alt" content="Yafato Jewelry — handcrafted silver ring on velvet" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Yafato Jewelry — Handcrafted Silver 925" />
+    <meta name="twitter:description" content="Custom silver jewelry, made to last. Discover rings, necklaces, and more." />
+    <meta name="twitter:image" content="https://www.your-domain.com/og/yafato-hero.jpg" />
+
+    <!-- Preconnect / Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Sen:wght@400;600;700&display=swap" rel="stylesheet" />
+
+    <!-- Performance: preload your hero image (optional) -->
+    <!-- <link rel="preload" as="image" href="/images/hero@2x.jpg" imagesrcset="/images/hero.jpg 1x, /images/hero@2x.jpg 2x" imagesizes="100vw" /> -->
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context":"https://schema.org",
+      "@type":"WebSite",
+      "name":"Yafato Jewelry",
+      "url":"https://www.Yafato.com/",
+      "potentialAction":{
+        "@type":"SearchAction",
+        "target":"https://www.Yafato.com/search?q={query}",
+        "query-input":"required name=query"
+      }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context":"https://schema.org",
+      "@type":"Organization",
+      "name":"Yafato Jewelry",
+      "url":"https://www.Yafato.com/",
+      "logo":"https://www.Yafato.com/logo.png",
+      "sameAs":[
+        "https://instagram.com/Yafato_",
+        "https://tiktok.com/@Yafato_"
+      ]
+    }
+    </script>
+
+    <!-- Fallback color while CSS loads -->
+    <style>
+      html{background:#F8F5F2}
+    </style>
   </head>
   <body>
+    <noscript>
+      <p style="text-align:center;padding:1rem">
+        Yafato Jewelry works best with JavaScript enabled. Email us at
+        <a href="mailto:yafatojewlry@gmail.com">yafatojewlry@gmail.com</a>.
+      </p>
+    </noscript>
+
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
+
