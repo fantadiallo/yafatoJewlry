@@ -1,14 +1,5 @@
 /* AuthModal.module.scss */
 
-/* Palette (from your globals) 
-$color-primary: #C0C0C0;
-$color-dark:    #111111;
-$color-light:   #F8F5F2;
-$color-accent:  #37697d;
-$color-muted:   #AFAFAF;
-$color-white:   #FFFFFF;
-*/
-
 .overlay {
   position: fixed;
   inset: 0;
@@ -19,9 +10,11 @@ $color-white:   #FFFFFF;
 
 .modal {
   position: fixed;
-  inset: 50% auto auto 50%;
+  top: 50%;
+  left: 50%;
   transform: translate(-50%, -50%);
   width: min(92vw, 480px);
+  max-height: calc(100dvh - 2rem);
   background: $color-light;
   color: $color-dark;
   border: 1px solid rgba($color-dark, 0.08);
@@ -29,19 +22,16 @@ $color-white:   #FFFFFF;
   box-shadow: 0 24px 64px rgba($color-dark, 0.25);
   z-index: 1210;
   padding: 0 0 1rem 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 
-  /* Subtle separator line sheen using primary “silver” */
   &::after {
     content: "";
     display: block;
     height: 1px;
     margin-top: -1px;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba($color-primary, 0.7),
-      transparent
-    );
+    background: linear-gradient(90deg, transparent, rgba($color-primary, 0.7), transparent);
   }
 }
 
@@ -50,11 +40,7 @@ $color-white:   #FFFFFF;
   align-items: center;
   position: relative;
   border-bottom: 1px solid rgba($color-dark, 0.08);
-  background: linear-gradient(
-    180deg,
-    rgba($color-white, 0.7),
-    rgba($color-white, 0.3)
-  );
+  background: linear-gradient(180deg, rgba($color-white, 0.7), rgba($color-white, 0.3));
   border-top-left-radius: 16px;
   border-top-right-radius: 16px;
   overflow: hidden;
@@ -72,21 +58,11 @@ $color-white:   #FFFFFF;
     color: $color-dark;
     transition: background 180ms ease, color 180ms ease, box-shadow 180ms ease;
 
-    &:hover {
-      background: rgba($color-primary, 0.2);
-    }
-
-    &:focus-visible {
-      outline: 3px solid rgba($color-accent, 0.35);
-      outline-offset: -2px;
-      border-radius: 12px;
-    }
+    &:hover { background: rgba($color-primary, 0.2); }
+    &:focus-visible { outline: 3px solid rgba($color-accent, 0.35); outline-offset: -2px; border-radius: 12px; }
   }
 
-  .activeTab {
-    color: $color-accent;
-    box-shadow: inset 0 -3px 0 $color-accent;
-  }
+  .activeTab { color: $color-accent; box-shadow: inset 0 -3px 0 $color-accent; }
 
   .close {
     position: absolute;
@@ -102,24 +78,18 @@ $color-white:   #FFFFFF;
     line-height: 1;
     color: $color-dark;
     transition: background 180ms ease, transform 120ms ease;
-
-    &:hover {
-      background: rgba($color-dark, 0.1);
-      transform: scale(1.03);
-    }
-
-    &:focus-visible {
-      outline: 3px solid rgba($color-accent, 0.4);
-      outline-offset: 2px;
-    }
+    &:hover { background: rgba($color-dark, 0.1); transform: scale(1.03); }
+    &:focus-visible { outline: 3px solid rgba($color-accent, 0.4); outline-offset: 2px; }
   }
 }
 
-/* Body content used by your JSX */
 .body {
   padding: 1.25rem 1rem 0.5rem;
   display: grid;
   gap: 0.75rem;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 0.5rem);
 }
 
 .note {
@@ -134,32 +104,15 @@ $color-white:   #FFFFFF;
   border: none;
   border-radius: 12px;
   padding: 0.9rem 1rem;
-  background: $color-dark;           /* strong CTA by default */
+  background: $color-dark;
   color: $color-white;
   font-weight: 800;
   cursor: pointer;
   transition: transform 120ms ease, box-shadow 180ms ease, background 180ms ease;
-
-  &:hover {
-    background: lighten($color-dark, 6%);
-    box-shadow: 0 8px 20px rgba($color-dark, 0.15);
-    transform: translateY(-1px);
-  }
-
-  &:active {
-    transform: translateY(0);
-    box-shadow: 0 4px 10px rgba($color-dark, 0.12);
-  }
-
-  &:focus-visible {
-    outline: 3px solid rgba($color-accent, 0.45);
-    outline-offset: 2px;
-  }
-
-  &:disabled {
-    opacity: 0.7;
-    cursor: default;
-  }
+  &:hover { background: lighten($color-dark, 6%); box-shadow: 0 8px 20px rgba($color-dark, 0.15); transform: translateY(-1px); }
+  &:active { transform: translateY(0); box-shadow: 0 4px 10px rgba($color-dark, 0.12); }
+  &:focus-visible { outline: 3px solid rgba($color-accent, 0.45); outline-offset: 2px; }
+  &:disabled { opacity: 0.7; cursor: default; }
 }
 
 .subtle {
@@ -170,39 +123,26 @@ $color-white:   #FFFFFF;
     font-weight: 600;
     border-bottom: 1px dashed rgba($color-accent, 0.35);
     transition: color 150ms ease, border-color 150ms ease;
-
-    &:hover {
-      color: darken($color-accent, 6%);
-      border-color: rgba($color-accent, 0.6);
-    }
-
-    &:focus-visible {
-      outline: 3px solid rgba($color-accent, 0.35);
-      outline-offset: 2px;
-      border-radius: 6px;
-    }
+    &:hover { color: darken($color-accent, 6%); border-color: rgba($color-accent, 0.6); }
+    &:focus-visible { outline: 3px solid rgba($color-accent, 0.35); outline-offset: 2px; border-radius: 6px; }
   }
 }
 
-/* Small devices */
+/* Small devices: switch to bottom sheet */
 @media (max-width: 480px) {
   .modal {
-    width: calc(100vw - 1.5rem);
-    border-radius: 14px;
+    inset: auto 0 0 0;
+    transform: none;
+    width: 100%;
+    max-height: calc(100dvh - 0.75rem);
+    border-radius: 14px 14px 0 0;
+    margin: 0 auto;
   }
   .header .tab,
-  .header .activeTab {
-    padding: 0.85rem;
-    font-weight: 700;
-  }
+  .header .activeTab { padding: 0.85rem; font-weight: 700; }
 }
 
-/* Respect reduced motion */
+/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .submit,
-  .header .tab,
-  .header .activeTab,
-  .header .close {
-    transition: none;
-  }
+  .submit, .header .tab, .header .activeTab, .header .close { transition: none; }
 }

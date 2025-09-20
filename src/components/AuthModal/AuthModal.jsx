@@ -1,18 +1,30 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import styles from "./AuthModal.module.scss";
 
 export default function AuthModal({ isOpen, onClose }) {
-  const [tab, setTab] = useState("login"); // "login" | "register"
+  const [tab, setTab] = useState("login");
 
-  // Domain from your existing env (used in api/shopify.js)
-  const SHOP_DOMAIN = import.meta.env.VITE_SHOPIFY_DOMAIN; // e.g. "your-store.myshopify.com" or "shop.yourdomain.com"
+  useEffect(() => {
+    const { body, documentElement } = document;
+    if (isOpen) {
+      const prevBody = body.style.overflow;
+      const prevRoot = documentElement.style.overflow;
+      body.style.overflow = "hidden";
+      documentElement.style.overflow = "hidden";
+      return () => {
+        body.style.overflow = prevBody;
+        documentElement.style.overflow = prevRoot;
+      };
+    }
+  }, [isOpen]);
+
+  const SHOP_DOMAIN = import.meta.env.VITE_SHOPIFY_DOMAIN;
   const SHOP_BASE = useMemo(() => {
     const d = String(SHOP_DOMAIN || "").replace(/^https?:\/\//i, "");
     return d ? `https://${d}` : "";
   }, [SHOP_DOMAIN]);
 
-  // Where to send users back after login/register
   const returnUrl = useMemo(() => {
     const here = window.location.pathname + window.location.search + window.location.hash;
     return encodeURIComponent(here || "/");
@@ -34,7 +46,7 @@ export default function AuthModal({ isOpen, onClose }) {
           <motion.div
             className={styles.overlay}
             initial={{ opacity: 0 }}
-            animate={{ opacity: 0.5 }}
+            animate={{ opacity: 0.6 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
           />
@@ -63,7 +75,6 @@ export default function AuthModal({ isOpen, onClose }) {
               <button className={styles.close} onClick={onClose} aria-label="Close">×</button>
             </div>
 
-            {/* Simple explainer + continue button */}
             <div className={styles.body}>
               <p className={styles.note}>
                 You’ll be redirected to our secure Shopify {tab === "login" ? "login" : "registration"} page.
