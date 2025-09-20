@@ -2,7 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { FaInstagram, FaTiktok } from "react-icons/fa";
 import styles from "./NewsletterPage.module.scss";
-import NewsletterForm from "../../components/NewsletterForm/NewsletterForm";
+import NewsLetterForm from "../../components/NewsletterForm/NewsletterForm";
 
 const container = {
   hidden: { opacity: 0 },

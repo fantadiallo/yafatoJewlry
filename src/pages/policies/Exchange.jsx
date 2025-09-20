@@ -1,13 +1,16 @@
 export default function Exchange() {
   return (
-    <section style={{maxWidth:900,margin:"0 auto",padding:"2rem"}}>
-      <h1>Returns & Resizing</h1>
-      <p>You may request a return or resize within 14 days of receiving your item (unworn, original condition).</p>
+    <main>
+      <h1>Exchange Policy (No Refunds)</h1>
+      <p>You may request an exchange within 7 days of delivery.</p>
       <ul>
-        <li>Custom engravings or highly personalized pieces may be non-returnable; we’ll clarify before production.</li>
-        <li>Buyer is responsible for return shipping unless the item is faulty.</li>
-        <li>To start, email <a href="mailto:yafatojewlry@gmail.com">yafatojewlry@gmail.com</a> with your order number.</li>
+        <li>Items must be unused, unworn, and in original packaging.</li>
+        <li>Customers are responsible for return shipping costs.</li>
+        <li>After inspection, we issue store credit or an exchange of equal value.</li>
       </ul>
-    </section>
+      <p>Start an exchange: yafatojewlry@gmail.com</p>
+      <p>Last updated: 20 Sep 2025</p>
+    </main>
   );
 }
+

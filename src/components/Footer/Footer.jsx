@@ -22,7 +22,7 @@ export default function Footer() {
         </nav>
 
         <div className={styles.contact}>
-          <p><FiMail /> support@yafato.com</p>
+          <p><FiMail /> yafatojewlry@gmail.com</p>
           <p><FiPhone /> +47 944 64 132</p>
           <div className={styles.social}>
             <a href="https://instagram.com/yafato_" target="_blank" rel="noreferrer" aria-label="Instagram"><FiInstagram /></a>

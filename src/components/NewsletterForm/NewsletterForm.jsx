@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import styles from "./NewsletterForm.module.scss";
-import { supabase } from "../../../supabase/Client";
+import { supabase } from "../../supabase/Client";
 
 export default function NewsletterForm({ source = "coming-soon" }) {
   const [email, setEmail] = useState("");
