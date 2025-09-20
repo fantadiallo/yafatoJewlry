@@ -4,7 +4,6 @@ import HomePage from "./pages/HomePage/HomePage";
 import ContactPage from "./pages/Contact/Contact";
 import AboutPage from "./pages/About/About";
 import { CustomePage } from "./pages/CustomePage/CustomePage";
-import NewsletterPage from "./pages/NewsletterPage/NewsletterPage";
 import ProductDetailsPage from "./pages/ProductDetailsPage/ProductDetailsPage";
 import ProductPage from "./pages/ProductPage/ProductPage";
 import SearchResults from "./pages/SearchResults/SearchResults";
@@ -18,6 +17,7 @@ import Terms from "./pages/policies/Terms";
 import Shipping from "./pages/policies/Shipping";
 import Legal from "./pages/policies/Legal";
 import NotFound from "./pages/NotFound/NotFound";
+import NewsletterPage from "./pages/NewsletterPage/NewsletterPage";
 
 async function loadCatalog() {
   const pageSize = 100;
