@@ -10,14 +10,16 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@': resolve(__dirname, 'src'),
-      '@styles': resolve(__dirname, 'src/styles')
+      '@': resolve(__dirname, 'src')
     }
   },
   css: {
     preprocessorOptions: {
       scss: {
-        additionalData: '@use "@styles/_variables.scss" as *;'
+        // Let Sass resolve files inside src/styles with bare names like "variables"
+        loadPaths: [resolve(__dirname, 'src/styles')],
+        // IMPORTANT: end with \n so it doesn't glue to the next @use in your .scss files
+        additionalData: '@use "variables" as *;\n'
       }
     }
   }
