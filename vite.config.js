@@ -10,16 +10,19 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@': resolve(__dirname, 'src')
+      '@': resolve(__dirname, 'src'),
+      // you can keep this for JS imports if you use it, but SCSS won't rely on it anymore
+      '@styles': resolve(__dirname, 'src/styles'),
     }
   },
   css: {
     preprocessorOptions: {
       scss: {
-        // Let Sass resolve files inside src/styles with bare names like "variables"
+        // Let Sass resolve bare imports from src/styles (so "variables" works)
         loadPaths: [resolve(__dirname, 'src/styles')],
-        // IMPORTANT: end with \n so it doesn't glue to the next @use in your .scss files
+        // CRUCIAL: end with \n so it doesn't concatenate with the first line of your file
         additionalData: '@use "variables" as *;\n'
+        // If you also want the new color API everywhere: '@use "sass:color";\n@use "variables" as *;\n'
       }
     }
   }
