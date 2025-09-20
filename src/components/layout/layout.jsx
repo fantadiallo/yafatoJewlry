@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { ShopifyCartProvider } from "../../context/ShopifyCartContext";
 import NewsletterPopup from "../NewsletterPopup/NewsletterPopup";
 
+
 export default function Layout() {
   const location = useLocation();
   const hideNavAndFooter = location.pathname === "/newsletter";

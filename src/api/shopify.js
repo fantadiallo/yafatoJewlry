@@ -1,26 +1,52 @@
 // src/api/shopify.js
 
-// ---- Config ----
-const RAW_DOMAIN =
-  import.meta.env.VITE_SHOPIFY_DOMAIN ||
-  import.meta.env.VITE_SHOPIFY_STORE_DOMAIN || "";
-
-const TOKEN = import.meta.env.VITE_SHOPIFY_STOREFRONT_TOKEN || "";
-const API_VERSION = import.meta.env.VITE_SHOPIFY_API_VERSION || "2025-01";
-
+// ---------- Config ----------
 function normalizeDomain(s) {
   return String(s || "").trim().replace(/^https?:\/\//i, "").split("/")[0];
 }
 
-const HOST = normalizeDomain(RAW_DOMAIN);
+const RAW_DOMAIN =
+  import.meta.env.VITE_SHOPIFY_DOMAIN ||
+  import.meta.env.VITE_SHOPIFY_STORE_DOMAIN ||
+  "";
+
+const TOKEN = import.meta.env.VITE_SHOPIFY_STOREFRONT_TOKEN || "";
+const API_VERSION = import.meta.env.VITE_SHOPIFY_API_VERSION || "2025-01";
+
+const HOST = normalizeDomain(RAW_DOMAIN); // e.g. cahafaic-7x.myshopify.com
 export const SHOP_BASE = HOST ? `https://${HOST}` : "";
+
+const PUBLIC_HOST = normalizeDomain(import.meta.env.VITE_SHOPIFY_DOMAIN_PUBLIC); // e.g. shop.yafato.com
+export const SHOP_PUBLIC_BASE = PUBLIC_HOST ? `https://${PUBLIC_HOST}` : "";
+
 const API_URL = HOST ? `${SHOP_BASE}/api/${API_VERSION}/graphql.json` : "";
 
-// ---- Low-level GQL client ----
+// Replace the host in any absolute URL with the public customer domain
+export function toPublicShopUrl(url) {
+  try {
+    if (!url) return "";
+    if (!PUBLIC_HOST) return url;
+    const u = new URL(url);
+    u.host = PUBLIC_HOST;
+    u.protocol = "https:";
+    return u.toString();
+  } catch {
+    return url;
+  }
+}
+
+// Useful constants you can import in UI (auth buttons etc.)
+export const accountUrls = {
+  login:    SHOP_PUBLIC_BASE ? `${SHOP_PUBLIC_BASE}/account/login` : "",
+  register: SHOP_PUBLIC_BASE ? `${SHOP_PUBLIC_BASE}/account/register` : "",
+  recover:  SHOP_PUBLIC_BASE ? `${SHOP_PUBLIC_BASE}/account/login#recover` : "",
+};
+
+// ---------- Low-level GQL client ----------
 export async function gql(query, variables = {}) {
   if (!HOST || !TOKEN) {
     throw new Error(
-      "[Shopify] Not configured. Set VITE_SHOPIFY_DOMAIN (or VITE_SHOPIFY_STORE_DOMAIN) and VITE_SHOPIFY_STOREFRONT_TOKEN"
+      "[Shopify] Not configured. Set VITE_SHOPIFY_DOMAIN and VITE_SHOPIFY_STOREFRONT_TOKEN."
     );
   }
 
@@ -49,11 +75,11 @@ export async function gql(query, variables = {}) {
 }
 
 if (import.meta.env.DEV) {
-  if (!HOST) console.error("[Shopify] Missing VITE_SHOPIFY_DOMAIN.");
+  if (!HOST)  console.error("[Shopify] Missing VITE_SHOPIFY_DOMAIN.");
   if (!TOKEN) console.error("[Shopify] Missing VITE_SHOPIFY_STOREFRONT_TOKEN.");
 }
 
-// ---- Mappers ----
+// ---------- Mappers ----------
 function mapNodeToItem(node, cursor = null) {
   const v = node?.variants?.edges?.[0]?.node;
   return {
@@ -63,7 +89,8 @@ function mapNodeToItem(node, cursor = null) {
     title: node.title,
     handle: node.handle,
     description: node.description || "",
-    image: node.featuredImage?.url || node.images?.edges?.[0]?.node?.url || "",
+    image:
+      node.featuredImage?.url || node.images?.edges?.[0]?.node?.url || "",
     price: v?.price?.amount || "",
     currency: v?.price?.currencyCode || "GBP",
     productType: node.productType || "",
@@ -79,7 +106,7 @@ function mapProduct(p) {
     available: !!node.availableForSale,
     sku: node.sku || "",
     image: node.image?.url || "",
-    selectedOptions: node.selectedOptions || [],
+    selectedOptions: node.selectedOptions || [], // [{ name, value }]
     price: node.price?.amount || "",
     currency: node.price?.currencyCode || "GBP",
   }));
@@ -107,7 +134,7 @@ function mapProduct(p) {
   };
 }
 
-// ---- Products (array) ----
+// ---------- Products (array) ----------
 export async function fetchShopifyProducts(first = 20, after = null) {
   const query = `
     query ($first:Int!, $after:String) {
@@ -167,7 +194,7 @@ export async function fetchShopifyProductsPaged(first = 20, after = null) {
   };
 }
 
-// ---- Products (rich for cards) ----
+// ---------- Products (rich for cards) ----------
 export async function fetchShopifyProductsForCards(first = 20, after = null) {
   const query = `
     query ($first:Int!, $after:String) {
@@ -209,7 +236,7 @@ export async function fetchShopifyProductsForCards(first = 20, after = null) {
   return edges.map(({ node }) => mapProduct(node));
 }
 
-// ---- Single product ----
+// ---------- Single product ----------
 export async function fetchSingleProductById(idOrGid) {
   const gid = String(idOrGid).startsWith("gid://shopify/")
     ? String(idOrGid)
@@ -284,7 +311,7 @@ export async function fetchProductByHandle(handle) {
   return mapProduct(p);
 }
 
-// ---- Search ----
+// ---------- Search ----------
 function buildShopifyQuery(input) {
   const raw = input?.trim() || "";
   if (!raw) return "";
@@ -355,7 +382,7 @@ export async function searchShopifyProductsPaged(q, first = 20, after = null) {
   };
 }
 
-// ---- Customer auth ----
+// ---------- Customer auth ----------
 export async function customerLogin(email, password) {
   const mutation = `
     mutation ($input: CustomerAccessTokenCreateInput!) {
@@ -367,7 +394,8 @@ export async function customerLogin(email, password) {
   `;
   const d = await gql(mutation, { input: { email, password } });
   const out = d.customerAccessTokenCreate;
-  if (out?.userErrors?.length) throw new Error(out.userErrors.map((e) => e.message).join(", "));
+  if (out?.userErrors?.length)
+    throw new Error(out.userErrors.map((e) => e.message).join(", "));
   return out.customerAccessToken;
 }
 
@@ -383,11 +411,18 @@ export async function customerLogout(token) {
   `;
   const d = await gql(mutation, { token });
   if (d.customerAccessTokenDelete?.userErrors?.length)
-    throw new Error(d.customerAccessTokenDelete.userErrors.map((e) => e.message).join(", "));
+    throw new Error(
+      d.customerAccessTokenDelete.userErrors.map((e) => e.message).join(", ")
+    );
   return true;
 }
 
-export async function customerRegister({ email, password, firstName = "", lastName = "" }) {
+export async function customerRegister({
+  email,
+  password,
+  firstName = "",
+  lastName = "",
+}) {
   const mutation = `
     mutation ($input: CustomerCreateInput!) {
       customerCreate(input:$input) {
@@ -396,9 +431,12 @@ export async function customerRegister({ email, password, firstName = "", lastNa
       }
     }
   `;
-  const d = await gql(mutation, { input: { email, password, firstName, lastName } });
+  const d = await gql(mutation, {
+    input: { email, password, firstName, lastName },
+  });
   const out = d.customerCreate;
-  if (out?.userErrors?.length) throw new Error(out.userErrors.map((e) => e.message).join(", "));
+  if (out?.userErrors?.length)
+    throw new Error(out.userErrors.map((e) => e.message).join(", "));
   return out.customer;
 }
 
@@ -428,7 +466,7 @@ export async function customerMe(token) {
   return d.customer || null;
 }
 
-// ---- Recommendations ----
+// ---------- Recommendations ----------
 export async function fetchRecommendationsById(productId) {
   const query = `
     query($id: ID!) {
@@ -470,7 +508,7 @@ export async function fetchRecommendationsByHandle(handle) {
   return fetchRecommendationsById(id);
 }
 
-// ---- Cart (Storefront) ----
+// ---------- Cart (Storefront) ----------
 const CART_FRAGMENT = `
 fragment CartFields on Cart {
   id
@@ -535,7 +573,10 @@ export async function cartCreate() {
   const d = await gql(mutation, { input: {} });
   const err = d.cartCreate?.userErrors?.[0]?.message;
   if (err) throw new Error(err);
-  return d.cartCreate.cart;
+  const cart = d.cartCreate.cart;
+  // Normalize checkout URL to public domain if needed
+  if (cart?.checkoutUrl) cart.checkoutUrl = toPublicShopUrl(cart.checkoutUrl);
+  return cart;
 }
 
 export async function cartGet(id) {
@@ -546,7 +587,9 @@ export async function cartGet(id) {
     ${CART_FRAGMENT}
   `;
   const d = await gql(query, { id });
-  return d.cart || null;
+  const cart = d.cart || null;
+  if (cart?.checkoutUrl) cart.checkoutUrl = toPublicShopUrl(cart.checkoutUrl);
+  return cart;
 }
 
 export async function cartLinesAdd(cartId, lines) {
@@ -562,7 +605,9 @@ export async function cartLinesAdd(cartId, lines) {
   const d = await gql(mutation, { cartId, lines });
   const err = d.cartLinesAdd?.userErrors?.[0]?.message;
   if (err) throw new Error(err);
-  return d.cartLinesAdd.cart;
+  const cart = d.cartLinesAdd.cart;
+  if (cart?.checkoutUrl) cart.checkoutUrl = toPublicShopUrl(cart.checkoutUrl);
+  return cart;
 }
 
 export async function cartLinesRemove(cartId, lineIds) {
@@ -578,10 +623,13 @@ export async function cartLinesRemove(cartId, lineIds) {
   const d = await gql(mutation, { cartId, lineIds });
   const err = d.cartLinesRemove?.userErrors?.[0]?.message;
   if (err) throw new Error(err);
-  return d.cartLinesRemove.cart;
+  const cart = d.cartLinesRemove.cart;
+  if (cart?.checkoutUrl) cart.checkoutUrl = toPublicShopUrl(cart.checkoutUrl);
+  return cart;
 }
 
 export async function cartLinesUpdate(cartId, lines) {
+  // lines: [{ id, quantity?, merchandiseId? }]
   const mutation = `
     mutation CartLinesUpdate($cartId: ID!, $lines: [CartLineUpdateInput!]!) {
       cartLinesUpdate(cartId: $cartId, lines: $lines) {
@@ -594,5 +642,21 @@ export async function cartLinesUpdate(cartId, lines) {
   const d = await gql(mutation, { cartId, lines });
   const err = d.cartLinesUpdate?.userErrors?.[0]?.message;
   if (err) throw new Error(err);
-  return d.cartLinesUpdate.cart;
+  const cart = d.cartLinesUpdate.cart;
+  if (cart?.checkoutUrl) cart.checkoutUrl = toPublicShopUrl(cart.checkoutUrl);
+  return cart;
+}
+
+// ---------- Utilities ----------
+export async function shopPing() {
+  // quick sanity check: token, products, primary domain
+  return gql(`
+    {
+      shop {
+        name
+        primaryDomain { url }
+      }
+      products(first: 1) { edges { node { id title } } }
+    }
+  `);
 }

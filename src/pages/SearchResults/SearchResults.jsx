@@ -20,7 +20,9 @@ const byPrefixThenContains = (list, q) => {
     else if (hay.includes(needle)) contains.push(p);
   }
   const seen = new Set();
-  return [...starts, ...contains].filter(x => (seen.has(x.id) ? false : (seen.add(x.id), true)));
+  return [...starts, ...contains].filter(x =>
+    seen.has(x.id) ? false : (seen.add(x.id), true)
+  );
 };
 
 export default function SearchResults() {
@@ -34,7 +36,6 @@ export default function SearchResults() {
 
   useEffect(() => { window.scrollTo(0, 0); }, [q]);
 
-  // Fallback to server if no local matches
   useEffect(() => {
     let alive = true;
     async function run() {
@@ -43,9 +44,9 @@ export default function SearchResults() {
       if (!needle) { setRemote([]); return; }
       try {
         setLoading(true);
-        const items = await searchShopifyProducts(q, 50); // more results on the page
+        const items = await searchShopifyProducts(q, 50);
         if (alive) setRemote(items || []);
-      } catch (e) {
+      } catch {
         if (alive) setRemote([]);
       } finally {
         if (alive) setLoading(false);
@@ -66,23 +67,33 @@ export default function SearchResults() {
         </h2>
       </header>
 
-      {loading && <p className={styles.empty}>Searching…</p>}
-      {!loading && items.length === 0 && <p className={styles.empty}>No products found.</p>}
+      <div className={styles.body}>
+        {loading && <p className={styles.empty}>Searching…</p>}
+        {!loading && items.length === 0 && (
+          <p className={styles.empty}>No products found.</p>
+        )}
 
-      <div className={styles.grid}>
-        {items.map((p) => (
-          <Link key={p.id} to={`/products/${p.handle}`} className={styles.card}>
-            <div className={styles.media}>
-              {p.image ? <img src={p.image} alt={p.title} /> : <div className={styles.placeholder} />}
-            </div>
-            <div className={styles.meta}>
-              <h4 className={styles.title}>{p.title}</h4>
-              <p className={styles.price}>
-                {p.price ? `${Number(p.price).toFixed(2)} ${p.currency || "GBP"}` : ""}
-              </p>
-            </div>
-          </Link>
-        ))}
+        {items.length > 0 && (
+          <div className={styles.grid}>
+            {items.map((p) => (
+              <Link key={p.id} to={`/products/${p.handle}`} className={styles.card}>
+                <div className={styles.media}>
+                  {p.image ? (
+                    <img src={p.image} alt={p.title} />
+                  ) : (
+                    <div className={styles.placeholder} />
+                  )}
+                </div>
+                <div className={styles.meta}>
+                  <h4 className={styles.title}>{p.title}</h4>
+                  <p className={styles.price}>
+                    {p.price ? `${Number(p.price).toFixed(2)} ${p.currency || "GBP"}` : ""}
+                  </p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

@@ -120,7 +120,7 @@
   .imageWrap {
     img {
       width: 100%;
-      border-radius: 1rem;
+      border-radius: 10px;
       box-shadow: 0 8px 30px rgba($color-dark, 0.25);
       object-fit: cover;
     }
@@ -172,7 +172,7 @@
       min-width: 220px;
       padding: 2rem;
       background: $color-white;
-      border-radius: 1rem;
+      border-radius: 10px;
       box-shadow: 0 4px 20px rgba($color-dark, 0.1);
       h3 {
         font-family: $display;
@@ -204,7 +204,7 @@
     position: relative;
     max-width: 900px;
     margin: 0 auto;
-    border-radius: 1rem;
+    border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 8px 30px rgba($color-dark, 0.25);
 
@@ -228,6 +228,7 @@
     linear-gradient(rgba($color-dark, 0.55), rgba($color-dark, 0.35)),
     url("https://cdn.shopify.com/s/files/1/0952/4261/7177/files/hearts.jpg?v=1758293544")
       center/cover no-repeat;
+  border-radius: 10px;
 }
 
 .ctaInner {
@@ -237,6 +238,7 @@
   margin: 0 auto;
   display: grid;
   gap: 0.75rem;
+  padding-bottom: 2rem; // Add more space at the bottom to separate from footer
 }
 
 .ctaSection h2 {
@@ -255,7 +257,7 @@
   color: $color-white;
   background: rgba($color-dark, 0.4);
   backdrop-filter: blur(2px);
-  border-radius: 999px;
+  border-radius: 10px;
   padding: clamp(0.45rem, 1.8vw, 0.6rem) clamp(0.9rem, 3.2vw, 1.1rem);
   font-size: clamp(0.85rem, 2.6vw, 0.95rem);
   font-weight: 700;

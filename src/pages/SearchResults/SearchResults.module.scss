@@ -1,9 +1,11 @@
-
 .wrap {
   max-width: 1200px;
   margin: 0 auto;
   padding: 1.25rem;
-  min-height: 70vh;
+ min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+ padding-bottom: max(env(safe-area-inset-bottom, 0px), 24px);
 }
 
 .header h2 {
@@ -13,12 +15,34 @@
   .count { opacity: .6; font-weight: 500; margin-left: .5rem; }
 }
 
-.empty { color: $color-muted; margin-top: 2rem; }
+/* Flex child that expands to push the footer down */
+.body {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.empty {
+  color: $color-muted;
+  margin-top: 2rem;
+
+ @media (max-width: 576px) {
+    margin-top: 1.25rem;
+  }
+}
 
 .grid {
+  margin-top: .5rem;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 1rem;
+
+ align-content: start;
+
+  @media (max-width: 480px) {
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: .75rem;
+  }
 }
 
 .card {
@@ -71,5 +95,4 @@
 }
 
 .title { margin: 0; font-weight: 700; line-height: 1.25; }
-
 .price { margin: 0; color: $color-dark; opacity: .8; font-weight: 600; }

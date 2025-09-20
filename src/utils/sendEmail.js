@@ -4,8 +4,8 @@ emailjs.send(
   "service_u2mmon2",    // your Service ID
   "template_znscq7a",   // your Template ID
   {
-    name: "Fatou",              // maps to {{name}}
-    email: "fatou@example.com", // maps to {{email}}
+    name: "Fatou",              
+    email: "fatou@example.com", 
     subject: "Order Inquiry",   // maps to {{subject}}
     message: "Hey 👋",           // maps to {{message}}
     time: new Date().toLocaleString() // maps to {{time}} if you use it
