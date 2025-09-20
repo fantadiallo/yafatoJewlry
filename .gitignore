@@ -34,3 +34,6 @@ Yafatoo.mp4
 .env*
 
 .vercel
+
+# Supabase temp
+supabase/.temp/
