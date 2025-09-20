@@ -1,23 +1,25 @@
 import { Link, useNavigate } from "react-router-dom";
-import styles from "./ProductCard.module.scss";
-import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { useMemo, useState } from "react";
-import { useShopifyCart } from "../../context/ShopifyCartContext";
+import { FaHeart, FaRegHeart, FaShoppingCart } from "react-icons/fa";
 import toast from "react-hot-toast";
+import { useShopifyCart } from "../../context/ShopifyCartContext";
+import styles from "./ProductCard.module.scss";
 
 function resolveVariant(variants, selections) {
   if (!variants?.length) return null;
   const keys = Object.keys(selections || {});
   if (!keys.length) return null;
-  return variants.find(v => {
-    const opts = v.selectedOptions || v.node?.selectedOptions || [];
-    return opts.every(o => {
-      const n = o.name?.toLowerCase?.().trim();
-      const val = o.value?.toLowerCase?.().trim();
-      const sel = selections[n];
-      return sel && sel.toLowerCase().trim() === val;
-    });
-  }) || null;
+  return (
+    variants.find((v) => {
+      const opts = v.selectedOptions || v.node?.selectedOptions || [];
+      return opts.every((o) => {
+        const n = o.name?.toLowerCase?.().trim();
+        const val = o.value?.toLowerCase?.().trim();
+        const sel = selections[n];
+        return sel && sel.toLowerCase().trim() === val;
+      });
+    }) || null
+  );
 }
 
 export default function ProductCard({
@@ -37,21 +39,25 @@ export default function ProductCard({
   const isFavorite = favorites.some((item) => item.id === id);
 
   const flatVariants = useMemo(
-    () => variants.map(v => ({
-      id: v.id || v.node?.id,
-      availableForSale: v.availableForSale ?? v.node?.availableForSale,
-      price: v.price || v.node?.price,
-      selectedOptions: v.selectedOptions || v.node?.selectedOptions || [],
-      title: v.title || v.node?.title
-    })),
+    () =>
+      variants.map((v) => ({
+        id: v.id || v.node?.id,
+        availableForSale: v.availableForSale ?? v.node?.availableForSale,
+        price: v.price || v.node?.price,
+        selectedOptions: v.selectedOptions || v.node?.selectedOptions || [],
+        title: v.title || v.node?.title,
+      })),
     [variants]
   );
 
   const matchedVariant = useMemo(
-    () => resolveVariant(
-      flatVariants,
-      Object.fromEntries(Object.entries(selections).map(([k, v]) => [k.toLowerCase(), v]))
-    ),
+    () =>
+      resolveVariant(
+        flatVariants,
+        Object.fromEntries(
+          Object.entries(selections).map(([k, v]) => [k.toLowerCase(), v])
+        )
+      ),
     [flatVariants, selections]
   );
 
@@ -95,22 +101,30 @@ export default function ProductCard({
   }
 
   function onSelectChange(name, value) {
-    setSelections(prev => ({ ...prev, [name.toLowerCase().trim()]: value }));
+    setSelections((prev) => ({ ...prev, [name.toLowerCase().trim()]: value }));
   }
 
-  const addLabel = needsVariant ? "Select" : "+ Cart";
   const addAria = needsVariant ? "Select options" : "Add to Cart";
 
   return (
     <Link to={`/products/${shortId}`} className={styles.productCard}>
       <div className={styles.imageWrapper}>
-        <img src={image} alt={title} className={`${styles.productImage} ${styles.defaultImage}`} />
+        <img
+          src={image}
+          alt={title}
+          className={`${styles.productImage} ${styles.defaultImage}`}
+        />
         {secondaryImage && (
-          <img src={secondaryImage} alt={`${title} alternate`} className={`${styles.productImage} ${styles.hoverImage}`} />
+          <img
+            src={secondaryImage}
+            alt={`${title} alternate`}
+            className={`${styles.productImage} ${styles.hoverImage}`}
+          />
         )}
 
         <div className={styles.iconBar}>
           <button
+            type="button"
             className={styles.iconButton}
             onClick={handleToggleFavorite}
             aria-label={isFavorite ? "Remove favorite" : "Add favorite"}
@@ -120,13 +134,14 @@ export default function ProductCard({
           </button>
 
           <button
+            type="button"
             className={styles.iconButton}
             onClick={handlePrimaryAction}
             aria-label={addAria}
             title={addAria}
             data-needs-variant={needsVariant ? "1" : "0"}
           >
-            {addLabel}
+            {needsVariant ? "Select" : <FaShoppingCart />}
           </button>
         </div>
       </div>
@@ -136,8 +151,11 @@ export default function ProductCard({
         <p className={styles.price}>£ {price}</p>
 
         {options?.length > 0 && (
-          <div className={styles.optionsBar} onClick={(e) => e.preventDefault()}>
-            {options.map(opt => {
+          <div
+            className={styles.optionsBar}
+            onClick={(e) => e.preventDefault()}
+          >
+            {options.map((opt) => {
               const name = opt?.name || "";
               const values = opt?.values || [];
               return (
@@ -149,8 +167,10 @@ export default function ProductCard({
                     onChange={(e) => onSelectChange(name, e.target.value)}
                   >
                     <option value="">{`Select ${name}`}</option>
-                    {values.map(v => (
-                      <option key={v} value={v}>{v}</option>
+                    {values.map((v) => (
+                      <option key={v} value={v}>
+                        {v}
+                      </option>
                     ))}
                   </select>
                 </label>
@@ -159,7 +179,9 @@ export default function ProductCard({
             {matchedVariant && matchedVariant.price?.amount && (
               <div className={styles.variantPrice}>
                 £ {Number(matchedVariant.price.amount).toFixed(2)}
-                {!matchedVariant.availableForSale && <span className={styles.badge}>Sold out</span>}
+                {!matchedVariant.availableForSale && (
+                  <span className={styles.badge}>Sold out</span>
+                )}
               </div>
             )}
           </div>
