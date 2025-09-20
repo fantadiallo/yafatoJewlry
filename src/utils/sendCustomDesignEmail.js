@@ -1,22 +1,11 @@
-import emailjs from "emailjs-com";
+// src/utils/sendCustomDesignEmail.js
+import emailjs from '@emailjs/browser'
 
-export function sendCustomDesignEmail(formData) {
-  const templateParams = {
-    description: formData.description || "",
-    stone: formData.stone || "",
-    engraving: formData.engraving || "",
-    materialAccent: formData.materialAccent || "",
-    size: formData.size || "",
-    confirmSilver: formData.confirmSilver ? "Yes" : "No",
-    imageUrl: formData.aiImage || formData.patternFileUrl || "",
-    email: formData.email || "",
-    user_email: formData.email || "", // ← used in CC
-  };
-
-  return emailjs.send(
+export function sendCustomDesignEmail(formEl) {
+  return emailjs.sendForm(
     import.meta.env.VITE_EMAILJS_SERVICE_ID,
-    import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-    templateParams,
-    import.meta.env.VITE_EMAILJS_PUBLIC_KEY
-  );
+    import.meta.env.VITE_EMAILJS_TPL_CUSTOM, // template_86onwbc
+    formEl,
+    { publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY }
+  )
 }
