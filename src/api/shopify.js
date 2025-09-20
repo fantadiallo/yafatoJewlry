@@ -1,10 +1,33 @@
-const DOMAIN = import.meta.env.VITE_SHOPIFY_DOMAIN;
-const TOKEN = import.meta.env.VITE_SHOPIFY_STOREFRONT_TOKEN;
-const API_URL = `https://${DOMAIN}/api/2024-04/graphql.json`;
+// src/api/shopify.js
 
-async function gql(query, variables = {}) {
+// ---- Config ----
+const RAW_DOMAIN =
+  import.meta.env.VITE_SHOPIFY_DOMAIN ||
+  import.meta.env.VITE_SHOPIFY_STORE_DOMAIN || "";
+
+const TOKEN = import.meta.env.VITE_SHOPIFY_STOREFRONT_TOKEN || "";
+const API_VERSION = import.meta.env.VITE_SHOPIFY_API_VERSION || "2025-01";
+
+function normalizeDomain(s) {
+  return String(s || "").trim().replace(/^https?:\/\//i, "").split("/")[0];
+}
+
+const HOST = normalizeDomain(RAW_DOMAIN);
+export const SHOP_BASE = HOST ? `https://${HOST}` : "";
+const API_URL = HOST ? `${SHOP_BASE}/api/${API_VERSION}/graphql.json` : "";
+
+// ---- Low-level GQL client ----
+export async function gql(query, variables = {}) {
+  if (!HOST || !TOKEN) {
+    throw new Error(
+      "[Shopify] Not configured. Set VITE_SHOPIFY_DOMAIN (or VITE_SHOPIFY_STORE_DOMAIN) and VITE_SHOPIFY_STOREFRONT_TOKEN"
+    );
+  }
+
   const r = await fetch(API_URL, {
     method: "POST",
+    mode: "cors",
+    credentials: "omit",
     headers: {
       "Content-Type": "application/json",
       "X-Shopify-Storefront-Access-Token": TOKEN,
@@ -14,14 +37,23 @@ async function gql(query, variables = {}) {
 
   if (!r.ok) {
     const text = await r.text().catch(() => "");
-    throw new Error(`HTTP ${r.status}: ${text || r.statusText}`);
+    throw new Error(`[Shopify] HTTP ${r.status} ${r.statusText}: ${text}`);
   }
+
   const j = await r.json();
-  if (j.errors) throw new Error(JSON.stringify(j.errors));
+  if (j.errors) {
+    const msg = j.errors.map((e) => e.message).join("; ");
+    throw new Error(`[Shopify] GraphQL: ${msg}`);
+  }
   return j.data;
 }
 
-/* -------------------- Mappers -------------------- */
+if (import.meta.env.DEV) {
+  if (!HOST) console.error("[Shopify] Missing VITE_SHOPIFY_DOMAIN.");
+  if (!TOKEN) console.error("[Shopify] Missing VITE_SHOPIFY_STOREFRONT_TOKEN.");
+}
+
+// ---- Mappers ----
 function mapNodeToItem(node, cursor = null) {
   const v = node?.variants?.edges?.[0]?.node;
   return {
@@ -47,7 +79,7 @@ function mapProduct(p) {
     available: !!node.availableForSale,
     sku: node.sku || "",
     image: node.image?.url || "",
-    selectedOptions: node.selectedOptions || [], // [{name, value}]
+    selectedOptions: node.selectedOptions || [],
     price: node.price?.amount || "",
     currency: node.price?.currencyCode || "GBP",
   }));
@@ -59,14 +91,14 @@ function mapProduct(p) {
     handle: p.handle,
     productType: p.productType || "",
     tags: p.tags || [],
-    images: (p.images?.edges || []).map(e => ({
+    images: (p.images?.edges || []).map((e) => ({
       url: e.node.url,
       alt: e.node.altText || p.title,
     })),
     variantId: v0?.id || "",
     price: v0?.price || "",
     currency: v0?.currency || "GBP",
-    options: (p.options || []).map(o => ({
+    options: (p.options || []).map((o) => ({
       id: o.id,
       name: o.name,
       values: o.values || [],
@@ -75,7 +107,7 @@ function mapProduct(p) {
   };
 }
 
-/* -------------------- Products (array by default) -------------------- */
+// ---- Products (array) ----
 export async function fetchShopifyProducts(first = 20, after = null) {
   const query = `
     query ($first:Int!, $after:String) {
@@ -135,7 +167,7 @@ export async function fetchShopifyProductsPaged(first = 20, after = null) {
   };
 }
 
-/* ----- Rich list for cards (options + variants) ----- */
+// ---- Products (rich for cards) ----
 export async function fetchShopifyProductsForCards(first = 20, after = null) {
   const query = `
     query ($first:Int!, $after:String) {
@@ -170,13 +202,14 @@ export async function fetchShopifyProductsForCards(first = 20, after = null) {
         }
         pageInfo { hasNextPage }
       }
-    }`;
+    }
+  `;
   const d = await gql(query, { first, after });
   const edges = d.products?.edges || [];
   return edges.map(({ node }) => mapProduct(node));
 }
 
-/* -------------------- Single product (RICH) -------------------- */
+// ---- Single product ----
 export async function fetchSingleProductById(idOrGid) {
   const gid = String(idOrGid).startsWith("gid://shopify/")
     ? String(idOrGid)
@@ -251,15 +284,15 @@ export async function fetchProductByHandle(handle) {
   return mapProduct(p);
 }
 
-/* -------------------- Search -------------------- */
+// ---- Search ----
 function buildShopifyQuery(input) {
   const raw = input?.trim() || "";
   if (!raw) return "";
   const terms = raw.split(/\s+/).slice(0, 6);
   const parts = [`"${raw}"`]
-    .concat(terms.map(t => `title:*${t}*`))
-    .concat(terms.map(t => `tag:'${t}'`))
-    .concat(terms.map(t => `vendor:*${t}*`));
+    .concat(terms.map((t) => `title:*${t}*`))
+    .concat(terms.map((t) => `tag:'${t}'`))
+    .concat(terms.map((t) => `vendor:*${t}*`));
   return parts.join(" OR ");
 }
 
@@ -322,7 +355,7 @@ export async function searchShopifyProductsPaged(q, first = 20, after = null) {
   };
 }
 
-/* -------------------- Customer auth -------------------- */
+// ---- Customer auth ----
 export async function customerLogin(email, password) {
   const mutation = `
     mutation ($input: CustomerAccessTokenCreateInput!) {
@@ -334,7 +367,7 @@ export async function customerLogin(email, password) {
   `;
   const d = await gql(mutation, { input: { email, password } });
   const out = d.customerAccessTokenCreate;
-  if (out?.userErrors?.length) throw new Error(out.userErrors.map(e => e.message).join(", "));
+  if (out?.userErrors?.length) throw new Error(out.userErrors.map((e) => e.message).join(", "));
   return out.customerAccessToken;
 }
 
@@ -350,7 +383,7 @@ export async function customerLogout(token) {
   `;
   const d = await gql(mutation, { token });
   if (d.customerAccessTokenDelete?.userErrors?.length)
-    throw new Error(d.customerAccessTokenDelete.userErrors.map(e => e.message).join(", "));
+    throw new Error(d.customerAccessTokenDelete.userErrors.map((e) => e.message).join(", "));
   return true;
 }
 
@@ -365,7 +398,7 @@ export async function customerRegister({ email, password, firstName = "", lastNa
   `;
   const d = await gql(mutation, { input: { email, password, firstName, lastName } });
   const out = d.customerCreate;
-  if (out?.userErrors?.length) throw new Error(out.userErrors.map(e => e.message).join(", "));
+  if (out?.userErrors?.length) throw new Error(out.userErrors.map((e) => e.message).join(", "));
   return out.customer;
 }
 
@@ -395,7 +428,7 @@ export async function customerMe(token) {
   return d.customer || null;
 }
 
-/* -------------------- Recommendations -------------------- */
+// ---- Recommendations ----
 export async function fetchRecommendationsById(productId) {
   const query = `
     query($id: ID!) {
@@ -437,7 +470,7 @@ export async function fetchRecommendationsByHandle(handle) {
   return fetchRecommendationsById(id);
 }
 
-/* -------------------- Cart (native Shopify) -------------------- */
+// ---- Cart (Storefront) ----
 const CART_FRAGMENT = `
 fragment CartFields on Cart {
   id
@@ -462,14 +495,14 @@ fragment CartFields on Cart {
             id
             title
             availableForSale
-            selectedOptions { name value }   # needed for option display
+            selectedOptions { name value }
             price { amount currencyCode }
             image { url altText }
             product {
               handle
               title
               featuredImage { url altText }
-              variants(first: 50) {          # used to change variant in cart
+              variants(first: 50) {
                 edges {
                   node {
                     id
@@ -548,9 +581,7 @@ export async function cartLinesRemove(cartId, lineIds) {
   return d.cartLinesRemove.cart;
 }
 
-/* ----- NEW: update qty or change variant on a line ----- */
 export async function cartLinesUpdate(cartId, lines) {
-  // lines: [{ id, quantity?, merchandiseId? }]
   const mutation = `
     mutation CartLinesUpdate($cartId: ID!, $lines: [CartLineUpdateInput!]!) {
       cartLinesUpdate(cartId: $cartId, lines: $lines) {
