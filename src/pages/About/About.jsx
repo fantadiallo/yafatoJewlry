@@ -1,8 +1,8 @@
-import styles from './AboutPage.module.scss';
-import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import styles from "./AboutPage.module.scss";
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import { Globe2, Mountain } from "lucide-react";
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect } from "react";
 
 export default function AboutPage() {
   const vidRef = useRef(null);
@@ -10,21 +10,25 @@ export default function AboutPage() {
   useEffect(() => {
     const v = vidRef.current;
     if (!v) return;
-    const onMeta = () => { try { v.currentTime = 0.01; } catch {} };
+    const onMeta = () => {
+      try {
+        v.currentTime = 0.01;
+      } catch {}
+    };
     const onPlay = () => v.pause();
-    v.addEventListener('loadedmetadata', onMeta, { once: true });
-    v.addEventListener('play', onPlay, { once: true });
+    v.addEventListener("loadedmetadata", onMeta, { once: true });
+    v.addEventListener("play", onPlay, { once: true });
     v.play().catch(() => {});
     return () => {
-      v.removeEventListener('loadedmetadata', onMeta);
-      v.removeEventListener('play', onPlay);
+      v.removeEventListener("loadedmetadata", onMeta);
+      v.removeEventListener("play", onPlay);
     };
   }, []);
 
   return (
     <div className={styles.aboutPage}>
       <section className={styles.heroSection}>
-        <img src="./heroimg2.jpg" alt="Yafato Jewelry" className={styles.bgImage} />
+        <img src="/heroimg2.jpg" alt="Yafato Jewelry" className={styles.bgImage} />
         <div className={styles.heroOverlay}></div>
 
         <div className={styles.heroContent}>
@@ -46,9 +50,8 @@ export default function AboutPage() {
               Jewelry That Carries Your Meaning
             </motion.h1>
             <p>
-              Yafato creates more than jewelry — we create reminders.
-              Each piece is designed to hold meaning, crafted to meet your eyes
-              and return you to yourself.
+              Yafato creates more than jewelry — we create reminders. Each piece is designed to
+              hold meaning, crafted to meet your eyes and return you to yourself.
             </p>
           </div>
 
@@ -58,9 +61,8 @@ export default function AboutPage() {
             transition={{ delay: 1, duration: 1 }}
             className={styles.bottomQuote}
           >
-            “Crafted in quality silver 925 and real gold in 14k, 18k, and 22k —
-            Yafato is a Scandinavian brand rooted in West African heritage.
-            Minimal. Timeless. Meaningful.”
+            “Crafted in quality silver 925 and real gold in 14k, 18k, and 22k — Yafato is a
+            Scandinavian brand rooted in West African heritage. Minimal. Timeless. Meaningful.”
           </motion.blockquote>
         </div>
       </section>
@@ -73,13 +75,12 @@ export default function AboutPage() {
           <div className={styles.textWrap}>
             <h2>Meet Amz Silver</h2>
             <p>
-              Amz is more than a craftsman — he’s an artist carrying generations of skill.
-              From The Gambia and Senegal, his legacy is one of precision, soul,
-              and timeless artistry.
+              Amz is more than a craftsman — he’s an artist carrying generations of skill. From The
+              Gambia and Senegal, his legacy is one of precision, soul, and timeless artistry.
             </p>
             <p>
-              Each creation is born from heritage and shaped with dignity.
-              His jewelry is not just worn — it’s carried, like a story passed down.
+              Each creation is born from heritage and shaped with dignity. His jewelry is not just
+              worn — it’s carried, like a story passed down.
             </p>
           </div>
         </div>
@@ -96,11 +97,11 @@ export default function AboutPage() {
           <div className={styles.feature}>
             <Mountain className={styles.icon} />
             <h3>Scandinavia</h3>
-            <p>Founded and branded, norwegian heart</p>
+            <p>Founded and branded, Norwegian heart.</p>
           </div>
           <div className={styles.feature}>
             <h3>One Voice</h3>
-            <p>Yafato brings these worlds together in each piece. by being from two worlds</p>
+            <p>Yafato brings these worlds together in each piece.</p>
           </div>
         </div>
       </motion.section>
@@ -127,17 +128,24 @@ export default function AboutPage() {
         </div>
       </motion.section>
 
-      <motion.section className={styles.ctaSection}>
-        <h2>Carry Your Reminder</h2>
-        <Link to="/products" className={styles.shopBtn}>
-          Explore the Collections
-        </Link>
-        <p className={styles.instaFollow}>
-          Follow the journey on{" "}
-          <a href="https://instagram.com/yafato_" target="_blank" rel="noreferrer">
-            @yafato
-          </a>
-        </p>
+      <motion.section
+        className={styles.ctaSection}
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+      >
+        <div className={styles.ctaInner}>
+          <h2>Carry Your Reminder</h2>
+          <Link to="/newsletter" className={styles.shopBtn}>
+            Join the newsletter
+          </Link>
+          <p className={styles.instaFollow}>
+            Follow the journey on{" "}
+            <a href="https://instagram.com/yafato_" target="_blank" rel="noreferrer">
+              @yafato_
+            </a>
+          </p>
+        </div>
       </motion.section>
     </div>
   );

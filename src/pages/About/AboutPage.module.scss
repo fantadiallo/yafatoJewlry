@@ -219,55 +219,75 @@
 
 
 .ctaSection {
-  padding: 6rem 0;
+  position: relative;
+  isolation: isolate;
   text-align: center;
-  background: $color-dark;
-  color: $color-light;
-  border-radius: 1rem;
-  margin: 4rem 0;
+  color: $color-white;
+  padding: clamp(2rem, 8vw, 6rem) 1.5rem;
+  background:
+    linear-gradient(rgba($color-dark, 0.55), rgba($color-dark, 0.35)),
+    url("https://cdn.shopify.com/s/files/1/0952/4261/7177/files/hearts.jpg?v=1758293544")
+      center/cover no-repeat;
+}
 
-  h2 {
-    font-family: $display;
-    font-size: 2.2rem;
-    margin-bottom: 2rem;
-  }
+.ctaInner {
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
+  margin: 0 auto;
+  display: grid;
+  gap: 0.75rem;
+}
 
-  .shopBtn {
-    display: inline-block;
+.ctaSection h2 {
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  font-size: clamp(1.25rem, 4.6vw, 2rem);
+  margin: 0 0 0.25rem;
+}
+
+.shopBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba($color-white, 0.35);
+  color: $color-white;
+  background: rgba($color-dark, 0.4);
+  backdrop-filter: blur(2px);
+  border-radius: 999px;
+  padding: clamp(0.45rem, 1.8vw, 0.6rem) clamp(0.9rem, 3.2vw, 1.1rem);
+  font-size: clamp(0.85rem, 2.6vw, 0.95rem);
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  box-shadow: 0 6px 16px rgba($color-dark, 0.25);
+
+  &:hover {
     background: $color-accent;
-    color: $color-white;
-    padding: 1rem 2.5rem;
-    border-radius: 50px;
-    font-weight: 600;
-    font-family: $sans;
-    font-size: 1rem;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    box-shadow: 0 8px 20px rgba($color-accent, 0.35);
-    transition: all 0.35s ease;
-
-    &:hover {
-      background: darken($color-accent, 10%);
-      box-shadow: 0 12px 28px rgba($color-accent, 0.5);
-      transform: translateY(-2px);
-    }
-
-    &:active {
-      transform: translateY(0);
-      box-shadow: 0 6px 16px rgba($color-accent, 0.25);
-    }
+    border-color: transparent;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 24px rgba($color-accent, 0.28);
+    text-decoration: none;
   }
 
-  .instaFollow {
-    margin-top: 1.5rem;
-    font-size: 1rem;
-    a {
-      color: $color-primary;
-      font-weight: 600;
-      text-decoration: none;
-      &:hover {
-        color: $color-accent;
-      }
-    }
+  &:focus-visible {
+    outline: 3px solid rgba($color-accent, 0.5);
+    outline-offset: 2px;
+  }
+}
+
+.instaFollow {
+  margin-top: 0.35rem;
+  font-size: clamp(0.9rem, 2.4vw, 1rem);
+  color: rgba($color-white, 0.9);
+
+  a {
+    color: $color-white;
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    &:hover { color: lighten($color-accent, 10%); }
+    &:focus-visible { outline: 3px solid rgba($color-accent, 0.5); outline-offset: 2px; }
   }
 }
