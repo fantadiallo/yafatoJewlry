@@ -1,7 +1,3 @@
-/// <reference lib="dom" />
-/// <reference lib="dom.iterable" />
-/// <reference lib="deno.ns" />
-
 import React from "react";
 import { motion } from "framer-motion";
 import { FaInstagram, FaTiktok } from "react-icons/fa";
@@ -70,7 +66,7 @@ export default function NewsletterPage() {
 
             <motion.h2 className={styles.heading} variants={item}>
               <p>Welcome to early access Official Launch</p>
-              <p className={styles.launchDate}>SEPTEMBER 1.</p>
+              <p className={styles.launchDate}>SEPTEMBER 20. Kl:18:00</p>
             </motion.h2>
 
             <motion.div variants={item}>
