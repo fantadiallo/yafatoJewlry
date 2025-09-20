@@ -15,7 +15,6 @@ const TOKEN_KEY = "customerToken";
 const EXP_KEY = "customerTokenExpires";
 
 export default function Header() {
-  // ✅ Use native Shopify cart + keep your favorites as-is (with a safe default)
 const { cart, favorites } = useShopifyCart();
 const cartCount = cart?.totalQuantity ?? 0;
 

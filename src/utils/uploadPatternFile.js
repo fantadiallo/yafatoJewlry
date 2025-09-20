@@ -1,4 +1,4 @@
-import { supabase } from "../supabse/Client";
+import { supabase } from "../supabase/Client";
 
 
 export async function uploadPatternFile(file, email) {

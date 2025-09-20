@@ -2,7 +2,7 @@ import { useState } from "react";
 import styles from "./ProductGallery.module.scss";
 
 export default function ProductGallery({ images = [], title = "Product" }) {
-  // Normalize: ensure each item is { url, alt }
+
   const normalized = images.map((img, i) =>
     typeof img === "string" ? { url: img, alt: `${title} image ${i + 1}` } : img
   );
