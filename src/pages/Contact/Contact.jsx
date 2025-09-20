@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import emailjs from "@emailjs/browser";
 import styles from "./ContactPage.module.scss";
-import FaqItem from "../../components/Contac/FaqItem";
+import FaqItem from "../../components/Contact/FaqItem";
 
 const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;   // e.g. service_u2mmon2
 const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TPL_CONTACT;                    // your “Contact Us” template id

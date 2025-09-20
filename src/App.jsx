@@ -4,7 +4,7 @@ import HomePage from "./pages/HomePage/HomePage";
 import ContactPage from "./pages/Contact/Contact";
 import AboutPage from "./pages/About/About";
 import { CustomePage } from "./pages/CustomePage/CustomePage";
-import NewsletterPage from "./pages/NewsLetterPage/NewsLetterPage";
+import NewsletterPage from "./pages/NewsletterPage/NewsletterPage";
 import ProductDetailsPage from "./pages/ProductDetailsPage/ProductDetailsPage";
 import ProductPage from "./pages/ProductPage/ProductPage";
 import SearchResults from "./pages/SearchResults/SearchResults";
