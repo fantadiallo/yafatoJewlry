@@ -1,4 +1,9 @@
 // src/api/shopify.js
+// Works with:
+//   VITE_SHOPIFY_DOMAIN=yafato.myshopify.com
+//   VITE_SHOPIFY_DOMAIN_PUBLIC=shop.yafato.com  (customer-facing domain for checkout/account)
+//   VITE_SHOPIFY_STOREFRONT_TOKEN=****** (Storefront API access token for yafato.myshopify.com)
+//   VITE_SHOPIFY_API_VERSION=2025-01
 
 // ---------- Config ----------
 function normalizeDomain(s) {
@@ -7,19 +12,23 @@ function normalizeDomain(s) {
 
 const RAW_DOMAIN =
   import.meta.env.VITE_SHOPIFY_DOMAIN ||
-  import.meta.env.VITE_SHOPIFY_STORE_DOMAIN ||
+  import.meta.env.VITE_SHOPIFY_STORE_DOMAIN || // legacy var support
   "";
 
-const TOKEN = import.meta.env.VITE_SHOPIFY_STOREFRONT_TOKEN || "";
+const TOKEN       = import.meta.env.VITE_SHOPIFY_STOREFRONT_TOKEN || "";
 const API_VERSION = import.meta.env.VITE_SHOPIFY_API_VERSION || "2025-01";
 
-const HOST = normalizeDomain(RAW_DOMAIN); // e.g. cahafaic-7x.myshopify.com
+const HOST = normalizeDomain(RAW_DOMAIN); // e.g. yafato.myshopify.com
 export const SHOP_BASE = HOST ? `https://${HOST}` : "";
 
 const PUBLIC_HOST = normalizeDomain(import.meta.env.VITE_SHOPIFY_DOMAIN_PUBLIC); // e.g. shop.yafato.com
 export const SHOP_PUBLIC_BASE = PUBLIC_HOST ? `https://${PUBLIC_HOST}` : "";
 
-const API_URL = HOST ? `${SHOP_BASE}/api/${API_VERSION}/graphql.json` : "";
+const API_PATH = `/api/${API_VERSION}/graphql.json`;
+
+// In dev we call a same-origin proxy (/sf) to avoid CORS. In prod we call Shopify directly.
+// (Add a Vite proxy for /sf → https://yafato.myshopify.com/api/2025-01/graphql.json)
+const API_URL = import.meta.env.DEV ? "/sf" : (HOST ? `${SHOP_BASE}${API_PATH}` : "");
 
 // Replace the host in any absolute URL with the public customer domain
 export function toPublicShopUrl(url) {
@@ -35,7 +44,7 @@ export function toPublicShopUrl(url) {
   }
 }
 
-// Useful constants you can import in UI (auth buttons etc.)
+// Useful account URLs you can surface in UI
 export const accountUrls = {
   login:    SHOP_PUBLIC_BASE ? `${SHOP_PUBLIC_BASE}/account/login` : "",
   register: SHOP_PUBLIC_BASE ? `${SHOP_PUBLIC_BASE}/account/register` : "",
@@ -44,10 +53,8 @@ export const accountUrls = {
 
 // ---------- Low-level GQL client ----------
 export async function gql(query, variables = {}) {
-  if (!HOST || !TOKEN) {
-    throw new Error(
-      "[Shopify] Not configured. Set VITE_SHOPIFY_DOMAIN and VITE_SHOPIFY_STOREFRONT_TOKEN."
-    );
+  if (!API_URL || !TOKEN) {
+    throw new Error("[Shopify] Not configured. Set VITE_SHOPIFY_DOMAIN and VITE_SHOPIFY_STOREFRONT_TOKEN.");
   }
 
   const r = await fetch(API_URL, {
@@ -75,7 +82,7 @@ export async function gql(query, variables = {}) {
 }
 
 if (import.meta.env.DEV) {
-  if (!HOST)  console.error("[Shopify] Missing VITE_SHOPIFY_DOMAIN.");
+  if (!HOST)  console.error("[Shopify] Missing/invalid VITE_SHOPIFY_DOMAIN.");
   if (!TOKEN) console.error("[Shopify] Missing VITE_SHOPIFY_STOREFRONT_TOKEN.");
 }
 
@@ -89,8 +96,7 @@ function mapNodeToItem(node, cursor = null) {
     title: node.title,
     handle: node.handle,
     description: node.description || "",
-    image:
-      node.featuredImage?.url || node.images?.edges?.[0]?.node?.url || "",
+    image: node.featuredImage?.url || node.images?.edges?.[0]?.node?.url || "",
     price: v?.price?.amount || "",
     currency: v?.price?.currencyCode || "GBP",
     productType: node.productType || "",
@@ -574,7 +580,6 @@ export async function cartCreate() {
   const err = d.cartCreate?.userErrors?.[0]?.message;
   if (err) throw new Error(err);
   const cart = d.cartCreate.cart;
-  // Normalize checkout URL to public domain if needed
   if (cart?.checkoutUrl) cart.checkoutUrl = toPublicShopUrl(cart.checkoutUrl);
   return cart;
 }
