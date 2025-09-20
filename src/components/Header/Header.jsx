@@ -121,7 +121,7 @@ const cartCount = cart?.totalQuantity ?? 0;
         <div className={styles.topBar}>
           <div className={styles.topContent}>
             <span className={styles.marquee} aria-live="polite">
-              <FaGlobe /> Free Shipping Worldwide over £100 &nbsp;&nbsp;&nbsp;
+              <FaGlobe /> Free Shipping Worldwide over £ 90 &nbsp;&nbsp;&nbsp;
               <FaEnvelopeOpenText /> Subscribe to our Newsletter
             </span>
           </div>
