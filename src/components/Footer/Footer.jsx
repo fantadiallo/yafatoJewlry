@@ -13,11 +13,12 @@ export default function Footer() {
           <p className={styles.tagline}>light that never leaves</p>
         </div>
 
-        <nav className={styles.links}>
+        <nav className={styles.links} aria-label="Primary">
           <Link to="/products">Jewelry</Link>
           <Link to="/about">About</Link>
           <Link to="/contact">Contact</Link>
           <Link to="/faq">FAQ</Link>
+          <Link to="/newsletter">Newsletter</Link>
         </nav>
 
         <div className={styles.contact}>
@@ -28,6 +29,17 @@ export default function Footer() {
             <a href="https://twitter.com" target="_blank" rel="noreferrer" aria-label="Twitter"><FiTwitter /></a>
           </div>
         </div>
+      </div>
+
+      {/* Simple policies bar */}
+      <div className={styles.policyRow}>
+        <nav className={styles.policyLinks} aria-label="Policies">
+          <Link to="/policies/privacy">Privacy</Link>
+          <Link to="/policies/terms">Terms</Link>
+          <Link to="/policies/shipping">Shipping</Link>
+          <Link to="/policies/exchange">Exchange</Link>
+          <Link to="/policies/legal">Legal</Link>
+        </nav>
       </div>
 
       <div className={styles.bottom}>
