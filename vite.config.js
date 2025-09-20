@@ -11,13 +11,16 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
-      '@styles': resolve(__dirname, 'src/Styles')
+      '@styles': resolve(__dirname, 'src/styles')
     }
   },
   css: {
     preprocessorOptions: {
       scss: {
-        additionalData: '@use "@styles/variables.scss" as *;'
+        additionalData: `
+          @use "sass:color";
+          @use "@styles/_variables.scss" as *;
+        `
       }
     }
   }
