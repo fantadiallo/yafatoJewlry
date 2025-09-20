@@ -652,10 +652,8 @@ export async function cartLinesUpdate(cartId, lines) {
   return cart;
 }
 
-// ---------- Utilities ----------
 export async function shopPing() {
-  // quick sanity check: token, products, primary domain
-  return gql(`
+ return gql(`
     {
       shop {
         name

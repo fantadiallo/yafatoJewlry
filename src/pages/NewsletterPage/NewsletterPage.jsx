@@ -1,8 +1,9 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { FaInstagram, FaTiktok } from "react-icons/fa";
+import { Link } from "react-router-dom";
 import styles from "./NewsletterPage.module.scss";
-import NewsLetterForm from "../../components/NewsletterForm/NewsletterForm";
+import NewsletterForm from "../../components/NewsletterForm/NewsletterForm";
 
 const container = {
   hidden: { opacity: 0 },
@@ -99,9 +100,17 @@ export default function NewsletterPage() {
                 <FaTiktok /> TikTok
               </motion.a>
             </motion.div>
+
+            {/* Go back to homepage link */}
+            <motion.div variants={item} className={styles.backHome}>
+              <Link to="/" className={styles.backHomeLink}>
+                ← Go back to homepage
+              </Link>
+            </motion.div>
           </motion.div>
         </motion.div>
       </div>
     </div>
   );
 }
+
