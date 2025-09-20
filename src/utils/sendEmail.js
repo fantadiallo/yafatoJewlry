@@ -1,7 +1,23 @@
-import emailjs from '@emailjs/browser'
+import emailjs from "@emailjs/browser";
 
-const SERVICE = import.meta.env.VITE_EMAILJS_SERVICE_ID
-const TEMPLATE = import.meta.env.VITE_EMAILJS_TPL_CONTACT
-const PUBLIC   = import.meta.env.VITE_EMAILJS_PUBLIC_KEY
-
-await emailjs.sendForm(SERVICE, TEMPLATE, formRef.current, { publicKey: PUBLIC })
+emailjs.send(
+  "service_u2mmon2",    // your Service ID
+  "template_znscq7a",   // your Template ID
+  {
+    name: "Fatou",              // maps to {{name}}
+    email: "fatou@example.com", // maps to {{email}}
+    subject: "Order Inquiry",   // maps to {{subject}}
+    message: "Hey 👋",           // maps to {{message}}
+    time: new Date().toLocaleString() // maps to {{time}} if you use it
+  },
+  {
+    publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+  }
+).then(
+  (res) => {
+    console.log("SUCCESS!", res.status, res.text);
+  },
+  (err) => {
+    console.error("FAILED...", err);
+  }
+);
