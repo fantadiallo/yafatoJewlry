@@ -40,11 +40,11 @@ export default function HomePage() {
 
     {/* Extra impact message */}
     <div className={styles.impactBox}>
-      <h3>Giving Back</h3>
+      <h3>Protecting Nature</h3>
       <p>
-        15% of every purchase supports education and community projects in
-        The Gambia — including new waste disposal systems and awareness
-        programs to reduce littering.
+       We focus on reducing unnecessary waste and making mindful choices to
+  protect the environment — because preserving nature matters more than
+  ever.
       </p>
     </div>
   </div>
