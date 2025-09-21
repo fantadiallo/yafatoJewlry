@@ -1,37 +1,75 @@
-
 .gallery {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2rem;
+  display: grid;
+  gap: 1rem;
   width: 100%;
+}
+
+.mainWrap {
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.navBtn {
+  appearance: none;
+  border: 1px solid rgba($color-dark, 0.12);
+  background: $color-white;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+  cursor: pointer;
+}
+.navBtn:disabled {
+  opacity: 0.4;
+  cursor: default;
 }
 
 .mainImage {
   width: 100%;
-  max-width: 800px; // bigger showcase
+  max-width: 800px;
+  justify-self: center;
   aspect-ratio: 1 / 1;
   border-radius: 16px;
   overflow: hidden;
   background: $color-light;
   border: 1px solid rgba($color-primary, 0.5);
   box-shadow: 0 12px 32px rgba($color-dark, 0.2);
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-    display: block;
-  }
+}
+.mainImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
 }
 
+/* Thumbnails: mobile = horizontal snap slider; desktop = wrapped row */
 .thumbnailRow {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-  justify-content: center;
-  max-width: 800px;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  gap: 0.6rem;
+  overflow-x: auto;
+  padding: 0.25rem;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  justify-content: start;
+}
+.thumbnailRow::-webkit-scrollbar { display: none; }
+
+@media (min-width: 768px) {
+  .thumbnailRow {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 800px;
+    margin: 0 auto;
+  }
 }
 
 .thumb {
@@ -40,26 +78,40 @@
   padding: 0;
   background: $color-white;
   cursor: pointer;
-  width: 110px;  // bigger thumbnails
-  height: 110px;
+  width: 92px;
+  height: 92px;
   overflow: hidden;
-  transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
+  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  scroll-snap-align: center;
+}
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+@media (min-width: 480px) {
+  .thumb {
+    width: 100px;
+    height: 100px;
   }
+}
+@media (min-width: 1024px) {
+  .thumb {
+    width: 110px;
+    height: 110px;
+  }
+}
 
-  &:hover {
+@media (hover: hover) {
+  .thumb:hover {
     border-color: $color-primary;
-    transform: translateY(-3px);
-    box-shadow: 0 6px 16px rgba($color-dark, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba($color-dark, 0.18);
   }
+}
 
-  &.active {
-    border-color: $color-primary;
-    box-shadow: 0 0 0 3px rgba($color-primary, 0.3);
-  }
+.active {
+  border-color: $color-primary;
+  box-shadow: 0 0 0 3px rgba($color-primary, 0.28);
 }
