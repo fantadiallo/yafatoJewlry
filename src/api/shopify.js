@@ -1,27 +1,20 @@
-// src/api/shopify.js
-// Works with:
-//   VITE_SHOPIFY_DOMAIN=yafato.myshopify.com
-//   VITE_SHOPIFY_DOMAIN_PUBLIC=shop.yafato.com  (customer-facing domain for checkout/account)
-//   VITE_SHOPIFY_STOREFRONT_TOKEN=****** (Storefront API access token for yafato.myshopify.com)
-//   VITE_SHOPIFY_API_VERSION=2025-01
 
-// ---------- Config ----------
 function normalizeDomain(s) {
   return String(s || "").trim().replace(/^https?:\/\//i, "").split("/")[0];
 }
 
 const RAW_DOMAIN =
   import.meta.env.VITE_SHOPIFY_DOMAIN ||
-  import.meta.env.VITE_SHOPIFY_STORE_DOMAIN || // legacy var support
+  import.meta.env.VITE_SHOPIFY_STORE_DOMAIN || 
   "";
 
 const TOKEN       = import.meta.env.VITE_SHOPIFY_STOREFRONT_TOKEN || "";
 const API_VERSION = import.meta.env.VITE_SHOPIFY_API_VERSION || "2025-01";
 
-const HOST = normalizeDomain(RAW_DOMAIN); // e.g. yafato.myshopify.com
+const HOST = normalizeDomain(RAW_DOMAIN);
 export const SHOP_BASE = HOST ? `https://${HOST}` : "";
 
-const PUBLIC_HOST = normalizeDomain(import.meta.env.VITE_SHOPIFY_DOMAIN_PUBLIC); // e.g. shop.yafato.com
+const PUBLIC_HOST = normalizeDomain(import.meta.env.VITE_SHOPIFY_DOMAIN_PUBLIC);
 export const SHOP_PUBLIC_BASE = PUBLIC_HOST ? `https://${PUBLIC_HOST}` : "";
 
 const API_PATH = `/api/${API_VERSION}/graphql.json`;
