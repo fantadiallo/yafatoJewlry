@@ -10,9 +10,9 @@ function formatMoneyGBP(amount) {
   const n = typeof amount === "string" ? parseFloat(amount) : amount;
   if (!Number.isFinite(n)) return "";
   try {
-    return new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(n);
+    return new Intl.NumberFormat("en-NO", { style: "currency", currency: "NOK" }).format(n);
   } catch {
-    return `£${(n || 0).toFixed(2)}`;
+    return `kr${(n || 0).toFixed(2)}`;
   }
 }
 
