@@ -1,6 +1,8 @@
+import styles from "./policies.module.scss";
+
 export default function Shipping() {
   return (
-    <section style={{maxWidth:900,margin:"0 auto",padding:"2rem"}}>
+    <section className={styles.shipping}>
       <h1>Shipping Policy</h1>
       <p>We ship from Norway. Processing typically 1–3 business days.</p>
       <ul>

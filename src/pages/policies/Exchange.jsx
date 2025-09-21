@@ -1,6 +1,8 @@
+import styles from "./policies.module.scss";
+
 export default function Exchange() {
   return (
-    <main>
+    <main className={styles.exchange}>
       <h1>Exchange Policy (No Refunds)</h1>
       <p>You may request an exchange within 7 days of delivery.</p>
       <ul>

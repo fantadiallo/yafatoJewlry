@@ -1,6 +1,7 @@
+import styles from "./policies.module.scss";
 export default function Legal() {
   return (
-    <section style={{maxWidth:900,margin:"0 auto",padding:"2rem"}}>
+    <section className={styles.legal}>
       <h1>Legal</h1>
       <p>Yafato — a Scandinavian brand rooted in West African heritage.</p>
       <ul>

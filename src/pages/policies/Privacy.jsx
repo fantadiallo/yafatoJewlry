@@ -1,6 +1,8 @@
+import styles from "./policies.module.scss";
+
 export default function Privacy() {
   return (
-    <section style={{maxWidth:900,margin:"0 auto",padding:"2rem"}}>
+    <section className={styles.privacy}>
       <h1>Privacy Policy</h1>
       <p>We respect your privacy. We collect only what we need to process orders, support you, and improve Yafato.</p>
       <ul>

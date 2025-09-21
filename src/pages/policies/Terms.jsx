@@ -1,6 +1,8 @@
+import styles from "./policies.module.scss";
+
 export default function Terms() {
   return (
-    <section style={{maxWidth:900,margin:"0 auto",padding:"2rem"}}>
+    <section className={styles.terms}>
       <h1>Terms & Conditions</h1>
       <p>These terms govern your use of our site and purchases from Yafato.</p>
       <ul>

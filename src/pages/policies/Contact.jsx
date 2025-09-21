@@ -1,6 +1,7 @@
+import styles from "./policies.module.scss";
 export default function Contact() {
   return (
-    <main>
+    <main className={styles.contact}>
       <h1>Contact</h1>
       <p>Yafato Jewelry</p>
       <p>Oslo, Norway</p>
