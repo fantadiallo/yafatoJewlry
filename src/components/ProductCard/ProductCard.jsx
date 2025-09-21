@@ -100,7 +100,7 @@ export default function ProductCard({
         image,
         title,
         price,
-        currency: "GBP",
+        currency: "NOK",
         handle: handle || "",                 // 🔹 real handle saved here
       });
       toast.success("Saved to favorites");
@@ -189,7 +189,7 @@ export default function ProductCard({
 
       <div className={styles.info}>
         <h3 className={styles.title}>{title}</h3>
-        <p className={styles.price}>£ {price}</p>
+        <p className={styles.price}>Kr {price}</p>
 
         {options?.length > 0 && (
           <div
