@@ -24,7 +24,7 @@ $hover-row: mix($color-light, $color-primary, 85%);
     overflow: hidden;
 
     .topContent { flex: 1; overflow: hidden; }
-    .marquee { display: inline-block; white-space: nowrap; animation: marquee 15s linear infinite; min-width: 100%; }
+    .marquee { display: inline-block; white-space: nowrap; animation: marquee 10s linear infinite; min-width: 100%; }
 
     .closeBtn {
       background: none; border: none; color: inherit; font-size: 1.2rem; margin-left: 1rem; cursor: pointer;
