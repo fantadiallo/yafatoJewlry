@@ -1,24 +1,82 @@
-// ProductInfo.jsx
 import styles from "./ProductInfo.module.scss";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { useEffect, useMemo, useState } from "react";
 import { useShopifyCart } from "../../context/ShopifyCartContext";
 import toast from "react-hot-toast";
 
+/**
+ * @typedef {Object} SelectedOption
+ * @property {string} name
+ * @property {string} value
+ */
+
+/**
+ * @typedef {Object} Variant
+ * @property {string} id
+ * @property {number|string} price
+ * @property {string} [currency]
+ * @property {boolean} [available]
+ * @property {boolean} [availableForSale]
+ * @property {SelectedOption[]} [selectedOptions]
+ */
+
+/**
+ * @typedef {Object} Option
+ * @property {string} name
+ * @property {string[]} values
+ * @property {string} [id]
+ */
+
+/**
+ * @typedef {Object} Product
+ * @property {string} id
+ * @property {string} title
+ * @property {string} [description]
+ * @property {number|string} price
+ * @property {string} [currency]
+ * @property {number|string} [oldPrice]
+ * @property {string} [material]
+ * @property {string} [finish]
+ * @property {string} [sku]
+ * @property {string} [variantId]
+ * @property {Variant[]} [variants]
+ * @property {Option[]} [options]
+ * @property {string} [handle]
+ * @property {(string|{url:string})[]} [images]
+ * @property {{url:string}} [featuredImage]
+ * @property {string} [image]
+ */
+
+/**
+ * Format a money value safely with fallback.
+ * @param {number|string} amount
+ * @param {string} [currency="GBP"]
+ * @returns {string}
+ */
 function money(amount, currency = "GBP") {
-  if (!amount && amount !== 0) return "";
   const n = typeof amount === "string" ? parseFloat(amount) : Number(amount);
+  if (!Number.isFinite(n)) return "";
   try {
     return new Intl.NumberFormat("en-GB", { style: "currency", currency }).format(n);
   } catch {
-    return `${n.toFixed(2)} ${currency}`;
+    return `${(n || 0).toFixed(2)} ${currency}`;
   }
 }
 
+/**
+ * Heuristic to detect color-like option names.
+ * @param {string} name
+ * @returns {boolean}
+ */
 function isColorOption(name) {
   return /color|colour|tone|hue/i.test(name);
 }
 
+/**
+ * Product purchase UI: variants, qty, favorites, add-to-cart.
+ * Button sits directly under Quantity on all breakpoints.
+ * @param {{product: Product}} props
+ */
 export default function ProductInfo({ product }) {
   const { addToCart, addToFavorites, removeFromFavorites, favorites = [] } = useShopifyCart();
 
@@ -39,7 +97,7 @@ export default function ProductInfo({ product }) {
     featuredImage,
   } = product;
 
-  // normalize variants (lowercase option names)
+  /** @type {Variant[]} */
   const normVariants = useMemo(
     () =>
       variants.map((v) => ({
@@ -53,17 +111,17 @@ export default function ProductInfo({ product }) {
     [variants]
   );
 
+  /** @type {string[]} */
   const optionNames = useMemo(() => options.map((o) => o.name?.toLowerCase?.() || ""), [options]);
 
+  /** @type {Variant|null} */
   const initialVariant = useMemo(
     () => normVariants.find((v) => v.id === variantId) || normVariants[0] || null,
     [normVariants, variantId]
   );
 
-  // selected options state
+  /** @type {Record<string,string>} */
   const [selectedOptions, setSelectedOptions] = useState({});
-
-  // init when product/options change
   useEffect(() => {
     const base = {};
     if (initialVariant?.selectedOptions?.length) {
@@ -76,10 +134,9 @@ export default function ProductInfo({ product }) {
       });
     }
     setSelectedOptions(base);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product?.id, optionNames.join("|")]);
 
-  // active variant for selected options
+  /** @type {Variant|null} */
   const activeVariant = useMemo(() => {
     if (!normVariants.length) return null;
     const entries = Object.entries(selectedOptions);
@@ -91,29 +148,39 @@ export default function ProductInfo({ product }) {
 
   const selectedVariantId = activeVariant?.id || "";
 
-  // display price
-  const displayPrice = useMemo(() => {
+  const displayPriceStr = useMemo(() => {
     const amt = activeVariant?.price ?? price;
     const cur = activeVariant?.currency ?? currency;
     return money(amt, cur);
   }, [activeVariant, price, currency]);
 
-  // main image
+  const displayOldPriceStr = useMemo(() => {
+    if (!oldPrice) return "";
+    const cur = activeVariant?.currency ?? currency;
+    return money(oldPrice, cur);
+  }, [oldPrice, activeVariant, currency]);
+
+  const displayPriceNumber = Number(activeVariant?.price ?? price ?? 0);
+
   const primaryImage =
     (Array.isArray(images) && (typeof images[0] === "string" ? images[0] : images[0]?.url)) ||
     featuredImage?.url ||
     product.image ||
     "";
 
-  // favorites
   const isFav = favorites.some((item) => item.variantId === selectedVariantId);
 
+  /**
+   * Select an option value.
+   * @param {string} name
+   * @param {string} value
+   */
   function onSelectOption(name, value) {
     const key = name.toLowerCase();
     setSelectedOptions((prev) => ({ ...prev, [key]: value }));
   }
 
-  // availability per option value (given partial selection)
+  /** @type {Map<string, Set<string>>} */
   const availabilityByOption = useMemo(() => {
     const map = new Map();
     options.forEach((opt) => map.set(opt.name.toLowerCase(), new Set()));
@@ -134,12 +201,16 @@ export default function ProductInfo({ product }) {
     return map;
   }, [normVariants, options, selectedOptions]);
 
+  /**
+   * Toggle favorite for current variant.
+   * @returns {Promise<void>}
+   */
   async function toggleFavorite() {
     if (!selectedVariantId) {
       toast.error("Select options first");
       return;
     }
-    const unitPrice = activeVariant?.price ?? price ?? 0;
+    const unitPrice = displayPriceNumber;
     const cur = activeVariant?.currency ?? currency ?? "GBP";
     const payload = {
       ...product,
@@ -160,31 +231,40 @@ export default function ProductInfo({ product }) {
     }
   }
 
-  // Quantity select (visible + working)
-  const [quantity, setQuantity] = useState(1);
+  const [qty, setQty] = useState(1);
   useEffect(() => {
-    if (quantity < 1) setQuantity(1);
-  }, [selectedVariantId, quantity]);
+    if (qty < 1) setQty(1);
+  }, [selectedVariantId, qty]);
 
+  function dec() {
+    setQty((n) => Math.max(1, n - 1));
+  }
+  function inc() {
+    setQty((n) => Math.min(99, n + 1));
+  }
+
+  /**
+   * Add current variant to cart.
+   * @returns {Promise<void>}
+   */
   async function add() {
     if (!selectedVariantId) {
       toast.error("Please select options first");
       return;
     }
-    if (!activeVariant?.available && activeVariant?.available !== true) {
+    if (activeVariant?.available === false) {
       toast.error("This option is out of stock");
       return;
     }
-    const unitPrice = activeVariant?.price ?? price ?? 0;
     const cur = activeVariant?.currency ?? currency ?? "GBP";
     const res = await addToCart({
       title,
       handle,
       image: primaryImage || null,
-      price: Number(unitPrice),
+      price: displayPriceNumber,
       currency: cur,
       variantId: selectedVariantId,
-      quantity,
+      quantity: qty,
     });
     if (res?.ok) toast.success("Added to cart");
     else if (res?.error === "VARIANT_REQUIRED") toast.error("Please select options first");
@@ -193,8 +273,10 @@ export default function ProductInfo({ product }) {
 
   const addDisabled = !activeVariant || activeVariant.available === false;
 
+  const [openDesc, setOpenDesc] = useState(false);
+
   return (
-   <section className={styles.info} id="productInfoRoot">
+    <section className={styles.info} id="productInfoRoot" aria-live="polite">
       <header className={styles.head}>
         <h1 className={styles.title}>{title}</h1>
         <button
@@ -210,33 +292,28 @@ export default function ProductInfo({ product }) {
         </button>
       </header>
 
-      {description ? <p className={styles.description}>{description}</p> : null}
+      {description ? (
+        <div className={`${styles.description} ${openDesc ? styles.expanded : ""}`}>
+          <p>{description}</p>
+          <button type="button" className={styles.readMore} onClick={() => setOpenDesc((v) => !v)}>
+            {openDesc ? "Show less" : "Read more"}
+          </button>
+        </div>
+      ) : null}
 
-      <div className={styles.pricing}>
-        <span className={styles.price}>{displayPrice}</span>
-        {oldPrice ? <span className={styles.oldPrice}>{money(oldPrice, currency)}</span> : null}
+      <div className={styles.pricing} aria-live="polite">
+        <span className={styles.price}>{displayPriceStr}</span>
+        {oldPrice ? <span className={styles.oldPrice}>{displayOldPriceStr}</span> : null}
       </div>
 
       <ul className={styles.meta}>
-        {material ? (
-          <li>
-            <strong>Material:</strong> {material}
-          </li>
-        ) : null}
-        {finish ? (
-          <li>
-            <strong>Finish:</strong> {finish}
-          </li>
-        ) : null}
-        {sku ? (
-          <li>
-            <strong>SKU:</strong> {sku}
-          </li>
-        ) : null}
+        {material ? <li><strong>Material:</strong> {material}</li> : null}
+        {finish ? <li><strong>Finish:</strong> {finish}</li> : null}
+        {sku ? <li><strong>SKU:</strong> {sku}</li> : null}
       </ul>
 
       {options?.length > 0 && (
-        <div className={styles.variants}>
+        <div className={styles.optionsWrap}>
           {options.map((opt) => {
             const key = opt.name.toLowerCase();
             const enabled = availabilityByOption.get(key) || new Set();
@@ -249,7 +326,7 @@ export default function ProductInfo({ product }) {
                   {opt.name}: <b>{currentVal}</b>
                 </div>
 
-                <div className={isColor ? styles.swatches : styles.pills}>
+                <div className={isColor ? styles.swatches : styles.pills} role="tablist">
                   {(opt.values || []).map((val) => {
                     const active = currentVal === val;
                     const disabled = !enabled.has(val);
@@ -261,6 +338,7 @@ export default function ProductInfo({ product }) {
                         className={`${styles.swatch} ${active ? styles.active : ""}`}
                         title={val}
                         aria-label={val}
+                        aria-selected={active}
                         disabled={disabled}
                         onClick={() => !disabled && onSelectOption(opt.name, val)}
                       >
@@ -271,6 +349,7 @@ export default function ProductInfo({ product }) {
                         key={val}
                         type="button"
                         className={`${styles.pill} ${active ? styles.active : ""}`}
+                        aria-selected={active}
                         disabled={disabled}
                         onClick={() => !disabled && onSelectOption(opt.name, val)}
                       >
@@ -285,23 +364,25 @@ export default function ProductInfo({ product }) {
         </div>
       )}
 
-      {/* Quantity + single CTA */}
+      {/* Quantity + Add to Cart (always stacked) */}
       <div className={styles.controls}>
-        <label htmlFor="qty" className={styles.qtyLabel}>
-          Quantity
-        </label>
-        <select
-          id="qty"
-          value={quantity}
-          onChange={(e) => setQuantity(Number(e.target.value))}
-          className={styles.qtySelect}
-        >
-          {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
-            <option key={n} value={n}>
-              {n}
-            </option>
-          ))}
-        </select>
+        <div className={styles.qtyGroup}>
+          <label htmlFor="qty" className={styles.qtyLabel}>Quantity</label>
+          <div className={styles.stepper}>
+            <button type="button" onClick={dec} aria-label="Decrease quantity">−</button>
+            <input
+              id="qty"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              value={qty}
+              onChange={(e) => {
+                const v = e.target.value.replace(/[^\d]/g, "");
+                setQty(Math.min(99, Math.max(1, Number(v || 1))));
+              }}
+            />
+            <button type="button" onClick={inc} aria-label="Increase quantity">+</button>
+          </div>
+        </div>
 
         <button className={styles.addBtn} onClick={add} disabled={addDisabled} aria-disabled={addDisabled}>
           {addDisabled ? "Out of stock" : "Add to Cart"}

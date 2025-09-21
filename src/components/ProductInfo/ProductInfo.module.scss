@@ -1,121 +1,120 @@
-/* clean, direct on page background */
-.productInfoRoot {
+.info {
   display: grid;
   gap: 0.75rem;
   color: $color-dark;
   text-align: left;
 }
 
-/* header */
 .head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: .5rem;
+  gap: 0.5rem;
 }
 
 .title {
   margin: 0;
-  font-size: clamp(1.6rem, 2.4vw, 2.2rem);
+  font-size: clamp(1.4rem, 3.5vw, 2.2rem);
   line-height: 1.15;
-  letter-spacing: .2px;
+  letter-spacing: 0.2px;
+  word-break: break-word;
 }
 
-/* heart: ghost button, no borders */
 .heart {
   display: grid;
   place-items: center;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border: none;
   background: transparent;
   cursor: pointer;
-  border-radius: 50%;
-  transition: transform .12s ease, background-color .12s ease;
-
-  svg { font-size: 18px; color: $color-dark; }
-  &:hover { transform: translateY(-1px); background-color: rgba($color-dark, .06); }
-  &:focus-visible { outline: 2px solid $color-accent; outline-offset: 2px; }
+  border-radius: 999px;
+  transition: transform 0.12s ease, background-color 0.12s ease;
 }
-.filled { color: $color-primary; }
+.heart svg { font-size: 20px; color: $color-dark; }
+@media (hover: hover) {
+  .heart:hover { transform: translateY(-1px); background-color: rgba($color-dark, 0.06); }
+}
+.heart:focus-visible { outline: 2px solid $color-accent; outline-offset: 2px; }
 
-/* body copy */
 .description {
-  margin: .25rem 0 0;
-  font-size: .98rem;
-  line-height: 1.65;
-  color: rgba($color-dark, .9);
+  position: relative;
+  max-height: 6.5rem;
+  overflow: hidden;
+}
+.description p { margin: 0.25rem 0 0; font-size: 0.98rem; line-height: 1.65; color: rgba($color-dark, 0.9); }
+.expanded { max-height: none; }
+
+.readMore {
+  margin-top: 0.25rem;
+  background: none;
+  border: none;
+  color: $color-accent;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.25rem 0;
 }
 
-/* pricing */
 .pricing {
   display: inline-flex;
   align-items: baseline;
-  gap: .5rem;
-  margin-top: .25rem;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
 }
-.price {
-  font-size: clamp(1.25rem, 2vw, 1.6rem);
-  font-weight: 700;
-  font-feature-settings: "tnum" 1, "lnum" 1;
-}
-.oldPrice {
-  font-size: .95rem;
-  color: $color-muted;
-  text-decoration: line-through;
-}
+.price { font-size: clamp(1.25rem, 2.4vw, 1.6rem); font-weight: 700; font-feature-settings: "tnum" 1, "lnum" 1; }
+.oldPrice { font-size: 0.95rem; color: $color-muted; text-decoration: line-through; }
 
-/* meta list */
 .meta {
   list-style: none;
   padding: 0;
-  margin: .25rem 0 0;
+  margin: 0.25rem 0 0;
   display: grid;
-  gap: .25rem;
-
-  li { margin: 0; font-size: .95rem; color: rgba($color-dark, .9); }
-  strong { color: $color-dark; }
+  gap: 0.25rem;
 }
+.meta li { margin: 0; font-size: 0.95rem; color: rgba($color-dark, 0.9); }
+.meta strong { color: $color-dark; }
 
-/* -------- Variant options (auto: pills or color swatches) -------- */
+.optionsWrap { display: grid; gap: 0.75rem; }
+.optionBlock { display: grid; gap: 0.5rem; margin-top: 0.25rem; }
+.optionLabel { font-size: 0.92rem; color: rgba($color-dark, 0.8); }
 
-.optionBlock {
+.pills,
+.swatches {
   display: grid;
-  gap: .5rem;
-  margin-top: .25rem;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding: 0.25rem;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  touch-action: pan-x pinch-zoom;
 }
+.pills::-webkit-scrollbar,
+.swatches::-webkit-scrollbar { display: none; }
 
-.optionLabel {
-  font-size: .92rem;
-  color: rgba($color-dark, .8);
-}
-
-.pills, .swatches {
-  display: flex;
-  flex-wrap: wrap;
-  gap: .5rem;
-}
-
-/* text option */
 .pill {
-  padding: .45rem .75rem;
+  padding: 0.55rem 0.9rem;
   border: none;
   background: $color-light;
   color: $color-dark;
   border-radius: 999px;
   cursor: pointer;
-  transition: transform .12s ease, background-color .12s ease, opacity .12s ease;
-
-  &:hover { transform: translateY(-1px); background-color: mix($color-light, $color-dark, 92%); }
-  &:focus-visible { outline: 2px solid $color-accent; outline-offset: 2px; }
-  &.active { background: mix($color-accent, $color-white, 88%); }
-  &:disabled { opacity: .45; cursor: not-allowed; }
+  scroll-snap-align: start;
+  transition: transform 0.12s ease, background-color 0.12s ease, opacity 0.12s ease;
+  font-size: 0.95rem;
 }
+@media (hover: hover) {
+  .pill:hover { transform: translateY(-1px); background-color: mix($color-light, $color-dark, 92%); }
+}
+.pill:focus-visible { outline: 2px solid $color-accent; outline-offset: 2px; }
+.pill.active { background: mix($color-accent, $color-white, 88%); }
+.pill:disabled { opacity: 0.45; cursor: not-allowed; }
 
-/* color option */
 .swatch {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   padding: 0;
   border: none;
   background: transparent;
@@ -123,77 +122,38 @@
   display: grid;
   place-items: center;
   cursor: pointer;
-  transition: transform .12s ease, opacity .12s ease;
-
-  &:hover { transform: translateY(-1px); }
-  &:focus-visible { outline: 2px solid $color-accent; outline-offset: 2px; border-radius: 999px; }
-  &.active .swatchDot { box-shadow: 0 0 0 2px $color-white, 0 0 0 4px rgba($color-dark, .22); }
-  &:disabled { opacity: .45; cursor: not-allowed; }
+  scroll-snap-align: start;
+  transition: transform 0.12s ease, opacity 0.12s ease;
 }
-
-.swatchDot {
-  width: 100%;
-  height: 100%;
-  border-radius: 999px;
-  box-shadow: 0 0 0 1px rgba($color-dark, .15) inset;
+@media (hover: hover) {
+  .swatch:hover { transform: translateY(-1px); }
 }
+.swatch:focus-visible { outline: 2px solid $color-accent; outline-offset: 2px; border-radius: 999px; }
+.swatchDot { width: 100%; height: 100%; border-radius: 999px; box-shadow: 0 0 0 1px rgba($color-dark, 0.15) inset; }
+.swatch.active .swatchDot { box-shadow: 0 0 0 2px $color-white, 0 0 0 4px rgba($color-dark, 0.22); }
+.swatch:disabled { opacity: 0.45; cursor: not-allowed; }
 
-/* legacy single-row variant buttons (kept for compatibility) */
-.variants {
-  display: flex;
-  flex-wrap: wrap;
-  gap: .5rem;
-  margin-top: .25rem;
-}
-.variantBtn {
-  padding: .45rem .75rem;
-  border: none;
-  background: $color-light;
-  color: $color-dark;
-  border-radius: 999px;
-  cursor: pointer;
-  transition: transform .12s ease, background-color .12s ease;
-
-  &:hover { transform: translateY(-1px); background-color: mix($color-light, $color-dark, 92%); }
-  &.active { background: mix($color-accent, $color-white, 88%); }
-  &:focus-visible { outline: 2px solid $color-accent; outline-offset: 2px; }
-  &:disabled { opacity: .5; cursor: not-allowed; }
-}
-
-/* controls (qty + CTA) */
 .controls {
   display: grid;
-  grid-template-columns: 110px auto;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
   align-items: center;
-  gap: .75rem;
-
-  @media (max-width: 640px) { grid-template-columns: 1fr; }
 }
+.qtyGroup { display: grid; gap: 0.35rem; max-width: 260px; }
+.qtyLabel { font-size: 0.9rem; color: rgba($color-dark, 0.85); margin: 0; }
 
-.qtyLabel {
-  font-size: .9rem;
-  color: rgba($color-dark, .85);
-  margin: 0;
-}
-
-.qtySelect {
-  width: 140px;
-  height: 42px;
-  padding: 0 .75rem;
-  border: none;
-  border-radius: 10px;
+.stepper {
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  align-items: center;
   background: $color-light;
-  color: $color-dark;
-  font-size: 1rem;
-  appearance: none;
-
-  &:focus-visible { outline: 2px solid $color-accent; outline-offset: 2px; }
-  @media (max-width: 640px) { width: 100%; }
+  border-radius: 12px;
+  height: 44px;
 }
+.stepper > button { border: none; background: transparent; font-size: 20px; cursor: pointer; }
+.stepper > input { border: none; background: transparent; text-align: center; font-size: 1rem; width: 100%; outline: none; }
 
-/* primary action */
 .addBtn {
-  grid-column: 1 / -1;
   width: 100%;
   height: 48px;
   border: none;
@@ -201,18 +161,17 @@
   background: $color-dark;
   color: $color-white;
   font-weight: 700;
-  letter-spacing: .2px;
+  letter-spacing: 0.2px;
   cursor: pointer;
-  transition: transform .12s ease, opacity .12s ease;
-
-  &:hover { transform: translateY(-1px); opacity: .95; }
-  &:focus-visible { outline: 2px solid $color-accent; outline-offset: 2px; }
-  &:disabled { opacity: .6; cursor: not-allowed; }
+  transition: transform 0.12s ease, opacity 0.12s ease;
 }
+@media (hover: hover) {
+  .addBtn:hover { transform: translateY(-1px); opacity: 0.95; }
+}
+.addBtn:focus-visible { outline: 2px solid $color-accent; outline-offset: 2px; }
+.addBtn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-/* ——— Hide any injected “Size / Add to Cart” block under OUR CTA ——— */
-/* If the theme/app injects native form bits *after* our component,
-   hide those siblings using the root id. */
+/* Hide any injected Shopify form bits under our component */
 :global(#productInfoRoot) ~ form[action*="cart"],
 :global(#productInfoRoot) ~ .product-form,
 :global(#productInfoRoot) ~ .shopify-product-form,
@@ -221,11 +180,8 @@
 :global(#productInfoRoot) ~ * button[name="add"],
 :global(#productInfoRoot) ~ * button[type="submit"],
 :global(#productInfoRoot) ~ * .shopify-buy__quantity,
-:global(#productInfoRoot) ~ * .shopify-buy__btn {
-  display: none !important;
-}
+:global(#productInfoRoot) ~ * .shopify-buy__btn { display: none !important; }
 
-/* Keep your previous in-scope guards too (in case markup lands inside .info) */
 .info :global(form[action*="cart"]),
 .info :global(.product-form__input),
 .info :global(.product-form__buttons),
@@ -234,6 +190,4 @@
 .info :global(button[name="add"]),
 .info :global(button[type="submit"]),
 .info :global(.shopify-buy__quantity),
-.info :global(.shopify-buy__btn) {
-  display: none !important;
-}
+.info :global(.shopify-buy__btn) { display: none !important; }
