@@ -19,8 +19,6 @@ export const SHOP_PUBLIC_BASE = PUBLIC_HOST ? `https://${PUBLIC_HOST}` : "";
 
 const API_PATH = `/api/${API_VERSION}/graphql.json`;
 
-// In dev we call a same-origin proxy (/sf) to avoid CORS. In prod we call Shopify directly.
-// (Add a Vite proxy for /sf → https://yafato.myshopify.com/api/2025-01/graphql.json)
 const API_URL = import.meta.env.DEV ? "/sf" : (HOST ? `${SHOP_BASE}${API_PATH}` : "");
 
 // Replace the host in any absolute URL with the public customer domain
