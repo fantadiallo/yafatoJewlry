@@ -5,11 +5,6 @@ import toast from "react-hot-toast";
 import { useShopifyCart } from "../../context/ShopifyCartContext";
 import styles from "./ProductCard.module.scss";
 
-/**
- * Try to find a variant matching current selections.
- * @param {Array} variants - array of variant nodes or flattened objects
- * @param {Object} selections - { size: 'M', color: 'Gold' } (lowercased keys)
- */
 function resolveVariant(variants, selections) {
   if (!variants?.length) return null;
   const keys = Object.keys(selections || {});
@@ -28,27 +23,36 @@ function resolveVariant(variants, selections) {
 }
 
 /**
- * Product card with heart (favorites) and add-to-cart.
- * Favorites are saved by PRODUCT ID, no variant needed.
+ * ProductCard
+ * @param {{
+ *   id: string,                    // gid://shopify/Product/123...
+ *   handle?: string,              // product handle (slug)
+ *   image?: string,
+ *   secondaryImage?: string,
+ *   title: string,
+ *   price?: number|string,
+ *   options?: Array,
+ *   variants?: Array,
+ *   requireSelection?: boolean
+ * }} props
  */
 export default function ProductCard({
-  /** gid://shopify/Product/### */
   id,
-  /** Shopify product handle (preferred for links & favorites) */
-  handle,
+  handle,                 // 🔹 make sure the parent passes this (p.handle)
   image,
   secondaryImage,
   title,
   price,
   options = [],
   variants = [],
-  /** if true, force variant selection before add-to-cart */
   requireSelection = true,
 }) {
   const { favorites = [], addToFavorites, removeFromFavorites, addToCart } = useShopifyCart();
   const navigate = useNavigate();
-  const productId = id;
-  const shortId = id?.split("/").pop();
+
+  // fallbacks for routing
+  const numericId = id?.split("/").pop();
+  const productRoute = handle ? `/products/${handle}` : `/products/${numericId || ""}`;
 
   const [selections, setSelections] = useState({});
 
@@ -75,64 +79,58 @@ export default function ProductCard({
     [flatVariants, selections]
   );
 
-  // Is this product already in favorites?
+  // We favorite by PRODUCT id (GID). No variant required.
+  const favKey = id;
   const isFavorite = useMemo(
-    () => favorites.some((f) => (f.productId || f.id) === productId),
-    [favorites, productId]
+    () => favorites.some((f) => (f.productId || f.id) === favKey),
+    [favorites, favKey]
   );
 
-  /** Toggle favorite without requiring a variant. */
   function handleToggleFavorite(e) {
     e.preventDefault();
-    e.stopPropagation(); // prevent wrapping <Link> navigation
-
+    e.stopPropagation();
     if (isFavorite) {
-      removeFromFavorites(productId);
+      removeFromFavorites(favKey);            // remove by product id
       toast("Removed from favorites");
     } else {
       addToFavorites({
-        productId,
-        id: productId,               // back-compat
-        handle: handle || shortId,   // keep handle for deep-link
+        productId: favKey,
+        id: favKey,                           // back-compat
+        variantId: null,
         image,
         title,
         price,
         currency: "GBP",
-        quantity: 1,
+        handle: handle || "",                 // 🔹 real handle saved here
       });
       toast.success("Saved to favorites");
     }
   }
 
-  /** Add to cart (requires a specific variant). */
   async function handlePrimaryAction(e) {
     e.preventDefault();
     e.stopPropagation();
-
     const resolvedVariantId = matchedVariant?.id || null;
-    const needsVariant =
-      requireSelection && options.length > 0 && !resolvedVariantId;
+    const needsVariant = requireSelection && options.length > 0 && !resolvedVariantId;
 
     if (needsVariant) {
       toast.error("Please select options first");
-      navigate(`/products/${handle || shortId}?select=1`);
+      navigate(`${productRoute}?select=1`);
       return;
     }
     if (!resolvedVariantId) {
-      // If product truly has no options, navigate to PDP
-      navigate(`/products/${handle || shortId}?select=1`);
+      navigate(`${productRoute}?select=1`);
       return;
     }
     if (matchedVariant && matchedVariant.availableForSale === false) {
       toast.error("This option is out of stock");
       return;
     }
-
     const res = await addToCart({ variantId: resolvedVariantId, quantity: 1 });
     if (res?.ok) toast.success("Added to cart");
     else if (res?.error === "VARIANT_REQUIRED") {
       toast.error("Please select options first");
-      navigate(`/products/${handle || shortId}?select=1`);
+      navigate(`${productRoute}?select=1`);
     } else {
       toast.error("Couldn’t add to cart");
     }
@@ -147,7 +145,7 @@ export default function ProductCard({
   const addAria = needsVariant ? "Select options" : "Add to Cart";
 
   return (
-    <Link to={`/products/${handle || shortId}`} className={styles.productCard}>
+    <Link to={productRoute} className={styles.productCard}>
       <div className={styles.imageWrapper}>
         <img
           src={image}
@@ -166,8 +164,8 @@ export default function ProductCard({
           <button
             type="button"
             className={styles.iconButton}
-            onMouseDown={(e) => e.stopPropagation()}
             onClick={handleToggleFavorite}
+            onMouseDown={(e) => e.stopPropagation()}
             aria-label={isFavorite ? "Remove favorite" : "Add favorite"}
             aria-pressed={isFavorite}
             title={isFavorite ? "Remove favorite" : "Add favorite"}
@@ -178,8 +176,8 @@ export default function ProductCard({
           <button
             type="button"
             className={styles.iconButton}
-            onMouseDown={(e) => e.stopPropagation()}
             onClick={handlePrimaryAction}
+            onMouseDown={(e) => e.stopPropagation()}
             aria-label={addAria}
             title={addAria}
             data-needs-variant={needsVariant ? "1" : "0"}

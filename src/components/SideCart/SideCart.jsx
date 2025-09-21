@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import classNames from "classnames";
 import { useShopifyCart } from "../../context/ShopifyCartContext";
 
+
 function money(amt, cur) {
   const n = Number(amt || 0);
   const currency = cur || "GBP";
