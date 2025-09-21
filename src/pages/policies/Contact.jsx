@@ -1,4 +1,5 @@
-import styles from "./policies.module.scss";
+import styles from "./Policies.module.scss";
+
 export default function Contact() {
   return (
     <main className={styles.contact}>

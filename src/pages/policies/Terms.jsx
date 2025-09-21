@@ -1,4 +1,4 @@
-import styles from "./policies.module.scss";
+import styles from "./Policies.module.scss";
 
 export default function Terms() {
   return (
