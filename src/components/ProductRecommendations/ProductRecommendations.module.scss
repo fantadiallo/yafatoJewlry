@@ -5,12 +5,9 @@
   border-radius: 20px;
   box-shadow: 0 8px 28px rgba($color-dark, 0.08);
   animation: fadeUp 0.6s ease both;
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(16px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
 }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
 
 .heading {
   font-size: clamp(1.2rem, 2vw, 1.5rem);
@@ -18,33 +15,88 @@
   letter-spacing: 0.3px;
   text-align: center;
   color: $color-dark;
-  margin-bottom: 1.75rem;
+  margin-bottom: 1.25rem;
 }
 
-/* ---------------- Desktop / Tablet Grid ---------------- */
-.grid {
-  --card-min: 240px;
-  --card-max: 300px;
+.controls {
+  display: flex;
+  gap: .5rem;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: .5rem;
+}
 
+.navBtn {
+  appearance: none;
+  border: 1px solid rgba($color-dark,.12);
+  background: $color-white;
+  border-radius: 999px;
+  width: 36px;
+  height: 36px;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
   display: grid;
-  gap: 1.25rem;
-  grid-template-columns: repeat(auto-fit, minmax(var(--card-min), var(--card-max)));
-  justify-content: center;   /* centers the whole grid */
+  place-items: center;
+  transition: transform .15s ease, box-shadow .2s ease, background .2s ease;
+}
+.navBtn:active { transform: scale(.96); }
+@media (hover:hover) {
+  .navBtn:hover { box-shadow: 0 6px 18px rgba($color-dark,.12); }
 }
 
+:root { --card-min: 240px; --card-max: 300px; }
 
-/* A wrapper that enforces identical sizing for every card */
+/* Mobile-first slider (under 600px) */
+.rail {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(70vw, 86vw);
+  gap: 1rem;
+  overflow-x: auto;
+  padding: 0 calc(env(safe-area-inset-left) + .5rem);
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: calc(env(safe-area-inset-left) + .5rem);
+  touch-action: pan-x pinch-zoom;
+  scrollbar-width: none;
+}
+.rail::-webkit-scrollbar { display: none; }
+
 .cardWrap {
   width: 100%;
-  max-width: var(--card-max);
-  aspect-ratio: 4 / 5;       /* keeps uniform height automatically */
+  aspect-ratio: 4/5;
   display: grid;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
 }
 
-/* Make cards fill the wrapper and behave consistently */
+/* Desktop/Tablet grid (≥600px) */
+.grid {
+  display: none;
+  gap: 1.25rem;
+  justify-content: center;
+}
+
+@media (min-width: 600px) {
+  .rail { display: none; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(var(--card-min), var(--card-max)));
+  }
+}
+
+@media (min-width: 960px) {
+  .grid { --card-max: 320px; }
+}
+
+@media (min-width: 1280px) {
+  .grid { --card-max: 340px; }
+}
+
 :global(.productCard) {
   display: grid;
-  grid-template-rows: auto 1fr auto; /* media / body / footer(price) */
+  grid-template-rows: auto 1fr auto;
   border-radius: 16px;
   height: 100%;
   width: 100%;
@@ -52,14 +104,9 @@
   background: $color-white;
   box-shadow: 0 4px 16px rgba($color-dark, 0.06);
   transition: transform 0.25s ease, box-shadow 0.25s ease;
-
-  &:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 12px 28px rgba($color-dark, 0.12);
-  }
 }
+:global(.productCard:hover) { transform: translateY(-6px); box-shadow: 0 12px 28px rgba($color-dark, 0.12); }
 
-/* Media stays stable */
 :global(.productCard .card-media),
 :global(.productCard img) {
   width: 100%;
@@ -68,7 +115,6 @@
   display: block;
 }
 
-/* Titles clamp to avoid jumpy heights */
 :global(.productCard .title) {
   margin: 0.5rem 0.75rem 0;
   font-size: 0.98rem;
@@ -80,13 +126,12 @@
   overflow: hidden;
 }
 
-/* Price area: tabular nums = cleaner alignment */
 :global(.productCard .price) {
   margin: 0.5rem 0.75rem 0.75rem;
   font-weight: 700;
   font-size: 1rem;
   line-height: 1.2;
-  font-feature-settings: "tnum" 1, "lnum" 1; /* tabular, lining */
+  font-feature-settings: "tnum" 1, "lnum" 1;
   letter-spacing: 0.2px;
   color: $color-dark;
 }
@@ -98,63 +143,13 @@
   text-decoration: line-through;
 }
 
-/* ---------------- Skeletons match card size ---------------- */
 .skeleton {
   width: 100%;
   max-width: var(--card-max);
   aspect-ratio: 4 / 5;
   border-radius: 16px;
-  background: linear-gradient(
-    90deg,
-    rgba($color-muted, 0.18) 25%,
-    rgba($color-muted, 0.34) 37%,
-    rgba($color-muted, 0.18) 63%
-  );
+  background: linear-gradient(90deg, rgba($color-muted, 0.18) 25%, rgba($color-muted, 0.34) 37%, rgba($color-muted, 0.18) 63%);
   background-size: 400% 100%;
   animation: shimmer 1.4s infinite linear;
-
-  @keyframes shimmer {
-    0% { background-position: -400% 0; }
-    100% { background-position: 400% 0; }
-  }
 }
-
-/* ---------------- Mobile: Snap Slider ---------------- */
-/* ---------------- Larger Desktop: force single row ---------------- */
-@media (min-width: 1280px) {
-  .grid {
-    /* one horizontal row of equal-width columns */
-    display: grid;
-    grid-auto-flow: column;                 /* lay items left→right */
-    grid-auto-columns: var(--card-max);     /* each card same width */
-    grid-template-columns: none;            /* ignore previous grid template */
-    gap: 1.25rem;
-    justify-content: center;                /* center row if it fits */
-    overflow-x: auto;                       /* scroll if too many items */
-    -webkit-overflow-scrolling: touch;
-    scroll-snap-type: x proximity;          /* nice scroll feel */
-    padding-inline: .5rem;
-  }
-
-  .grid::-webkit-scrollbar { height: 10px; }
-  .grid::-webkit-scrollbar-thumb { background: rgba(0,0,0,.12); border-radius: 10px; }
-  .grid { scrollbar-color: rgba(0,0,0,.12) transparent; scrollbar-width: thin; }
-
-  .cardWrap,
-  .skeleton {
-    width: var(--card-max);
-    max-width: none;        /* ensure consistent width */
-    aspect-ratio: 4 / 5;
-    scroll-snap-align: center;
-  }
-
-  /* slightly bigger cards on big screens if you want */
-  .grid { --card-max: 320px; }
-}
-
-/* ---------------- Larger Desktop: slightly bigger cards ---------------- */
-@media (min-width: 1280px) {
-  .grid {
-    --card-max: 320px;
-  }
-}
+@keyframes shimmer { 0% { background-position: -400% 0; } 100% { background-position: 400% 0; } }
