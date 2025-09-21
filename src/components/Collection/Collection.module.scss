@@ -1,24 +1,19 @@
-@import "../../styles/variables"; // assuming your variables live here
-
 .sectionCollection {
   width: 100%;
   padding: 5rem 2rem;
   color: black;
   background: $color-light;
 
-  /* entrance animation */
   opacity: 0;
   transform: translateY(30px);
   animation: fadeUp 0.8s ease forwards;
 }
 
 @keyframes fadeUp {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  to { opacity: 1; transform: translateY(0); }
 }
 
+/* Header */
 .sectionHeader {
   max-width: 1200px;
   margin: 0 auto 3rem auto;
@@ -26,303 +21,240 @@
   justify-content: space-between;
   align-items: center;
   position: relative;
-
-  h2 {
-    font-family: $display;
-    font-size: clamp(1.8rem, 3vw, 2.5rem);
-    font-weight: 700;
-    margin: 0;
-    color: black;
-    position: relative;
-
-    /* underline hover effect */
-    &::after {
-      content: "";
-      position: absolute;
-      bottom: -8px;
-      left: 0;
-      width: 60px;
-      height: 3px;
-      background: $color-accent;
-      border-radius: 2px;
-      transform: scaleX(0);
-      transform-origin: left;
-      transition: transform 0.4s ease;
-    }
-
-    &:hover::after {
-      transform: scaleX(1);
-    }
-  }
-
-  .viewAll {
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: $color-accent;
-    text-decoration: none;
-    position: relative;
-    transition: color 0.3s ease, transform 0.3s ease;
-
-    &::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      bottom: -4px;
-      width: 100%;
-      height: 2px;
-      background: $color-accent;
-      transform: scaleX(0);
-      transform-origin: right;
-      transition: transform 0.3s ease;
-    }
-
-    &:hover {
-      color: darken($color-accent, 10%);
-      transform: translateX(4px);
-
-      &::after {
-        transform: scaleX(1);
-        transform-origin: left;
-      }
-    }
-  }
-
-  /* glowing divider */
-  &::after {
-    content: "";
-    position: absolute;
-    bottom: -16px;
-    left: 0;
-    right: 0;
-    height: 2px;
-    border-radius: 2px;
-    background: linear-gradient(
-      90deg,
-      $color-accent,
-      lighten($color-accent, 15%),
-      $color-accent
-    );
-    box-shadow: 0 0 12px rgba($color-accent, 0.7);
-  }
 }
 
-/* 🔹 Always 2-col hero layout */
-/* 🔹 Always 2-col hero layout */
+.sectionHeader h2 {
+  font-family: $display;
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  font-weight: 700;
+  margin: 0;
+  color: black;
+  position: relative;
+}
+
+.sectionHeader h2::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background: $color-accent;
+  border-radius: 2px;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s ease;
+}
+
+.sectionHeader h2:hover::after { transform: scaleX(1); }
+
+.viewAll {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: $color-accent;
+  text-decoration: none;
+  position: relative;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.viewAll::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 100%;
+  height: 2px;
+  background: $color-accent;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s ease;
+}
+
+.viewAll:hover {
+  color: darken($color-accent, 10%);
+  transform: translateX(4px);
+}
+.viewAll:hover::after { transform: scaleX(1); transform-origin: left; }
+
+/* glowing divider */
+.sectionHeader::after {
+  content: "";
+  position: absolute;
+  bottom: -16px;
+  left: 0; right: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, $color-accent, lighten($color-accent, 15%), $color-accent);
+  box-shadow: 0 0 12px rgba($color-accent, 0.7);
+}
+
+/* Hero grid */
 .collectionHeroNew {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 2rem;
+  gap: clamp(1rem, 3vw, 2rem);
   max-width: 1200px;
   margin: 0 auto;
-
-  > div {
-    aspect-ratio: 1 / 1;
-    border-radius: 16px;
-    overflow: hidden;
-    position: relative;
-    transform: translateY(20px);
-    opacity: 0;
-    animation: fadeUp 0.8s ease forwards;
-  }
-
-  > div:nth-child(1) {
-    animation-delay: 0.2s;
-  }
-  > div:nth-child(2) {
-    animation-delay: 0.4s;
-  }
 }
 
-/* 📱 Mobile Responsive */
+.collectionHeroNew > div {
+  aspect-ratio: 1 / 1;
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+  transform: translateY(20px);
+  opacity: 0;
+  animation: fadeUp 0.8s ease forwards;
+}
+
+.collectionHeroNew > div:nth-child(1) { animation-delay: 0.2s; }
+.collectionHeroNew > div:nth-child(2) { animation-delay: 0.4s; }
+
+/* 📱 Mobile responsive: stack and keep nice height */
 @media (max-width: 600px) {
   .collectionHeroNew {
-    grid-template-columns: 1fr; // stack into 1 column
-    gap: 1.5rem;
-
-    > div {
-      aspect-ratio: auto; // let height adjust naturally
-      height: 320px; // optional: keeps nice tall look
-    }
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+  .collectionHeroNew > div {
+    aspect-ratio: auto;
+    min-height: clamp(280px, 52vw, 360px);
   }
 }
 
+/* Left hero */
+.heroLeft { position: relative; overflow: hidden; }
+.heroLeft img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  border-radius: 16px;
+  transition: transform 0.6s ease;
+}
+.heroLeft:hover img { transform: scale(1.05); }
 
-/* 🔹 Left Hero */
-.heroLeft {
+.heroLeft::before {
+  content: "";
+  position: absolute; inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: 16px;
+  z-index: 1;
+}
+
+.heroText {
+  position: absolute; inset: 0; z-index: 2;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: clamp(1.25rem, 4vw, 2.5rem);
+  color: white;
+  text-shadow: 0 3px 8px rgba(0, 0, 0, 0.6);
+  transition: all 0.4s ease;
+}
+
+.heroText h2 {
+  font-family: $display;
+  font-size: clamp(1.6rem, 3vw, 3rem);
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  line-height: 1.2;
+}
+
+.heroText p,
+.heroText .cta {
+  opacity: 0;
+  transform: translateY(15px);
+  transition: all 0.4s ease;
+}
+
+.heroLeft:hover .heroText p,
+.heroLeft:hover .heroText .cta {
+  opacity: 1; transform: translateY(0);
+}
+
+.cta {
   position: relative;
-  overflow: hidden;
+  display: inline-block;
+  color: $color-white;
+  text-decoration: none;
+  font-weight: 600;
+  padding-bottom: 2px;
+  transition: color 0.2s;
+}
+.cta::after {
+  content: "";
+  display: block;
+  position: absolute; left: 0; bottom: 0;
+  width: 100%; height: 2px;
+  background: $sage;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.cta:hover::after, .cta:focus::after { transform: scaleX(1); background: $sage; }
 
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 16px;
-    transition: transform 0.6s ease;
-  }
+/* Right product spotlight */
+.heroRight { position: relative; }
 
-  &:hover img {
-    transform: scale(1.05);
-  }
+.productShowcase { width: 100%; height: 100%; position: relative; }
 
-  /* dark overlay */
-  &::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.45);
-    border-radius: 16px;
-    z-index: 1;
-  }
-
-  .heroText {
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    padding: 2.5rem;
-    color: white;
-    text-shadow: 0 3px 8px rgba(0, 0, 0, 0.6);
-    transition: all 0.4s ease;
-
-    h2 {
-      font-family: $display;
-      font-size: clamp(2rem, 3vw, 3rem);
-      font-weight: 800;
-      margin-bottom: 0.5rem;
-      line-height: 1.2;
-    }
-
-    p,
-    .cta {
-      opacity: 0;
-      transform: translateY(15px);
-      transition: all 0.4s ease;
-    }
-
-    .cta {
-      position: relative;
-      display: inline-block;
-      color: $color-white;
-      text-decoration: none;
-      font-weight: 600;
-      padding-bottom: 2px;
-      transition: color 0.2s;
-
-      &::after {
-        content: "";
-        display: block;
-        position: absolute;
-        left: 0;
-        bottom: 0;
-        width: 100%;
-        height: 2px;
-        background: $sage;
-        transform: scaleX(0);
-        transform-origin: left;
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      }
-
-      &:hover,
-      &:focus,
-      &:active {
-        &::after {
-          transform: scaleX(1);
-          background: $sage;
-        }
-      }
-    }
-  }
-
-  /* Hover reveal on ALL screen sizes */
-  &:hover .heroText p,
-  &:hover .heroText .cta {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.productCard {
+  width: 100%; height: 100%; position: relative;
 }
 
-/* 🔹 Right Product Showcase */
-.heroRight {
-  position: relative;
-
-  .productShowcase {
-    width: 100%;
-    height: 100%;
-
-    .productCard {
-      width: 100%;
-      height: 100%;
-      position: relative;
-
-      img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        border-radius: 16px;
-        transition: transform 0.5s ease;
-      }
-
-      &:hover img {
-        transform: scale(1.04);
-      }
-
-      /* Hover overlay CTA */
-      .overlay {
-        position: absolute;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.5);
-        color: white;
-        font-size: 1.2rem;
-        font-weight: 700;
-        letter-spacing: 0.5px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-        border-radius: 16px;
-      }
-
-      &:hover .overlay {
-        opacity: 1;
-      }
-    }
-
-    /* Dots */
-    .dots {
-      position: absolute;
-      bottom: 1rem;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 0.6rem;
-
-      .dot {
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.6);
-        cursor: pointer;
-        transition: all 0.3s ease;
-
-        &:hover {
-          background: rgba(255, 255, 255, 0.9);
-        }
-      }
-
-      .activeDot {
-        background: $color-accent;
-        transform: scale(1.2);
-      }
-    }
-  }
+.productCard img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  border-radius: 16px;
+  transition: transform 0.5s ease;
 }
+.productCard:hover img { transform: scale(1.04); }
 
-/* Accent strong text */
-strong {
-  color: $sage;
+/* Hover overlay CTA */
+.overlay {
+  position: absolute; inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  font-size: 1.2rem;
   font-weight: 700;
   letter-spacing: 0.5px;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: 16px;
 }
+.productCard:hover .overlay { opacity: 1; }
+
+/* Prev/Next buttons */
+.navBtn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 42px; height: 42px;
+  border-radius: 999px;
+  border: 1px solid rgba(0,0,0,.12);
+  background: $color-white;
+  display: grid; place-items: center;
+  font-size: 22px;
+  cursor: pointer;
+  z-index: 3;
+  transition: box-shadow .2s ease, transform .2s ease;
+}
+.navBtn:hover { box-shadow: 0 10px 24px rgba(0,0,0,.16); transform: translateY(-50%) scale(1.02); }
+.prev { left: 0.5rem; }
+.next { right: 0.5rem; }
+
+/* Dots */
+.dots {
+  position: absolute; left: 50%; bottom: 0.9rem; transform: translateX(-50%);
+  display: flex; gap: 0.6rem; z-index: 3;
+}
+.dot {
+  width: 12px; height: 12px; border-radius: 50%;
+  background: rgba(255,255,255,.6);
+  border: 1px solid rgba(255,255,255,.8);
+  cursor: pointer;
+  transition: transform .2s ease, background .2s ease;
+}
+.dot:hover { background: rgba(255,255,255,.9); transform: scale(1.1); }
+.activeDot { background: $color-accent; transform: scale(1.2); }
+
+/* Accent strong text */
+strong { color: $sage; font-weight: 700; letter-spacing: 0.5px; }
