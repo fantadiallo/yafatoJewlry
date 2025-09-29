@@ -16,9 +16,11 @@ import styles from "./ProductList.module.scss";
 
 /**
  * Responsive product grid:
- * - Under 600px: exactly 2 cards/row (requested)
- * - ≥992px: 3 cards/row (kept like your current desktop)
+ * - Under 600px: exactly 2 cards/row
+ * - ≥992px: 3 cards/row
  * Includes an accessible floating “Back to top” button.
+ * Additionally: exposes a variant URL builder so cards can
+ * deep-link to a selected variant (and focused image).
  * @param {{ products?: Product[] }} props
  */
 export default function ProductList({ products = [] }) {
@@ -35,7 +37,7 @@ export default function ProductList({ products = [] }) {
       });
     };
     window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll(); // init
+    onScroll();
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
@@ -53,6 +55,31 @@ export default function ProductList({ products = [] }) {
           const primaryImage = p.images?.[0]?.url || "/placeholder.png";
           const secondaryImage = p.images?.[1]?.url || "/placeholder.png";
 
+        const buildVariantUrl = (variant) => {
+            try {
+              const u = new URL(`/products/${encodeURIComponent(p.id)}`, window.location.origin);
+
+              if (variant?.id) u.searchParams.set("variant", variant.id);
+
+             if (Array.isArray(variant?.selectedOptions)) {
+                for (const o of variant.selectedOptions) {
+                  const k = String(o?.name || "").toLowerCase();
+                  const v = String(o?.value || "");
+                  if (k && v) u.searchParams.set(k, v);
+                }
+              }
+
+             const vImg = variant?.image?.url || "";
+              if (vImg) u.searchParams.set("focus", vImg);
+
+              return u.pathname + u.search;
+            } catch {
+             return `/products/${encodeURIComponent(p.id)}`;
+            }
+          };
+
+        const productHref = `/products/${encodeURIComponent(p.id)}`;
+
           return (
             <div role="listitem" key={p.id} className={styles.item}>
               <ProductCard
@@ -66,6 +93,8 @@ export default function ProductList({ products = [] }) {
                 requireSelection
                 loading="lazy"
                 sizes="(min-width: 992px) 33vw, 50vw"
+               productHref={productHref}
+                variantHrefBuilder={buildVariantUrl}
               />
             </div>
           );

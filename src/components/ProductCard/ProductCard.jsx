@@ -24,21 +24,22 @@ function resolveVariant(variants, selections) {
 
 /**
  * ProductCard
- * @param {{
- *   id: string,                    // gid://shopify/Product/123...
- *   handle?: string,              // product handle (slug)
- *   image?: string,
- *   secondaryImage?: string,
- *   title: string,
- *   price?: number|string,
- *   options?: Array,
- *   variants?: Array,
- *   requireSelection?: boolean
- * }} props
+ * @param {Object} props
+ * @param {string} props.id                     gid://shopify/Product/123...
+ * @param {string=} props.handle                product handle (slug)
+ * @param {string=} props.image
+ * @param {string=} props.secondaryImage
+ * @param {string} props.title
+ * @param {number|string=} props.price
+ * @param {Array=} props.options
+ * @param {Array=} props.variants
+ * @param {boolean=} props.requireSelection
+ * @param {string=} props.productHref           // NEW: explicit PDP base URL
+ * @param {(variant:any)=>string=} props.variantHrefBuilder // NEW: build deep link for selected variant
  */
 export default function ProductCard({
   id,
-  handle,                 // 🔹 make sure the parent passes this (p.handle)
+  handle, // make sure the parent passes this (p.handle)
   image,
   secondaryImage,
   title,
@@ -46,13 +47,19 @@ export default function ProductCard({
   options = [],
   variants = [],
   requireSelection = true,
+  productHref,               // NEW
+  variantHrefBuilder,        // NEW
 }) {
-  const { favorites = [], addToFavorites, removeFromFavorites, addToCart } = useShopifyCart();
+  const { favorites = [], addToFavorites, removeFromFavorites, addToCart } =
+    useShopifyCart();
   const navigate = useNavigate();
 
   // fallbacks for routing
   const numericId = id?.split("/").pop();
-  const productRoute = handle ? `/products/${handle}` : `/products/${numericId || ""}`;
+  const computedRoute = handle
+    ? `/products/${handle}`
+    : `/products/${numericId || ""}`;
+  const baseHref = productHref || computedRoute;
 
   const [selections, setSelections] = useState({});
 
@@ -64,6 +71,7 @@ export default function ProductCard({
         price: v.price || v.node?.price,
         selectedOptions: v.selectedOptions || v.node?.selectedOptions || [],
         title: v.title || v.node?.title,
+        image: v.image || v.node?.image || null,
       })),
     [variants]
   );
@@ -79,6 +87,18 @@ export default function ProductCard({
     [flatVariants, selections]
   );
 
+  // Build a deep link to the selected variant (with focus image hint) if we have one
+  const selectedHref = useMemo(() => {
+    if (matchedVariant && typeof variantHrefBuilder === "function") {
+      try {
+        return variantHrefBuilder(matchedVariant) || baseHref;
+      } catch {
+        return baseHref;
+      }
+    }
+    return baseHref;
+  }, [matchedVariant, variantHrefBuilder, baseHref]);
+
   // We favorite by PRODUCT id (GID). No variant required.
   const favKey = id;
   const isFavorite = useMemo(
@@ -90,18 +110,18 @@ export default function ProductCard({
     e.preventDefault();
     e.stopPropagation();
     if (isFavorite) {
-      removeFromFavorites(favKey);            // remove by product id
+      removeFromFavorites(favKey); // remove by product id
       toast("Removed from favorites");
     } else {
       addToFavorites({
         productId: favKey,
-        id: favKey,                           // back-compat
+        id: favKey, // back-compat
         variantId: null,
         image,
         title,
         price,
         currency: "NOK",
-        handle: handle || "",                 // 🔹 real handle saved here
+        handle: handle || "", // real handle saved here
       });
       toast.success("Saved to favorites");
     }
@@ -111,15 +131,16 @@ export default function ProductCard({
     e.preventDefault();
     e.stopPropagation();
     const resolvedVariantId = matchedVariant?.id || null;
-    const needsVariant = requireSelection && options.length > 0 && !resolvedVariantId;
+    const needsVariant =
+      requireSelection && options.length > 0 && !resolvedVariantId;
 
     if (needsVariant) {
-      toast.error("Please select options first");
-      navigate(`${productRoute}?select=1`);
+      // go to PDP and keep the selection UI highlighted
+      navigate(`${baseHref}?select=1`);
       return;
     }
     if (!resolvedVariantId) {
-      navigate(`${productRoute}?select=1`);
+      navigate(`${baseHref}?select=1`);
       return;
     }
     if (matchedVariant && matchedVariant.availableForSale === false) {
@@ -130,22 +151,26 @@ export default function ProductCard({
     if (res?.ok) toast.success("Added to cart");
     else if (res?.error === "VARIANT_REQUIRED") {
       toast.error("Please select options first");
-      navigate(`${productRoute}?select=1`);
+      navigate(`${baseHref}?select=1`);
     } else {
       toast.error("Couldn’t add to cart");
     }
   }
 
   function onSelectChange(name, value) {
-    setSelections((prev) => ({ ...prev, [name.toLowerCase().trim()]: value }));
+    setSelections((prev) => ({
+      ...prev,
+      [name.toLowerCase().trim()]: value,
+    }));
   }
 
   const resolvedVariantId = matchedVariant?.id || null;
-  const needsVariant = requireSelection && options.length > 0 && !resolvedVariantId;
+  const needsVariant =
+    requireSelection && options.length > 0 && !resolvedVariantId;
   const addAria = needsVariant ? "Select options" : "Add to Cart";
 
   return (
-    <Link to={productRoute} className={styles.productCard}>
+    <Link to={selectedHref} className={styles.productCard}>
       <div className={styles.imageWrapper}>
         <img
           src={image}
@@ -194,7 +219,10 @@ export default function ProductCard({
         {options?.length > 0 && (
           <div
             className={styles.optionsBar}
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
           >
             {options.map((opt) => {
               const name = opt?.name || "";
