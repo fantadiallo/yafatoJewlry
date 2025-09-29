@@ -7,6 +7,10 @@ import NewsletterForm from "../NewsletterForm/NewsletterForm";
 const LS_KEY = "newsletterPopupPrefs";
 const SS_KEY = "newsletterSeenThisSession";
 
+/**
+ * Retrieve newsletter popup preferences from localStorage.
+ * @returns {Object} User preferences including subscribed, dismissCount, lastShown.
+ */
 function getPrefs() {
   try {
     return JSON.parse(localStorage.getItem(LS_KEY) || "{}");
@@ -14,13 +18,39 @@ function getPrefs() {
     return {};
   }
 }
+
+/**
+ * Save newsletter popup preferences to localStorage.
+ * @param {Object} next - Updated preferences object.
+ */
 function setPrefs(next) {
   localStorage.setItem(LS_KEY, JSON.stringify(next));
 }
+
+/**
+ * Calculate the number of whole days between two dates.
+ * @param {Date} a - Start date.
+ * @param {Date} b - End date.
+ * @returns {number} Difference in days.
+ */
 function daysBetween(a, b) {
   return Math.floor((b.getTime() - a.getTime()) / (1000 * 60 * 60 * 24));
 }
 
+/**
+ * NewsletterPopup component.
+ *
+ * A promotional modal that prompts users to subscribe to a newsletter.
+ * Features delay or scroll triggers, cooldown logic, session tracking, 
+ * and dismiss limits to prevent overexposure.
+ *
+ * @component
+ * @param {Object} props
+ * @param {number} [props.delayMs=1500] - Delay (in ms) before showing popup when trigger is "delay".
+ * @param {number} [props.cooldownDays=7] - Number of days to wait before showing popup again after last shown.
+ * @param {number} [props.maxDismissals=3] - Maximum dismissals before the popup is permanently hidden.
+ * @param {"delay"|"scroll50"} [props.trigger="delay"] - How the popup is triggered: "delay" (time-based) or "scroll50" (on 50% scroll).
+ */
 export default function NewsletterPopup({
   delayMs = 1500,
   cooldownDays = 7,
@@ -29,6 +59,10 @@ export default function NewsletterPopup({
 }) {
   const [showPopup, setShowPopup] = useState(false);
 
+  /**
+   * Determine if the popup is eligible to show.
+   * @returns {boolean} Whether popup can be shown.
+   */
   const canShow = useCallback(() => {
     const prefs = getPrefs();
     if (prefs.subscribed) return false;
@@ -42,10 +76,12 @@ export default function NewsletterPopup({
     return true;
   }, [cooldownDays, maxDismissals]);
 
+  // Handles showing popup based on trigger type
   useEffect(() => {
     if (!canShow()) return;
     let timer;
     let onScroll;
+
     if (trigger === "delay") {
       timer = setTimeout(() => setShowPopup(true), delayMs);
     } else if (trigger === "scroll50") {
@@ -58,12 +94,14 @@ export default function NewsletterPopup({
       };
       window.addEventListener("scroll", onScroll, { passive: true });
     }
+
     return () => {
       if (timer) clearTimeout(timer);
       if (onScroll) window.removeEventListener("scroll", onScroll);
     };
   }, [canShow, delayMs, trigger]);
 
+  // Mark popup as shown in session and update lastShown date
   useEffect(() => {
     if (!showPopup) return;
     sessionStorage.setItem(SS_KEY, "true");
@@ -71,12 +109,18 @@ export default function NewsletterPopup({
     setPrefs({ ...prefs, lastShown: new Date().toISOString() });
   }, [showPopup]);
 
+  /**
+   * Close popup and increment dismiss count.
+   */
   const close = () => {
     setShowPopup(false);
     const prefs = getPrefs();
     setPrefs({ ...prefs, dismissCount: (prefs.dismissCount || 0) + 1 });
   };
 
+  /**
+   * Mark user as subscribed and close popup.
+   */
   const onSubscribed = () => {
     const prefs = getPrefs();
     setPrefs({ ...prefs, subscribed: true });

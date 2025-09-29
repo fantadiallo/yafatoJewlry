@@ -2,30 +2,62 @@ import { useRef, useState } from "react";
 import styles from "./NewsletterForm.module.scss";
 import { supabase } from "../../supabase/Client";
 
+/**
+ * NewsletterForm Component
+ *
+ * Renders an email subscription form connected to Supabase via an RPC function (`subscribe_newsletter`).
+ * Handles validation, throttling, and feedback messages for users subscribing to the newsletter.
+ *
+ * @component
+ * @param {Object} props
+ * @param {string} [props.source="coming-soon"] - Optional identifier for tracking where the subscription originated (e.g., "homepage", "popup").
+ * @returns {JSX.Element} Rendered newsletter subscription form.
+ */
 export default function NewsletterForm({ source = "coming-soon" }) {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const lastSubmitAtRef = useRef(0);
 
+  /**
+   * Normalize an email string (trim + lowercase).
+   * @param {string} v - Input email.
+   * @returns {string} Normalized email.
+   */
   function normalizeEmail(v) {
     return v.trim().toLowerCase();
   }
 
+  /**
+   * Normalize the subscription source (limit to 64 chars).
+   * @param {string} v - Input source.
+   * @returns {string} Normalized source string.
+   */
   function normalizeSource(v) {
     return String(v || "coming-soon").slice(0, 64);
   }
 
+  /**
+   * Handle form submission.
+   * Validates email, throttles repeated submissions, calls Supabase RPC, 
+   * and sets appropriate feedback messages (including discount codes).
+   *
+   * @async
+   * @param {React.FormEvent<HTMLFormElement>} e - Form submit event.
+   */
   async function handleSubmit(e) {
     e.preventDefault();
     if (loading) return;
 
+    // Prevent rapid-fire submits
     const now = Date.now();
     if (now - lastSubmitAtRef.current < 1200) return;
     lastSubmitAtRef.current = now;
 
     setMessage("");
     const cleanEmail = normalizeEmail(email);
+
+    // Basic email validation
     if (!/^\S+@\S+\.\S+$/.test(cleanEmail)) {
       setMessage("Please enter a valid email address.");
       return;
@@ -42,6 +74,7 @@ export default function NewsletterForm({ source = "coming-soon" }) {
       const row = Array.isArray(data) ? data[0] : data || {};
       const code = row.out_discount_code;
 
+      // Handle different subscription states
       if (row.already_subscribed) {
         setMessage("✅ You’re already subscribed! Welcome back.");
       } else if (code === "SAYAFATO50") {
@@ -62,6 +95,7 @@ export default function NewsletterForm({ source = "coming-soon" }) {
         hint: err?.hint,
         code: err?.code,
       });
+
       if (String(err?.message || "").toLowerCase().includes("already")) {
         setMessage("✅ You’re already subscribed! Welcome back.");
       } else {

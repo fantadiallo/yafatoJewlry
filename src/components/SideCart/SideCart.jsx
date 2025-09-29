@@ -4,7 +4,13 @@ import { Link } from "react-router-dom";
 import classNames from "classnames";
 import { useShopifyCart } from "../../context/ShopifyCartContext";
 
-
+/**
+ * Format a numeric amount into a currency string.
+ *
+ * @param {number|string} amt - Amount to format.
+ * @param {string} [cur="GBP"] - Currency code (ISO 4217).
+ * @returns {string} Formatted currency string.
+ */
 function money(amt, cur) {
   const n = Number(amt || 0);
   const currency = cur || "GBP";
@@ -15,13 +21,31 @@ function money(amt, cur) {
   }
 }
 
+/**
+ * SideCart Component
+ *
+ * A slide-out cart panel that displays the user's current Shopify cart.
+ * Supports:
+ * - Viewing cart items with images, titles, and variants.
+ * - Changing product variants (if available).
+ * - Adjusting item quantities with +/- controls or direct input.
+ * - Removing items from the cart.
+ * - Displaying subtotal, taxes (MVA), and total.
+ * - Proceeding to checkout via Shopify checkout URL.
+ *
+ * @component
+ * @param {Object} props
+ * @param {boolean} props.isOpen - Whether the side cart is currently visible.
+ * @param {() => void} props.onClose - Callback to close the cart panel.
+ * @returns {JSX.Element} Rendered side cart component.
+ */
 export default function SideCart({ isOpen, onClose }) {
   const {
     cart,
     checkoutUrl,
     removeFromCart,
-    updateLineQty,      // <- make sure these are implemented in context
-    updateLineVariant,  // <-
+    updateLineQty,      // Ensure implemented in ShopifyCartContext
+    updateLineVariant,  // Ensure implemented in ShopifyCartContext
   } = useShopifyCart();
 
   const lines = cart?.lines?.edges?.map((e) => e.node) || [];
@@ -31,7 +55,7 @@ export default function SideCart({ isOpen, onClose }) {
   const totalAmtRaw = Number(cart?.cost?.totalAmount?.amount ?? subtotalAmt);
   const totalCur = cart?.cost?.totalAmount?.currencyCode ?? subtotalCur;
 
-  // If your store has taxes, Shopify will fill totalTaxAmount. Otherwise we derive it (best-effort).
+  // If store doesn’t provide tax amount, derive as total - subtotal (best-effort).
   const taxAmt = Number(
     cart?.cost?.totalTaxAmount?.amount ??
       Math.max(0, totalAmtRaw - subtotalAmt)
@@ -48,6 +72,7 @@ export default function SideCart({ isOpen, onClose }) {
       aria-modal="true"
       aria-label="Shopping cart"
     >
+      {/* Cart header with close button */}
       <div className={styles.topBar}>
         <h3>Your Cart</h3>
         <button onClick={onClose} className={styles.closeBtn} aria-label="Close cart">
@@ -55,12 +80,13 @@ export default function SideCart({ isOpen, onClose }) {
         </button>
       </div>
 
+      {/* Cart items */}
       <div className={styles.items}>
         {lines.length === 0 ? (
           <p>Your cart is empty</p>
         ) : (
           lines.map((line) => {
-            const merch = line.merchandise; // ProductVariant
+            const merch = line.merchandise; // Shopify ProductVariant
             const product = merch?.product;
             const img =
               merch?.image?.url ||
@@ -79,11 +105,12 @@ export default function SideCart({ isOpen, onClose }) {
             const variantTitle =
               merch?.title && merch.title !== "Default Title" ? merch.title : null;
 
-            // All variants for this product (requires you to include variants in CartFields)
+            // Available product variants (requires CartFields query to include them)
             const variantNodes = product?.variants?.edges?.map((e) => e.node) || [];
 
             return (
               <div key={line.id} className={styles.cartItem}>
+                {/* Product image */}
                 <Link to={handle} onClick={onClose} className={styles.mediaLink}>
                   <img
                     src={img}
@@ -93,11 +120,12 @@ export default function SideCart({ isOpen, onClose }) {
                 </Link>
 
                 <div className={styles.details}>
+                  {/* Product title */}
                   <Link to={handle} onClick={onClose} className={styles.titleLink}>
                     <h4>{product?.title || merch?.title || "Untitled"}</h4>
                   </Link>
 
-                  {/* Variant selector (if more than one variant exists) */}
+                  {/* Variant selector */}
                   {variantNodes.length > 1 && (
                     <label className={styles.variantSelectWrap}>
                       <span className={styles.label}>Variant</span>
@@ -125,19 +153,19 @@ export default function SideCart({ isOpen, onClose }) {
                     </label>
                   )}
 
-                  {/* Fallback display if only one variant */}
+                  {/* Fallback variant display */}
                   {!variantNodes.length && variantTitle && (
                     <p className={styles.variant}>
                       <strong>Variant:</strong> {variantTitle}
                     </p>
                   )}
 
+                  {/* Quantity and pricing */}
                   <div className={styles.row}>
                     <p>
                       <strong>Unit:</strong> {money(unitAmt, unitCur)}
                     </p>
 
-                    {/* Quantity stepper */}
                     <div className={styles.qtyWrap}>
                       <span className={styles.label}>Qty</span>
                       <button
@@ -172,6 +200,7 @@ export default function SideCart({ isOpen, onClose }) {
                     </div>
                   </div>
 
+                  {/* Line total */}
                   <p>
                     <strong>Line:</strong>{" "}
                     {money(
@@ -180,6 +209,7 @@ export default function SideCart({ isOpen, onClose }) {
                     )}
                   </p>
 
+                  {/* Remove button */}
                   <button
                     className={styles.removeBtn}
                     onClick={() => removeFromCart(line.id)}
@@ -193,6 +223,7 @@ export default function SideCart({ isOpen, onClose }) {
         )}
       </div>
 
+      {/* Totals */}
       {lines.length > 0 && (
         <div className={styles.total}>
           <p>
@@ -208,6 +239,7 @@ export default function SideCart({ isOpen, onClose }) {
         </div>
       )}
 
+      {/* Checkout */}
       {lines.length > 0 && checkoutUrl && (
         <button
           className={styles.checkoutBtn}

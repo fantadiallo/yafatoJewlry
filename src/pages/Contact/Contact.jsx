@@ -7,17 +7,46 @@ const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
 const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TPL_CONTACT;
 const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
+/**
+ * ContactForm Component
+ *
+ * Renders the contact page with:
+ * - An introduction and instructions for contacting Yafato.
+ * - FAQ items for common questions.
+ * - A contact form integrated with EmailJS for sending messages.
+ *
+ * Features:
+ * - EmailJS is initialized with a public key on mount.
+ * - Form submission sends data via EmailJS (`sendForm`).
+ * - Includes name, email, subject, message, optional file upload, and hidden timestamp.
+ * - Provides feedback messages for success and error states.
+ * - Includes a FAQ box with expandable items.
+ *
+ * Accessibility:
+ * - Form uses `required` attributes on mandatory fields.
+ * - Proper `aria-label` on the submit button.
+ * - Status messages displayed below the form.
+ *
+ * @component
+ * @returns {JSX.Element} Contact page with form and FAQ section
+ */
 export default function ContactForm() {
   const formRef = useRef(null);
   const [sending, setSending] = useState(false);
   const [status, setStatus] = useState("");
 
+  // Initialize EmailJS
   useEffect(() => {
     if (PUBLIC_KEY) {
       emailjs.init(PUBLIC_KEY);
     }
   }, []);
 
+  /**
+   * Handles form submission via EmailJS.
+   *
+   * @param {React.FormEvent<HTMLFormElement>} e - The form submission event
+   */
   async function onSubmit(e) {
     e.preventDefault();
     if (sending) return;
@@ -59,7 +88,7 @@ export default function ContactForm() {
         <h1>Let’s Connect</h1>
         <p>
           Questions, collaborations, or custom ideas — we’d love to hear from
-          you. 
+          you.
         </p>
         <p>
           For custom ideas, just send us an email at{" "}
@@ -68,6 +97,7 @@ export default function ContactForm() {
       </div>
 
       <div className={styles.grid}>
+        {/* FAQ Section */}
         <div className={styles.faqBox}>
           <FaqItem
             question="What’s the meaning of silver in our culture?"
@@ -88,6 +118,7 @@ export default function ContactForm() {
           />
         </div>
 
+        {/* Contact Form */}
         <div className={styles.formBox}>
           <h3>Send Us a Message 🤍</h3>
 

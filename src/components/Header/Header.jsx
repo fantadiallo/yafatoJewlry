@@ -14,12 +14,33 @@ import styles from "./Header.module.scss";
 const TOKEN_KEY = "customerToken";
 const EXP_KEY = "customerTokenExpires";
 
+/**
+ * Header Component
+ *
+ * Renders the main site header with:
+ * - Top bar (shipping + newsletter notice, auto-hides on scroll).
+ * - Navigation links with jewelry dropdown.
+ * - Site logo.
+ * - Search bar.
+ * - User account/login menu with authentication state.
+ * - Favorites and cart buttons with item counts.
+ * - Mobile menu toggle with animated overlay.
+ *
+ * Integrates with:
+ * - Shopify cart & favorites context (`useShopifyCart`).
+ * - Customer authentication via Shopify Storefront API.
+ * - Framer Motion for dropdown and mobile menu animations.
+ *
+ * @component
+ * @returns {JSX.Element} The rendered site header with navigation, account, cart, and menu controls.
+ */
 export default function Header() {
-const { cart, favorites } = useShopifyCart();
-const cartCount = cart?.totalQuantity ?? 0;
+  const { cart, favorites } = useShopifyCart();
+  const cartCount = cart?.totalQuantity ?? 0;
 
   const navigate = useNavigate();
 
+  // UI state
   const [cartOpen, setCartOpen] = useState(false);
   const [favoritesOpen, setFavoritesOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -27,20 +48,26 @@ const cartCount = cart?.totalQuantity ?? 0;
   const [jewelryOpen, setJewelryOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  // auth state
+  // Auth state
   const [authOpen, setAuthOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [customer, setCustomer] = useState(null);
   const [token, setToken] = useState(null);
 
-  // top bar hide on scroll
+  /**
+   * Hide/show top bar based on scroll position.
+   */
   useEffect(() => {
     const onScroll = () => setShowTopBar(window.scrollY <= 50);
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // bootstrap token from localStorage
+  /**
+   * Bootstrap customer token from localStorage.
+   * - Validates expiration.
+   * - Fetches customer profile if token is valid.
+   */
   useEffect(() => {
     const t = localStorage.getItem(TOKEN_KEY);
     const expires = localStorage.getItem(EXP_KEY);
@@ -69,7 +96,9 @@ const cartCount = cart?.totalQuantity ?? 0;
       });
   }, []);
 
-  // close dropdown on outside click / Esc
+  /**
+   * Close jewelry dropdown on outside click or Escape key.
+   */
   useEffect(() => {
     if (!jewelryOpen) return;
     function onDocClick(e) {
@@ -88,7 +117,14 @@ const cartCount = cart?.totalQuantity ?? 0;
     };
   }, [jewelryOpen]);
 
-  // handle successful auth from modal
+  /**
+   * Handle successful authentication (from modal).
+   * Stores access token and fetches customer data.
+   *
+   * @param {Object} access - Access token data.
+   * @param {string} access.accessToken - JWT access token.
+   * @param {string} [access.expiresAt] - Expiration timestamp.
+   */
   async function handleAuthSuccess(access) {
     const { accessToken, expiresAt } = access || {};
     if (!accessToken) return;
@@ -101,6 +137,10 @@ const cartCount = cart?.totalQuantity ?? 0;
     setCustomer(c);
   }
 
+  /**
+   * Handle customer logout.
+   * Calls Shopify logout endpoint and clears local auth state.
+   */
   async function handleLogout() {
     try {
       if (token) await customerLogout(token);
@@ -117,6 +157,7 @@ const cartCount = cart?.totalQuantity ?? 0;
 
   return (
     <header className={styles.header}>
+      {/* Top bar */}
       {showTopBar && (
         <div className={styles.topBar}>
           <div className={styles.topContent}>
@@ -132,6 +173,7 @@ const cartCount = cart?.totalQuantity ?? 0;
       )}
 
       <div className={styles.inner}>
+        {/* Navigation links */}
         <nav className={styles.navLinks}>
           <Link to="/">Home</Link>
 
@@ -154,10 +196,10 @@ const cartCount = cart?.totalQuantity ?? 0;
             {jewelryOpen && (
               <div className={styles.dropdownMenu} role="menu">
                 <Link to="/products" onClick={() => setJewelryOpen(false)}>All</Link>
-               <Link to="/products?type=rings" onClick={() => setJewelryOpen(false)}>Rings</Link>
+                <Link to="/products?type=rings" onClick={() => setJewelryOpen(false)}>Rings</Link>
                 <Link to="/products?type=bracelets" onClick={() => setJewelryOpen(false)}>Bracelets</Link>
 
-                {/* Coming soon */}
+                {/* Coming soon links */}
                 <Link
                   to="/products"
                   className={styles.inactive}
@@ -186,16 +228,18 @@ const cartCount = cart?.totalQuantity ?? 0;
           <Link to="/contact">Contact</Link>
         </nav>
 
+        {/* Logo */}
         <Link to="/" className={styles.logo} aria-label="YAFATO Home">
           <h1>YAFATO</h1>
         </Link>
 
+        {/* Right bar: search, account, favorites, cart, mobile menu */}
         <div className={styles.rightBar}>
           <div className={styles.searchWrapper}>
             <SearchBar />
           </div>
 
-          {/* Account */}
+          {/* Account: login or profile */}
           <div className={styles.accountWrapper}>
             {!customer ? (
               <button
@@ -219,6 +263,7 @@ const cartCount = cart?.totalQuantity ?? 0;
                   <FiUser size={22} />
                 </button>
 
+                {/* Account dropdown */}
                 <AnimatePresence>
                   {accountOpen && (
                     <motion.div
@@ -242,20 +287,18 @@ const cartCount = cart?.totalQuantity ?? 0;
           </div>
 
           {/* Favorites */}
-      {/* Favorites */}
-<button onClick={() => setFavoritesOpen(true)} className={styles.iconBtn} aria-label="Open favorites">
-  <FiHeart size={22} />
-  {!!(favorites?.length ?? 0) && <span className={styles.badge}>{favorites.length}</span>}
-</button>
+          <button onClick={() => setFavoritesOpen(true)} className={styles.iconBtn} aria-label="Open favorites">
+            <FiHeart size={22} />
+            {!!(favorites?.length ?? 0) && <span className={styles.badge}>{favorites.length}</span>}
+          </button>
 
-{/* Cart */}
-<button onClick={() => setCartOpen(true)} className={styles.iconBtn} aria-label="Open cart">
-  <FiShoppingBag size={22} />
-  {!!cartCount && <span className={styles.badge}>{cartCount}</span>}
-</button>
+          {/* Cart */}
+          <button onClick={() => setCartOpen(true)} className={styles.iconBtn} aria-label="Open cart">
+            <FiShoppingBag size={22} />
+            {!!cartCount && <span className={styles.badge}>{cartCount}</span>}
+          </button>
 
-
-          {/* Mobile */}
+          {/* Mobile menu toggle */}
           <button
             className={`${styles.iconBtn} ${styles.mobileMenuBtn}`}
             onClick={() => setMenuOpen((v) => !v)}
@@ -266,7 +309,7 @@ const cartCount = cart?.totalQuantity ?? 0;
         </div>
       </div>
 
-      {/* Panels */}
+      {/* Panels: cart + favorites */}
       <SideCart isOpen={cartOpen} onClose={() => setCartOpen(false)} />
       <FavoritesCart isOpen={favoritesOpen} onClose={() => setFavoritesOpen(false)} />
 
@@ -303,9 +346,9 @@ const cartCount = cart?.totalQuantity ?? 0;
               </div>
 
               <Link to="/products" onClick={() => setMenuOpen(false)}>All</Link>
-<Link to="/products?type=rings" onClick={() => setJewelryOpen(false)}>Rings</Link>
-<Link to="/products?type=bracelets" onClick={() => setJewelryOpen(false)}>Bracelets</Link>
- <Link to="/products" className={styles.inactive} onClick={() => setMenuOpen(false)}>
+              <Link to="/products?type=rings" onClick={() => setJewelryOpen(false)}>Rings</Link>
+              <Link to="/products?type=bracelets" onClick={() => setJewelryOpen(false)}>Bracelets</Link>
+              <Link to="/products" className={styles.inactive} onClick={() => setMenuOpen(false)}>
                 Necklaces <span className={styles.status}>Coming soon</span>
               </Link>
               <Link to="/products" className={styles.inactive} onClick={() => setMenuOpen(false)}>

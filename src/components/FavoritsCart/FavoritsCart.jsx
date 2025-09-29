@@ -5,21 +5,41 @@ import { useState } from "react";
 import { useShopifyCart } from "../../context/ShopifyCartContext";
 import { fetchProductByHandle, fetchSingleProductById } from "../../api/shopify";
 
-/** Format money helper */
+/**
+ * Format a number as localized money (default GBP).
+ * Falls back to a manual format if Intl.NumberFormat fails.
+ *
+ * @param {number|string} amount - Raw amount to format
+ * @param {string} [currency="GBP"] - ISO currency code
+ * @returns {string} Formatted money string
+ */
 function formatMoney(amount, currency = "GBP") {
   const n = Number(amount || 0);
-  try { return new Intl.NumberFormat("en-GB", { style: "currency", currency }).format(n); }
-  catch { return `${n.toFixed(2)} ${currency}`; }
+  try { 
+    return new Intl.NumberFormat("en-GB", { style: "currency", currency }).format(n); 
+  } catch { 
+    return `${n.toFixed(2)} ${currency}`; 
+  }
 }
 
-/** Extract numeric product id from a Shopify GID */
+/**
+ * Extract numeric product id from a Shopify GID string.
+ *
+ * @param {string} id - Shopify GID
+ * @returns {string|null} Numeric product id or null
+ */
 function productIdFromGID(id) {
   if (!id) return null;
   const m = String(id).match(/Product\/(\d+)/);
   return m ? m[1] : null;
 }
 
-/** Best-effort product link */
+/**
+ * Build the best-effort product path for routing.
+ *
+ * @param {object} item - Favorite product object
+ * @returns {string} URL path to the product
+ */
 function productPath(item) {
   if (item?.handle) return `/products/${item.handle}`;
   const numeric = productIdFromGID(item?.productId || item?.id);
@@ -28,7 +48,12 @@ function productPath(item) {
   return `/products`;
 }
 
-/** Pick a display image */
+/**
+ * Resolve a usable image URL for a favorite item.
+ *
+ * @param {object} item - Favorite product object
+ * @returns {string} Image URL or empty string
+ */
 function favoriteImage(item) {
   const candidates = [
     item?.image,
@@ -43,6 +68,25 @@ function favoriteImage(item) {
 
 const PLACEHOLDER = "https://via.placeholder.com/600x600?text=No+Image";
 
+/**
+ * FavoritesCart Component
+ *
+ * A slide-in panel showing all favorited products.  
+ * Supports:
+ * - Moving favorites to the shopping cart (with variant resolution).
+ * - Removing items from favorites.
+ * - Linking to product detail pages if variant resolution fails.
+ *
+ * Accessibility:
+ * - Uses `role="dialog"` and `aria-modal="true"`.
+ * - Buttons and links include ARIA labels for clarity.
+ *
+ * @component
+ * @param {Object} props
+ * @param {boolean} props.isOpen - Whether the favorites cart is open
+ * @param {() => void} props.onClose - Callback to close the favorites panel
+ * @returns {JSX.Element} The rendered Favorites cart drawer
+ */
 export default function FavoritesCart({ isOpen, onClose }) {
   const navigate = useNavigate();
   const { favorites = [], removeFromFavorites, moveToCartFromFavorites } = useShopifyCart();
@@ -50,17 +94,21 @@ export default function FavoritesCart({ isOpen, onClose }) {
   const currency = favorites?.[0]?.currency || "GBP";
 
   /**
-   * Find a usable variantId for a favorite item.
-   * 1) existing variantId
-   * 2) local variants on the item
-   * 3) fetch by handle
-   * 4) fetch by product id (GID or numeric)
+   * Resolve a variant ID for a favorite item.
+   *
+   * Priority:
+   * 1. Use existing variantId
+   * 2. Use local variants (on the favorite object)
+   * 3. Fetch product by handle
+   * 4. Fetch product by product ID
+   *
+   * @async
+   * @param {object} item - Favorite product object
+   * @returns {Promise<string|null>} Variant ID or null
    */
   async function resolveVariantId(item) {
-    // 1) already set?
     if (item?.variantId) return item.variantId;
 
-    // 2) local variants
     const localVariants =
       Array.isArray(item?.variants)
         ? item.variants
@@ -70,7 +118,6 @@ export default function FavoritesCart({ isOpen, onClose }) {
       localVariants[0];
     if (localPick?.id) return localPick.id;
 
-    // 3) by handle
     if (item?.handle) {
       try {
         const p = await fetchProductByHandle(item.handle);
@@ -81,7 +128,6 @@ export default function FavoritesCart({ isOpen, onClose }) {
       } catch { /* ignore */ }
     }
 
-    // 4) by product id (gid or numeric)
     const pid = item?.productId || item?.id;
     if (pid) {
       try {
@@ -93,14 +139,19 @@ export default function FavoritesCart({ isOpen, onClose }) {
       } catch { /* ignore */ }
     }
 
-    // no luck
     return null;
   }
 
+  /**
+   * Handle moving an item from favorites to cart.
+   * Falls back to PDP if no variant can be resolved.
+   *
+   * @async
+   * @param {object} item - Favorite product object
+   */
   async function handleMoveToCart(item) {
     const vId = await resolveVariantId(item);
 
-    // If still no variant, send user to PDP to select
     if (!vId) {
       const to = `${productPath(item)}?select=1`;
       onClose?.();
@@ -118,7 +169,6 @@ export default function FavoritesCart({ isOpen, onClose }) {
         quantity: item.quantity || 1,
       });
       if (!res?.ok) {
-        // Fallback: open PDP if Shopify rejected the variant
         const to = `${productPath(item)}?select=1`;
         navigate(to);
       }
@@ -131,8 +181,12 @@ export default function FavoritesCart({ isOpen, onClose }) {
     }
   }
 
+  /**
+   * Remove an item from favorites.
+   *
+   * @param {object} item - Favorite product object
+   */
   function handleRemove(item) {
-    // Remove by product id first; fallback to variant id
     const key = item?.productId || item?.id || item?.variantId;
     if (!key) return;
     removeFromFavorites(key);

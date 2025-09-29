@@ -9,36 +9,59 @@ const container = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.15, delayChildren: 0.1 }
-  }
+    transition: { staggerChildren: 0.15, delayChildren: 0.1 },
+  },
 };
 
 const item = {
   hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: "easeOut" },
+  },
 };
 
 const linkItem = {
   hidden: { opacity: 0, y: 8 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: "easeOut" } }
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.45, ease: "easeOut" },
+  },
 };
 
 /**
  * NewsletterPage
  *
  * Animated landing page for newsletter signups and early access.
- * - Features a split hero layout with logo and animated content.
- * - Displays launch date, newsletter form, and social links.
- * - Uses Framer Motion for entrance and staggered animations.
+ *
+ * Features:
+ * - Split hero layout with logo (left) and animated content (right).
+ * - Launch date announcement and promotional copy.
+ * - Newsletter subscription form integrated via `NewsletterForm`.
+ * - Early discount offer messaging.
+ * - Social media links (Instagram, TikTok).
+ * - Back-to-home navigation.
+ *
+ * Animations:
+ * - Framer Motion handles entrance, staggered reveals, and hover effects.
+ * - Container & item variants stagger content for smooth flow.
+ *
+ * Accessibility:
+ * - Proper alt text for images.
+ * - Semantic headings and links.
+ * - Keyboard-navigable back-to-home link.
  *
  * @component
- * @returns {JSX.Element} The rendered newsletter signup/launch page.
+ * @returns {JSX.Element} The rendered newsletter signup / launch announcement page.
  */
 export default function NewsletterPage() {
   return (
     <div className={styles.pageWrapper}>
       <div className={styles.overlay} />
       <div className={styles.splitHero}>
+        {/* Left side: brand logo */}
         <motion.div
           className={styles.leftSide}
           initial={{ x: "-100%", opacity: 0 }}
@@ -48,6 +71,7 @@ export default function NewsletterPage() {
           <img src="/yafato.png" alt="Yafato Logo" className={styles.logoImage} />
         </motion.div>
 
+        {/* Right side: content */}
         <motion.div
           className={styles.rightSide}
           initial={{ x: "100%", opacity: 0 }}
@@ -70,6 +94,7 @@ export default function NewsletterPage() {
               <p className={styles.launchDate}>SEPTEMBER 20. Kl:18:00</p>
             </motion.h2>
 
+            {/* Newsletter signup form */}
             <motion.div variants={item}>
               <NewsletterForm source="coming-soon" />
             </motion.div>
@@ -78,6 +103,7 @@ export default function NewsletterPage() {
               First 5 get 50% off
             </motion.p>
 
+            {/* Social links */}
             <motion.div className={styles.socials} variants={item}>
               <motion.a
                 href="https://instagram.com/Yafato_"
@@ -101,7 +127,7 @@ export default function NewsletterPage() {
               </motion.a>
             </motion.div>
 
-            {/* Go back to homepage link */}
+            {/* Back to homepage */}
             <motion.div variants={item} className={styles.backHome}>
               <Link to="/" className={styles.backHomeLink}>
                 ← Go back to homepage
@@ -113,4 +139,3 @@ export default function NewsletterPage() {
     </div>
   );
 }
-

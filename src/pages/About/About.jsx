@@ -4,6 +4,32 @@ import { motion } from "framer-motion";
 import { Globe2, Mountain } from "lucide-react";
 import { useRef, useEffect } from "react";
 
+/**
+ * AboutPage Component
+ *
+ * Renders the main About page for Yafato Jewelry.  
+ * It combines brand storytelling, heritage highlights, and visual content
+ * (images, video, and motion animations).
+ *
+ * Features:
+ * - **Hero section** with inspirational quotes and brand message.
+ * - **Maker section** introducing the craftsman (Amz Silver).
+ * - **Meaning section** highlighting the dual heritage (West Africa + Scandinavia).
+ * - **Video section** with autoplay-prevented video showcasing the story in motion.
+ * - **CTA section** encouraging newsletter signup and Instagram follow.
+ *
+ * Video Handling:
+ * - Uses a `ref` to prevent autoplay beyond the first frame.
+ * - Ensures video is muted, inline, and does not loop automatically.
+ *
+ * Accessibility:
+ * - Proper `alt` text for images.
+ * - Semantic headings (`h1`, `h2`, `h3`) for content structure.
+ * - Motion animations respect accessibility as progressive enhancement.
+ *
+ * @component
+ * @returns {JSX.Element} The rendered About page
+ */
 export default function AboutPage() {
   const vidRef = useRef(null);
 
@@ -27,6 +53,7 @@ export default function AboutPage() {
 
   return (
     <div className={styles.aboutPage}>
+      {/* Hero Section */}
       <section className={styles.heroSection}>
         <img src="/heroimg2.jpg" alt="Yafato Jewelry" className={styles.bgImage} />
         <div className={styles.heroOverlay}></div>
@@ -67,6 +94,7 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* Maker Section */}
       <motion.section className={styles.makerSection}>
         <div className={styles.split}>
           <div className={styles.imageWrap}>
@@ -86,6 +114,7 @@ export default function AboutPage() {
         </div>
       </motion.section>
 
+      {/* Meaning Section */}
       <motion.section className={styles.meaningSection}>
         <h2>Rooted in Two Worlds</h2>
         <div className={styles.features}>
@@ -106,6 +135,7 @@ export default function AboutPage() {
         </div>
       </motion.section>
 
+      {/* Video Section */}
       <motion.section
         className={styles.videoSection}
         initial={{ opacity: 0, y: 16 }}
@@ -128,6 +158,7 @@ export default function AboutPage() {
         </div>
       </motion.section>
 
+      {/* CTA Section */}
       <motion.section
         className={styles.ctaSection}
         initial={{ opacity: 0, y: 12 }}

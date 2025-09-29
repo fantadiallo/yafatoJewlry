@@ -4,7 +4,21 @@ import { useCatalog } from "../../context/CatalogContext.jsx";
 import styles from "./SearchResults.module.scss";
 import { searchShopifyProducts } from "../../api/shopify.js";
 
+/**
+ * Normalize a string to lowercase and trim whitespace.
+ * @param {string} s - Input string.
+ * @returns {string} Normalized string.
+ */
 const norm = (s) => (s || "").toString().toLowerCase().trim();
+
+/**
+ * Filters a product list by prefix match first, then substring match.
+ * Ensures no duplicates.
+ *
+ * @param {Array<Object>} list - Product list.
+ * @param {string} q - Search query.
+ * @returns {Array<Object>} Filtered products.
+ */
 const byPrefixThenContains = (list, q) => {
   const needle = norm(q);
   if (!needle) return [];
@@ -20,11 +34,27 @@ const byPrefixThenContains = (list, q) => {
     else if (hay.includes(needle)) contains.push(p);
   }
   const seen = new Set();
-  return [...starts, ...contains].filter(x =>
+  return [...starts, ...contains].filter((x) =>
     seen.has(x.id) ? false : (seen.add(x.id), true)
   );
 };
 
+/**
+ * SearchResults
+ *
+ * Displays search results for products.
+ *
+ * Features:
+ * - Reads query string parameter `q` for the search term.
+ * - Uses local catalog (`useCatalog`) for quick matching.
+ * - Falls back to remote API search (`searchShopifyProducts`) if no local results.
+ * - Prefix matches are prioritized before substring matches.
+ * - Handles loading state and empty state messaging.
+ * - Displays results in a grid of product cards with image, title, and price.
+ *
+ * @component
+ * @returns {JSX.Element} Rendered search results page.
+ */
 export default function SearchResults() {
   const { search } = useLocation();
   const q = new URLSearchParams(search).get("q") || "";
@@ -34,14 +64,22 @@ export default function SearchResults() {
 
   const local = useMemo(() => byPrefixThenContains(products, q), [products, q]);
 
-  useEffect(() => { window.scrollTo(0, 0); }, [q]);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [q]);
 
   useEffect(() => {
     let alive = true;
     async function run() {
-      if (local.length > 0) { setRemote([]); return; }
+      if (local.length > 0) {
+        setRemote([]);
+        return;
+      }
       const needle = norm(q);
-      if (!needle) { setRemote([]); return; }
+      if (!needle) {
+        setRemote([]);
+        return;
+      }
       try {
         setLoading(true);
         const items = await searchShopifyProducts(q, 50);
@@ -53,7 +91,9 @@ export default function SearchResults() {
       }
     }
     run();
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
   }, [q, local.length]);
 
   const items = local.length ? local : remote;
@@ -87,7 +127,9 @@ export default function SearchResults() {
                 <div className={styles.meta}>
                   <h4 className={styles.title}>{p.title}</h4>
                   <p className={styles.price}>
-                    {p.price ? `${Number(p.price).toFixed(2)} ${p.currency || "GBP"}` : ""}
+                    {p.price
+                      ? `${Number(p.price).toFixed(2)} ${p.currency || "GBP"}`
+                      : ""}
                   </p>
                 </div>
               </Link>
