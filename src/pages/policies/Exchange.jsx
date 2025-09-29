@@ -6,6 +6,7 @@ export default function Exchange() {
     <main className={styles.exchange}>
       <h1>Exchange Policy (No Refunds)</h1>
       <p>You may request an exchange within 7 days of delivery.</p>
+      <p>We do not accept returns unless the item is defective or damaged. Customers must contact us within 10 days of delivery to initiate an exchange.</p>
       <ul>
         <li>Items must be unused, unworn, and in original packaging.</li>
         <li>Customers are responsible for return shipping costs.</li>

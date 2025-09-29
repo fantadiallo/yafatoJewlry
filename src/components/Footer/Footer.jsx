@@ -58,7 +58,7 @@ export default function Footer() {
           <Link to="/policies/privacy">Privacy</Link>
           <Link to="/policies/terms">Terms</Link>
           <Link to="/policies/shipping">Shipping</Link>
-          <Link to="/policies/exchange">Exchange</Link>
+          <Link to="/policies/exchange">Return/Exchange</Link>
           <Link to="/policies/legal">Legal</Link>
         </nav>
       </div>
