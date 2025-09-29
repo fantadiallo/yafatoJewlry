@@ -13,9 +13,10 @@ import styles from "./ProductGallery.module.scss";
  * - Desktop: centered grid with larger main image
  * - Keyboard: ←/→ switches image, Enter/Space on thumb selects
  * - Accessibility: proper roles/labels; active state announced
- * @param {{ images?: (string|GalleryImage)[], title?: string }} props
+ * 
+ * @param {{ images?: (string|GalleryImage)[], title?: string, focusUrl?: string }} props
  */
-export default function ProductGallery({ images = [], title = "Product" }) {
+export default function ProductGallery({ images = [], title = "Product", focusUrl }) {
   /** @type {GalleryImage[]} */
   const normalized = useMemo(
     () =>
@@ -31,11 +32,13 @@ export default function ProductGallery({ images = [], title = "Product" }) {
   const main = normalized[index];
   const railRef = useRef(null);
 
+  // keep index in range if images change
   useEffect(() => {
     if (!normalized.length) return;
     if (index > normalized.length - 1) setIndex(0);
   }, [normalized.length, index]);
 
+  // scroll active thumb into view
   useEffect(() => {
     const rail = railRef.current;
     if (!rail) return;
@@ -44,6 +47,13 @@ export default function ProductGallery({ images = [], title = "Product" }) {
       active.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" });
     }
   }, [index]);
+
+  // ✅ Jump to the image matching focusUrl (if provided)
+  useEffect(() => {
+    if (!focusUrl || !normalized.length) return;
+    const i = normalized.findIndex((img) => img.url === focusUrl);
+    if (i >= 0) setIndex(i);
+  }, [focusUrl, normalized]);
 
   function prev() {
     setIndex((i) => (i - 1 + normalized.length) % normalized.length);

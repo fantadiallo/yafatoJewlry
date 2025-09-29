@@ -75,9 +75,10 @@ function isColorOption(name) {
 /**
  * Product purchase UI: variants, qty, favorites, add-to-cart.
  * Button sits directly under Quantity on all breakpoints.
- * @param {{product: Product}} props
+ * 
+ * @param {{product: Product, onPrimaryImageChange?: (url:string)=>void}} props
  */
-export default function ProductInfo({ product }) {
+export default function ProductInfo({ product, onPrimaryImageChange }) {
   const { addToCart, addToFavorites, removeFromFavorites, favorites = [] } = useShopifyCart();
 
   const {
@@ -162,11 +163,20 @@ export default function ProductInfo({ product }) {
 
   const displayPriceNumber = Number(activeVariant?.price ?? price ?? 0);
 
+  // ✅ Prefer the selected variant’s image (string URL from your mapper)
   const primaryImage =
+    activeVariant?.image ||
     (Array.isArray(images) && (typeof images[0] === "string" ? images[0] : images[0]?.url)) ||
     featuredImage?.url ||
     product.image ||
     "";
+
+  // ✅ Notify parent (page) whenever the primary image changes
+  useEffect(() => {
+    if (onPrimaryImageChange && primaryImage) {
+      onPrimaryImageChange(primaryImage);
+    }
+  }, [onPrimaryImageChange, primaryImage]);
 
   const isFav = favorites.some((item) => item.variantId === selectedVariantId);
 
