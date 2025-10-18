@@ -153,7 +153,7 @@ export default function NewsletterPopup({
               <img src="/yafato.png" alt="Yafato" className={styles.logoImage} />
               <h1 className={styles.logo}>YAFATO</h1>
               <h2 className={styles.heading}>A light that never leaves</h2>
-              <p className={styles.notice}>First 5 get 50% off — 10% for all new signups.</p>
+              <p className={styles.notice}>10% for all new signups.</p>
               <NewsletterForm onSuccess={onSubscribed} />
               <div className={styles.socials}>
                 <a href="https://instagram.com/Yafato_" target="_blank" rel="noreferrer">
