@@ -3,28 +3,28 @@ import styles from "./ProductGallery.module.scss";
 
 /**
  * @typedef {Object} GalleryImage
- * @property {string} url - Image source URL (absolute or relative)
- * @property {string} [alt] - Accessible description of the image
+ * @property {string} url - Image source URL (absolute or relative).
+ * @property {string} [alt] - Accessible description of the image.
  */
 
 /**
- * ProductGallery component
+ * ProductGallery
  *
- * Displays a responsive, accessible image gallery with:
- * - Keyboard navigation (← →, Enter, Space)
- * - Scrollable thumbnail strip on mobile
- * - Clickable thumbnails for switching images
- * - Click-to-open fullscreen zoom dialog (pan & zoom support)
+ * Responsive, accessible product gallery:
+ * - Main image fills the frame; subtle overlay prev/next arrows.
+ * - Mobile: horizontally scrollable thumbnail rail; Desktop: wrapped row.
+ * - Click main image → fullscreen lightbox (zoom: wheel/double-click, pan: drag).
+ * - Swipe/flick in lightbox to change image; keyboard navigation on thumbs.
  *
  * @component
  * @param {Object} props
- * @param {(string|GalleryImage)[]} [props.images=[]] - Array of image URLs or objects
- * @param {string} [props.title="Product"] - Product title for accessibility
- * @param {string} [props.focusUrl] - URL of image to focus initially
+ * @param {(string|GalleryImage)[]} [props.images=[]] - Array of image URLs or {url,alt} objects.
+ * @param {string} [props.title="Product"] - Used in alt text & aria labels.
+ * @param {string} [props.focusUrl] - If provided, focuses the image with this URL on load.
  * @returns {JSX.Element|null}
  */
 export default function ProductGallery({ images = [], title = "Product", focusUrl }) {
-  /** @type {GalleryImage[]} Normalize inputs */
+  /** Normalize inputs → [{url,alt}] */
   const normalized = useMemo(
     () =>
       images
@@ -39,13 +39,13 @@ export default function ProductGallery({ images = [], title = "Product", focusUr
   const main = normalized[index];
   const railRef = useRef(null);
 
-  /** Keep index within range if image array changes */
+  // Keep index in range if images change
   useEffect(() => {
     if (!normalized.length) return;
     if (index > normalized.length - 1) setIndex(0);
   }, [normalized.length, index]);
 
-  /** Auto-scroll active thumbnail into view */
+  // Scroll active thumb into view
   useEffect(() => {
     const rail = railRef.current;
     if (!rail) return;
@@ -53,67 +53,130 @@ export default function ProductGallery({ images = [], title = "Product", focusUr
     active?.scrollIntoView?.({ inline: "center", block: "nearest", behavior: "smooth" });
   }, [index]);
 
-  /** Focus a given image based on focusUrl prop */
+  // Focus a given image based on focusUrl
   useEffect(() => {
     if (!focusUrl || !normalized.length) return;
     const i = normalized.findIndex((img) => img.url === focusUrl);
     if (i >= 0) setIndex(i);
   }, [focusUrl, normalized]);
 
-  /** Navigate previous/next image */
-  function prev() { setIndex((i) => (i - 1 + normalized.length) % normalized.length); }
-  function next() { setIndex((i) => (i + 1) % normalized.length); }
-
-  /** Keyboard navigation on thumbnails */
-  function onThumbKey(e, i) {
-    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setIndex(i); }
-    else if (e.key === "ArrowRight") { e.preventDefault(); next(); }
-    else if (e.key === "ArrowLeft") { e.preventDefault(); prev(); }
+  /** Go to previous image */
+  function prev() {
+    setIndex((i) => (i - 1 + normalized.length) % normalized.length);
   }
 
-  /* ───── Lightbox (zoom) ───── */
+  /** Go to next image */
+  function next() {
+    setIndex((i) => (i + 1) % normalized.length);
+  }
+
+  /** Keyboard behavior on thumbnails */
+  function onThumbKey(e, i) {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      setIndex(i);
+    } else if (e.key === "ArrowRight") {
+      e.preventDefault();
+      next();
+    } else if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      prev();
+    }
+  }
+
+  /* ───── Lightbox (zoom + pan + swipe) ───── */
   const dialogRef = useRef(null);
   const [zoom, setZoom] = useState(1);
   const [tx, setTx] = useState(0);
   const [ty, setTy] = useState(0);
-  const dragRef = useRef({ dragging: false, sx: 0, sy: 0, ox: 0, oy: 0 });
+  const dragRef = useRef({ dragging: false, sx: 0, sy: 0, ox: 0, oy: 0, t0: 0 });
 
   /** Open fullscreen lightbox */
-  function openLightbox() { setZoom(1); setTx(0); setTy(0); dialogRef.current?.showModal(); }
+  function openLightbox() {
+    setZoom(1);
+    setTx(0);
+    setTy(0);
+    dialogRef.current?.showModal();
+  }
 
   /** Close lightbox */
-  function closeLightbox() { dialogRef.current?.close(); }
+  function closeLightbox() {
+    dialogRef.current?.close();
+  }
 
-  /** Mouse wheel zoom control */
+  /** Mouse wheel zoom */
   function onWheel(e) {
     e.preventDefault();
     const delta = -Math.sign(e.deltaY) * 0.2;
     setZoom((z) => {
       const nz = Math.min(4, Math.max(1, +(z + delta).toFixed(2)));
-      if (nz === 1) { setTx(0); setTy(0); }
+      if (nz === 1) {
+        setTx(0);
+        setTy(0);
+      }
       return nz;
     });
   }
 
-  /** Start drag/pan on zoomed image */
+  /** Start pan / prepare swipe */
   function onPointerDown(e) {
-    if (zoom === 1) return;
-    dragRef.current = { dragging: true, sx: e.clientX, sy: e.clientY, ox: tx, oy: ty };
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+    dragRef.current = {
+      dragging: true,
+      sx: e.clientX,
+      sy: e.clientY,
+      ox: tx,
+      oy: ty,
+      t0: performance.now(),
+    };
   }
 
-  /** Move image while dragging */
+  /** Pan while dragging (when zoomed) */
   function onPointerMove(e) {
     if (!dragRef.current.dragging) return;
     const { sx, sy, ox, oy } = dragRef.current;
-    setTx(ox + (e.clientX - sx));
-    setTy(oy + (e.clientY - sy));
+    const dx = e.clientX - sx;
+    const dy = e.clientY - sy;
+    if (zoom > 1) {
+      setTx(ox + dx);
+      setTy(oy + dy);
+    }
   }
 
-  /** End drag */
-  function onPointerUp() { dragRef.current.dragging = false; }
+  /** End drag; detect swipe to change image */
+  function onPointerUp(e) {
+    if (!dragRef.current.dragging) return;
+    const { sx, sy, t0, ox, oy } = dragRef.current;
+    const dx = e.clientX - sx;
+    const dy = e.clientY - sy;
+    const dt = Math.max(1, performance.now() - t0);
 
-  /** Reset pan/zoom when switching image */
-  useEffect(() => { setTx(0); setTy(0); setZoom(1); }, [main?.url]);
+    dragRef.current.dragging = false;
+
+    const speedX = Math.abs(dx) / dt; // px/ms
+    const isHorizontal = Math.abs(dx) > Math.abs(dy) * 1.2;
+    const passed = Math.abs(dx) > 120 || speedX > 0.6;
+
+    if (isHorizontal && passed) {
+      if (dx < 0) next();
+      else prev();
+      setTx(0);
+      setTy(0);
+      return;
+    }
+
+    if (zoom > 1) {
+      setTx(ox + dx);
+      setTy(oy + dy);
+    }
+  }
+
+  // Reset pan/zoom when switching image
+  useEffect(() => {
+    setTx(0);
+    setTy(0);
+    setZoom(1);
+  }, [main?.url]);
 
   if (!normalized.length) return null;
 
@@ -123,41 +186,43 @@ export default function ProductGallery({ images = [], title = "Product", focusUr
       aria-roledescription="product gallery"
       aria-label={`${title} gallery`}
     >
-      {/* ───── Main image section ───── */}
+      {/* ───── Main image with overlay, subtle arrows ───── */}
       <div className={styles.mainWrap}>
-        <button
-          type="button"
-          className={styles.navBtn}
-          onClick={prev}
-          aria-label="Previous image"
-          disabled={normalized.length <= 1}
-        >
-          ‹
-        </button>
-
         <div className={styles.mainImage}>
+          <button
+            type="button"
+            className={`${styles.mainArrow} ${styles.mainPrev}`}
+            aria-label="Previous image"
+            onClick={prev}
+            disabled={normalized.length <= 1}
+            title="Previous image"
+          >
+            ‹
+          </button>
+
           <img
             key={main?.url}
             src={main?.url}
             alt={main?.alt || title}
             loading="eager"
-            sizes="(max-width: 640px) 92vw, 800px"
+            sizes="(max-width: 640px) 100vw, 900px"
             onClick={openLightbox}
           />
-        </div>
 
-        <button
-          type="button"
-          className={styles.navBtn}
-          onClick={next}
-          aria-label="Next image"
-          disabled={normalized.length <= 1}
-        >
-          ›
-        </button>
+          <button
+            type="button"
+            className={`${styles.mainArrow} ${styles.mainNext}`}
+            aria-label="Next image"
+            onClick={next}
+            disabled={normalized.length <= 1}
+            title="Next image"
+          >
+            ›
+          </button>
+        </div>
       </div>
 
-      {/* ───── Thumbnail strip ───── */}
+      {/* ───── Thumbnails ───── */}
       {normalized.length > 1 && (
         <div
           className={styles.thumbnailRow}
@@ -178,6 +243,7 @@ export default function ProductGallery({ images = [], title = "Product", focusUr
                 aria-label={`Show image ${i + 1} of ${normalized.length}`}
                 onClick={() => setIndex(i)}
                 onKeyDown={(e) => onThumbKey(e, i)}
+                title={`Preview ${title} image ${i + 1}`}
               >
                 <img
                   src={img.url}
@@ -195,7 +261,11 @@ export default function ProductGallery({ images = [], title = "Product", focusUr
       <dialog
         ref={dialogRef}
         className={styles.lightbox}
-        onClose={() => { setZoom(1); setTx(0); setTy(0); }}
+        onClose={() => {
+          setZoom(1);
+          setTx(0);
+          setTy(0);
+        }}
       >
         <div
           className={styles.lbInner}
@@ -204,9 +274,34 @@ export default function ProductGallery({ images = [], title = "Product", focusUr
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
           onPointerLeave={onPointerUp}
-          onClick={(e) => { if (e.target === e.currentTarget) closeLightbox(); }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) closeLightbox();
+          }}
         >
-          <button className={styles.closeBtn} onClick={closeLightbox} aria-label="Close">×</button>
+          <button
+            className={styles.closeBtn}
+            onClick={closeLightbox}
+            aria-label="Close"
+            title="Close"
+          >
+            ×
+          </button>
+
+          <button
+            type="button"
+            className={`${styles.lbArrow} ${styles.lbPrev}`}
+            aria-label="Previous image"
+            onClick={() => {
+              prev();
+              setTx(0);
+              setTy(0);
+            }}
+            data-disabled={normalized.length <= 1 ? "true" : "false"}
+            title="Previous"
+          >
+            ‹
+          </button>
+
           <img
             src={main?.url}
             alt={main?.alt || title}
@@ -215,8 +310,24 @@ export default function ProductGallery({ images = [], title = "Product", focusUr
             draggable={false}
             onDoubleClick={() => setZoom((z) => (z === 1 ? 2 : 1))}
           />
+
+          <button
+            type="button"
+            className={`${styles.lbArrow} ${styles.lbNext}`}
+            aria-label="Next image"
+            onClick={() => {
+              next();
+              setTx(0);
+              setTy(0);
+            }}
+            data-disabled={normalized.length <= 1 ? "true" : "false"}
+            title="Next"
+          >
+            ›
+          </button>
         </div>
       </dialog>
     </section>
   );
 }
+

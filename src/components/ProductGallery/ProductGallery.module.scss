@@ -4,50 +4,93 @@
   width: 100%;
 }
 
-/* ───── MAIN WRAPPER ───── */
+/* ───── MAIN (edge-to-edge, subtle overlay arrows) ───── */
+
 .mainWrap {
   display: grid;
-  grid-template-columns: 44px 1fr 44px;
-  gap: 0.5rem;
-  align-items: center;
-}
-
-.navBtn {
-  appearance: none;
-  border: 1px solid rgba($color-dark, 0.12);
-  background: $color-white;
-  width: 44px;
-  height: 44px;
-  border-radius: 999px;
-  display: grid;
   place-items: center;
-  font-size: 22px;
-  cursor: pointer;
-}
-.navBtn:disabled { opacity: 0.4; cursor: default; }
-
-/* ───── MAIN IMAGE ───── */
-.mainImage {
   width: 100%;
-  max-width: 800px;
-  justify-self: center;
-  aspect-ratio: 1 / 1;
+}
+
+.mainImage {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  /* Portrait feel on phones, square hero on desktop */
+  aspect-ratio: 4 / 5;
+
+  @media (min-width: 768px) {
+    aspect-ratio: 1 / 1;
+  }
+
   border-radius: 16px;
   overflow: hidden;
   background: $color-light;
   border: 1px solid rgba($color-primary, 0.5);
   box-shadow: 0 12px 32px rgba($color-dark, 0.2);
+
+  > img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* fills the frame fully */
+    object-position: center;
+    display: block;
+    cursor: zoom-in;
+  }
 }
-.mainImage img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  display: block;
-  cursor: zoom-in;
+
+.mainArrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 56px;
+  border: 0;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+  cursor: pointer;
+
+  background: rgba(255,255,255,.35);
+  color: rgba(0,0,0,.55);
+  backdrop-filter: saturate(120%) blur(3px);
+  box-shadow: 0 4px 14px rgba($color-dark,.12);
+  opacity: .25; /* barely visible on phones */
+
+  transition: opacity .2s ease, transform .12s ease, box-shadow .2s ease, background .2s ease;
+
+  &:disabled { opacity: 0; pointer-events: none; }
+
+  @media (hover: hover) {
+    &:hover { opacity: .75; box-shadow: 0 10px 24px rgba($color-dark,.18); }
+  }
+  &:focus-visible {
+    outline: 3px solid rgba($color-primary,.5);
+    outline-offset: 2px;
+    opacity: .9;
+  }
+  &:active { transform: translateY(calc(-50% + 1px)); }
+}
+
+.mainPrev { left: .5rem; }
+.mainNext { right: .5rem; }
+
+@media (min-width: 768px) {
+  .mainArrow {
+    width: 48px;
+    height: 64px;
+    font-size: 26px;
+    opacity: .35; /* slightly more visible on larger screens */
+  }
+  .mainPrev { left: .75rem; }
+  .mainNext { right: .75rem; }
 }
 
 /* ───── THUMBNAILS ───── */
+
 .thumbnailRow {
   display: grid;
   grid-auto-flow: column;
@@ -67,7 +110,7 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    max-width: 800px;
+    max-width: 900px;
     margin: 0 auto;
   }
 }
@@ -83,6 +126,8 @@
   overflow: hidden;
   transition: border-color .2s ease, transform .2s ease, box-shadow .2s ease;
   scroll-snap-align: center;
+
+  &:focus-visible { outline: 3px solid rgba($color-primary,.45); outline-offset: 2px; }
 }
 .thumb img {
   width: 100%;
@@ -106,14 +151,15 @@
   box-shadow: 0 0 0 3px rgba($color-primary, 0.28);
 }
 
-/* ───── LIGHTBOX ZOOM ───── */
+/* ───── LIGHTBOX (fullscreen, over-image arrows) ───── */
+
 .lightbox {
   inset: 0;
   width: 100vw;
   height: 100vh;
   padding: 0;
   border: 0;
-  background: rgba(0,0,0,.85);
+  background: $color-white;
 }
 .lightbox::backdrop { background: rgba(0,0,0,.6); }
 
@@ -122,6 +168,8 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+           env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
 .lbImg {
@@ -135,8 +183,8 @@
   transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(var(--z));
   transform-origin: center center;
 
-  max-width: 90vw;
-  max-height: 90vh;
+  max-width: calc(100vw - 2rem);
+  max-height: calc(100vh - 2rem);
   object-fit: contain;
   user-select: none;
   -webkit-user-drag: none;
@@ -150,13 +198,77 @@
   position: absolute;
   top: 1rem;
   right: 1rem;
-  width: 40px; height: 40px;
+  width: 44px; height: 44px;
   border-radius: 999px;
-  border: 1px solid rgba(255,255,255,.25);
-  background: rgba(0,0,0,.4);
-  color: #fff;
+  border: 1px solid rgba(0,0,0,.15);
+  background: rgba(255,255,255,.85);
+  color: $color-dark;
   display: grid;
   place-items: center;
   font-size: 20px;
   cursor: pointer;
+  backdrop-filter: saturate(130%) blur(4px);
+  transition: box-shadow .2s ease, transform .1s ease;
+
+  &:hover { box-shadow: 0 8px 24px rgba($color-dark,.15); }
+  &:active { transform: translateY(1px); }
+  &:focus-visible { outline: 3px solid rgba($color-primary,.45); outline-offset: 2px; }
+}
+
+.lbArrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 64px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,.12);
+  background: rgba(255,255,255,.85);
+  color: $color-dark;
+  display: grid;
+  place-items: center;
+  font-size: 26px;
+  cursor: pointer;
+  backdrop-filter: saturate(130%) blur(4px);
+  transition: box-shadow .2s ease, transform .1s ease, background .2s ease;
+  z-index: 3;
+
+  &:hover { box-shadow: 0 10px 28px rgba($color-dark,.18); }
+  &:active { transform: translateY(calc(-50% + 1px)); }
+  &:focus-visible { outline: 3px solid rgba($color-primary,.45); outline-offset: 2px; }
+
+  &[data-disabled="true"] { visibility: hidden; }
+}
+.lbPrev { left: 0.75rem; }
+.lbNext { right: 0.75rem; }
+
+@media (min-width: 768px) {
+  .lbArrow {
+    width: 56px;
+    height: 72px;
+    font-size: 28px;
+  }
+  .lbPrev { left: 1rem; }
+  .lbNext { right: 1rem; }
+}
+
+/* Optional desktop edge fade */
+@media (min-width: 1024px) {
+  .lbInner::before,
+  .lbInner::after {
+    content: "";
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 40px;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .lbInner::before {
+    left: 0;
+    background: linear-gradient(90deg, rgba(255,255,255,.85), rgba(255,255,255,0));
+  }
+  .lbInner::after {
+    right: 0;
+    background: linear-gradient(270deg, rgba(255,255,255,.85), rgba(255,255,255,0));
+  }
 }

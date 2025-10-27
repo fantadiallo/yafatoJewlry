@@ -192,7 +192,6 @@ export default function Collection() {
                   image={slides[activeIndex].image}
                   secondaryImage={slides[activeIndex].secondaryImage}
                   title={slides[activeIndex].title}
-                  price={slides[activeIndex].price}
                 />
                 <div className={styles.overlay}>
                   <a href="/products">Go to Collection →</a>

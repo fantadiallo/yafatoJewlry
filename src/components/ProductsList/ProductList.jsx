@@ -2,6 +2,24 @@ import { useEffect, useState } from "react";
 import ProductCard from "../ProductCard/ProductCard";
 import styles from "./ProductList.module.scss";
 
+/** Return { price, compareAt } from common Shopify product shapes */
+function getPriceInfo(p) {
+  const v0 = p?.variants?.[0];
+
+  const price =
+    Number(v0?.price?.amount ?? p?.price ?? p?.priceRange?.minVariantPrice?.amount ?? 0);
+
+  const compareAt =
+    Number(
+      v0?.compareAtPrice?.amount ??
+      p?.compareAtPrice ??
+      p?.compareAtPriceRange?.minVariantPrice?.amount ??
+      0
+    );
+
+  return { price, compareAt };
+}
+
 export default function ProductList({ products = [] }) {
   const [showTop, setShowTop] = useState(false);
 
@@ -33,6 +51,7 @@ export default function ProductList({ products = [] }) {
         {products.map((p) => {
           const primaryImage = p.images?.[0]?.url || "/placeholder.png";
           const secondaryImage = p.images?.[1]?.url || "/placeholder.png";
+          const { price, compareAt } = getPriceInfo(p);
 
           const buildVariantUrl = (variant) => {
             try {
@@ -64,7 +83,8 @@ export default function ProductList({ products = [] }) {
                   image={primaryImage}
                   secondaryImage={secondaryImage}
                   title={p.title}
-                  price={p.price}
+                  price={price}                    
+                  compareAtPrice={compareAt || undefined}  
                   options={p.options}
                   variants={p.variants}
                   requireSelection

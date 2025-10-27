@@ -5,7 +5,7 @@ function normalizeDomain(s) {
 
 const RAW_DOMAIN =
   import.meta.env.VITE_SHOPIFY_DOMAIN ||
-  import.meta.env.VITE_SHOPIFY_STORE_DOMAIN || 
+  import.meta.env.VITE_SHOPIFY_STORE_DOMAIN ||
   "";
 
 const TOKEN       = import.meta.env.VITE_SHOPIFY_STOREFRONT_TOKEN || "";
@@ -14,14 +14,18 @@ const API_VERSION = import.meta.env.VITE_SHOPIFY_API_VERSION || "2025-01";
 const HOST = normalizeDomain(RAW_DOMAIN);
 export const SHOP_BASE = HOST ? `https://${HOST}` : "";
 
-const PUBLIC_HOST = normalizeDomain(import.meta.env.VITE_SHOPIFY_DOMAIN_PUBLIC);
+const PUBLIC_HOST = normalizeDomain(import.meta.env.VITE_SHOPIFY_DOMAIN_PUBLIC || "");
 export const SHOP_PUBLIC_BASE = PUBLIC_HOST ? `https://${PUBLIC_HOST}` : "";
 
 const API_PATH = `/api/${API_VERSION}/graphql.json`;
+const API_URL  = import.meta.env.DEV ? "/sf" : (HOST ? `${SHOP_BASE}${API_PATH}` : "");
 
-const API_URL = import.meta.env.DEV ? "/sf" : (HOST ? `${SHOP_BASE}${API_PATH}` : "");
-
-// Replace the host in any absolute URL with the public customer domain
+/**
+ * Replace the host in any absolute URL with the public customer domain.
+ * Useful when your admin/store domain differs from the public shop domain.
+ * @param {string} url
+ * @returns {string}
+ */
 export function toPublicShopUrl(url) {
   try {
     if (!url) return "";
@@ -35,14 +39,19 @@ export function toPublicShopUrl(url) {
   }
 }
 
-// Useful account URLs you can surface in UI
+/** Common account URLs you can surface in your UI */
 export const accountUrls = {
   login:    SHOP_PUBLIC_BASE ? `${SHOP_PUBLIC_BASE}/account/login` : "",
   register: SHOP_PUBLIC_BASE ? `${SHOP_PUBLIC_BASE}/account/register` : "",
   recover:  SHOP_PUBLIC_BASE ? `${SHOP_PUBLIC_BASE}/account/login#recover` : "",
 };
 
-// ---------- Low-level GQL client ----------
+/**
+ * Low-level GraphQL client.
+ * @param {string} query
+ * @param {Record<string, any>} variables
+ * @returns {Promise<any>}
+ */
 export async function gql(query, variables = {}) {
   if (!API_URL || !TOKEN) {
     throw new Error("[Shopify] Not configured. Set VITE_SHOPIFY_DOMAIN and VITE_SHOPIFY_STOREFRONT_TOKEN.");
@@ -77,7 +86,13 @@ if (import.meta.env.DEV) {
   if (!TOKEN) console.error("[Shopify] Missing VITE_SHOPIFY_STOREFRONT_TOKEN.");
 }
 
-// ---------- Mappers ----------
+/* --------------------------- Mapping helpers --------------------------- */
+
+/**
+ * Map a product node to a lightweight listing item.
+ * @param {any} node
+ * @param {string|null} cursor
+ */
 function mapNodeToItem(node, cursor = null) {
   const v = node?.variants?.edges?.[0]?.node;
   return {
@@ -95,8 +110,14 @@ function mapNodeToItem(node, cursor = null) {
   };
 }
 
+/**
+ * Normalize a full Product node into a UI-friendly shape (incl. compareAtPrice).
+ * @param {any} p
+ * @returns {any}
+ */
 function mapProduct(p) {
   if (!p) return null;
+
   const variants = (p.variants?.edges || []).map(({ node }) => ({
     id: node.id,
     title: node.title,
@@ -106,8 +127,12 @@ function mapProduct(p) {
     selectedOptions: node.selectedOptions || [], // [{ name, value }]
     price: node.price?.amount || "",
     currency: node.price?.currencyCode || "GBP",
+    compareAtPrice: node.compareAtPrice?.amount ?? null,
+    compareAtCurrency: node.compareAtPrice?.currencyCode ?? null,
   }));
+
   const v0 = variants[0];
+
   return {
     id: p.id,
     title: p.title,
@@ -115,9 +140,9 @@ function mapProduct(p) {
     handle: p.handle,
     productType: p.productType || "",
     tags: p.tags || [],
-    images: (p.images?.edges || []).map((e) => ({
+    images: (p.images?.edges || []).map((e, i) => ({
       url: e.node.url,
-      alt: e.node.altText || p.title,
+      alt: e.node.altText || `${p.title} image ${i + 1}`,
     })),
     variantId: v0?.id || "",
     price: v0?.price || "",
@@ -128,10 +153,22 @@ function mapProduct(p) {
       values: o.values || [],
     })),
     variants,
+    // Optional ranges for PDP summaries:
+    priceMin: p.priceRange?.minVariantPrice?.amount || null,
+    priceMinCurrency: p.priceRange?.minVariantPrice?.currencyCode || null,
+    compareMin: p.compareAtPriceRange?.minVariantPrice?.amount || null,
+    compareMinCurrency: p.compareAtPriceRange?.minVariantPrice?.currencyCode || null,
   };
 }
 
-// ---------- Products (array) ----------
+/* ------------------------------- Products ------------------------------ */
+
+/**
+ * Fetch a lightweight page of products for generic lists/grids.
+ * @param {number} first
+ * @param {string|null} after
+ * @returns {Promise<Array>}
+ */
 export async function fetchShopifyProducts(first = 20, after = null) {
   const query = `
     query ($first:Int!, $after:String) {
@@ -159,6 +196,12 @@ export async function fetchShopifyProducts(first = 20, after = null) {
   return edges.map(({ node, cursor }) => mapNodeToItem(node, cursor));
 }
 
+/**
+ * Fetch a lightweight page with pagination metadata.
+ * @param {number} first
+ * @param {string|null} after
+ * @returns {Promise<{items: Array, hasNextPage: boolean, endCursor: string|null}>}
+ */
 export async function fetchShopifyProductsPaged(first = 20, after = null) {
   const query = `
     query ($first:Int!, $after:String) {
@@ -191,7 +234,12 @@ export async function fetchShopifyProductsPaged(first = 20, after = null) {
   };
 }
 
-// ---------- Products (rich for cards) ----------
+/**
+ * Fetch products with all fields needed for product cards (incl. sale).
+ * @param {number} first
+ * @param {string|null} after
+ * @returns {Promise<Array>}
+ */
 export async function fetchShopifyProductsForCards(first = 20, after = null) {
   const query = `
     query ($first:Int!, $after:String) {
@@ -207,7 +255,10 @@ export async function fetchShopifyProductsForCards(first = 20, after = null) {
             tags
             featuredImage { url altText }
             images(first: 4) { edges { node { url altText } } }
+
             priceRange { minVariantPrice { amount currencyCode } }
+            compareAtPriceRange { minVariantPrice { amount currencyCode } }
+
             options { id name values }
             variants(first: 50) {
               edges {
@@ -218,7 +269,8 @@ export async function fetchShopifyProductsForCards(first = 20, after = null) {
                   sku
                   image { url }
                   selectedOptions { name value }
-                  price { amount currencyCode }
+                  price          { amount currencyCode }
+                  compareAtPrice { amount currencyCode }  # sale support
                 }
               }
             }
@@ -233,7 +285,11 @@ export async function fetchShopifyProductsForCards(first = 20, after = null) {
   return edges.map(({ node }) => mapProduct(node));
 }
 
-// ---------- Single product ----------
+/**
+ * Fetch a single product by Shopify ID (or raw numeric) for PDP.
+ * @param {string} idOrGid
+ * @returns {Promise<any>}
+ */
 export async function fetchSingleProductById(idOrGid) {
   const gid = String(idOrGid).startsWith("gid://shopify/")
     ? String(idOrGid)
@@ -251,6 +307,10 @@ export async function fetchSingleProductById(idOrGid) {
           tags
           images(first: 10) { edges { node { url altText } } }
           options { id name values }
+
+          priceRange { minVariantPrice { amount currencyCode } }
+          compareAtPriceRange { minVariantPrice { amount currencyCode } }
+
           variants(first: 100) {
             edges {
               node {
@@ -260,7 +320,8 @@ export async function fetchSingleProductById(idOrGid) {
                 sku
                 image { url }
                 selectedOptions { name value }
-                price { amount currencyCode }
+                price          { amount currencyCode }
+                compareAtPrice { amount currencyCode }
               }
             }
           }
@@ -274,6 +335,11 @@ export async function fetchSingleProductById(idOrGid) {
   return mapProduct(p);
 }
 
+/**
+ * Fetch a single product by handle for PDP.
+ * @param {string} handle
+ * @returns {Promise<any>}
+ */
 export async function fetchProductByHandle(handle) {
   const query = `
     query ($handle:String!) {
@@ -286,6 +352,10 @@ export async function fetchProductByHandle(handle) {
         tags
         images(first: 10) { edges { node { url altText } } }
         options { id name values }
+
+        priceRange { minVariantPrice { amount currencyCode } }
+        compareAtPriceRange { minVariantPrice { amount currencyCode } }
+
         variants(first: 100) {
           edges {
             node {
@@ -295,7 +365,8 @@ export async function fetchProductByHandle(handle) {
               sku
               image { url }
               selectedOptions { name value }
-              price { amount currencyCode }
+              price          { amount currencyCode }
+              compareAtPrice { amount currencyCode }
             }
           }
         }
@@ -308,7 +379,13 @@ export async function fetchProductByHandle(handle) {
   return mapProduct(p);
 }
 
-// ---------- Search ----------
+/* -------------------------------- Search -------------------------------- */
+
+/**
+ * Build a fuzzy Shopify search string from raw text.
+ * @param {string} input
+ * @returns {string}
+ */
 function buildShopifyQuery(input) {
   const raw = input?.trim() || "";
   if (!raw) return "";
@@ -320,6 +397,13 @@ function buildShopifyQuery(input) {
   return parts.join(" OR ");
 }
 
+/**
+ * Search products (simple list items).
+ * @param {string} q
+ * @param {number} first
+ * @param {string|null} after
+ * @returns {Promise<Array>}
+ */
 export async function searchShopifyProducts(q, first = 20, after = null) {
   const query = `
     query ($q:String!, $first:Int!, $after:String) {
@@ -347,6 +431,12 @@ export async function searchShopifyProducts(q, first = 20, after = null) {
   return edges.map(({ node, cursor }) => mapNodeToItem(node, cursor));
 }
 
+/**
+ * Search products with pagination metadata.
+ * @param {string} q
+ * @param {number} first
+ * @param {string|null} after
+ */
 export async function searchShopifyProductsPaged(q, first = 20, after = null) {
   const query = `
     query ($q:String!, $first:Int!, $after:String) {
@@ -379,7 +469,12 @@ export async function searchShopifyProductsPaged(q, first = 20, after = null) {
   };
 }
 
-// ---------- Customer auth ----------
+/* ---------------------------- Customer auth ---------------------------- */
+
+/**
+ * Login and receive a customer access token.
+ * @param {{email:string,password:string}} param0
+ */
 export async function customerLogin(email, password) {
   const mutation = `
     mutation ($input: CustomerAccessTokenCreateInput!) {
@@ -396,6 +491,7 @@ export async function customerLogin(email, password) {
   return out.customerAccessToken;
 }
 
+/** Revoke a customer access token. */
 export async function customerLogout(token) {
   const mutation = `
     mutation ($token:String!) {
@@ -414,6 +510,10 @@ export async function customerLogout(token) {
   return true;
 }
 
+/**
+ * Register a new customer.
+ * @param {{email:string,password:string,firstName?:string,lastName?:string}} input
+ */
 export async function customerRegister({
   email,
   password,
@@ -437,6 +537,7 @@ export async function customerRegister({
   return out.customer;
 }
 
+/** Fetch the authenticated customer's profile and a few orders. */
 export async function customerMe(token) {
   const query = `
     query ($token:String!) {
@@ -463,7 +564,13 @@ export async function customerMe(token) {
   return d.customer || null;
 }
 
-// ---------- Recommendations ----------
+/* ------------------------ Recommendations (PDP) ------------------------ */
+
+/**
+ * Get recommended products by product ID.
+ * (We only need title/handle/image for your UI; prices optional.)
+ * @param {string} productId
+ */
 export async function fetchRecommendationsById(productId) {
   const query = `
     query($id: ID!) {
@@ -493,19 +600,20 @@ export async function fetchRecommendationsById(productId) {
   });
 }
 
+/**
+ * Get recommendations by product handle.
+ * @param {string} handle
+ */
 export async function fetchRecommendationsByHandle(handle) {
-  const q = `
-    query($handle: String!) {
-      product(handle: $handle) { id }
-    }
-  `;
+  const q = `query($handle: String!) { product(handle: $handle) { id } }`;
   const d = await gql(q, { handle });
   const id = d.product?.id;
   if (!id) return [];
   return fetchRecommendationsById(id);
 }
 
-// ---------- Cart (Storefront) ----------
+/* --------------------------------- Cart -------------------------------- */
+
 const CART_FRAGMENT = `
 fragment CartFields on Cart {
   id
@@ -557,6 +665,7 @@ fragment CartFields on Cart {
 }
 `;
 
+/** Create a new cart. */
 export async function cartCreate() {
   const mutation = `
     mutation CartCreate($input: CartInput) {
@@ -575,6 +684,7 @@ export async function cartCreate() {
   return cart;
 }
 
+/** Fetch a cart by ID. */
 export async function cartGet(id) {
   const query = `
     query CartGet($id: ID!) {
@@ -588,6 +698,11 @@ export async function cartGet(id) {
   return cart;
 }
 
+/**
+ * Add lines to a cart.
+ * @param {string} cartId
+ * @param {Array<{quantity:number, merchandiseId:string}>} lines
+ */
 export async function cartLinesAdd(cartId, lines) {
   const mutation = `
     mutation CartLinesAdd($cartId: ID!, $lines: [CartLineInput!]!) {
@@ -606,6 +721,11 @@ export async function cartLinesAdd(cartId, lines) {
   return cart;
 }
 
+/**
+ * Remove lines from a cart.
+ * @param {string} cartId
+ * @param {string[]} lineIds
+ */
 export async function cartLinesRemove(cartId, lineIds) {
   const mutation = `
     mutation CartLinesRemove($cartId: ID!, $lineIds: [ID!]!) {
@@ -624,8 +744,12 @@ export async function cartLinesRemove(cartId, lineIds) {
   return cart;
 }
 
+/**
+ * Update cart lines.
+ * @param {string} cartId
+ * @param {Array<{id:string, quantity?:number, merchandiseId?:string}>} lines
+ */
 export async function cartLinesUpdate(cartId, lines) {
-  // lines: [{ id, quantity?, merchandiseId? }]
   const mutation = `
     mutation CartLinesUpdate($cartId: ID!, $lines: [CartLineUpdateInput!]!) {
       cartLinesUpdate(cartId: $cartId, lines: $lines) {
@@ -643,8 +767,9 @@ export async function cartLinesUpdate(cartId, lines) {
   return cart;
 }
 
+/** Quick probe for connectivity + store name. */
 export async function shopPing() {
- return gql(`
+  return gql(`
     {
       shop {
         name

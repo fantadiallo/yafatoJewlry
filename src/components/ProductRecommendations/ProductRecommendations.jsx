@@ -12,15 +12,7 @@ import {
  * @param {number|string} amount - The amount to format.
  * @returns {string} Formatted currency string, e.g. "kr100.00".
  */
-function formatMoneyGBP(amount) {
-  const n = typeof amount === "string" ? parseFloat(amount) : amount;
-  if (!Number.isFinite(n)) return "";
-  try {
-    return new Intl.NumberFormat("en-NO", { style: "currency", currency: "NOK" }).format(n);
-  } catch {
-    return `kr${(n || 0).toFixed(2)}`;
-  }
-}
+
 
 /**
  * ProductRecommendations Component
@@ -148,9 +140,6 @@ export default function ProductRecommendations({ products, productId, handle, cu
               id={p.id}
               image={p.image}
               title={p.title}
-              price={formatMoneyGBP(p.price)}
-              oldPrice={p.oldPrice ? formatMoneyGBP(p.oldPrice) : undefined}
-              discount={p.discount}
             />
           </div>
         ))}
@@ -164,9 +153,6 @@ export default function ProductRecommendations({ products, productId, handle, cu
               id={p.id}
               image={p.image}
               title={p.title}
-              price={formatMoneyGBP(p.price)}
-              oldPrice={p.oldPrice ? formatMoneyGBP(p.oldPrice) : undefined}
-              discount={p.discount}
             />
           </div>
         ))}
