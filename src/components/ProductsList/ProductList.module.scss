@@ -1,64 +1,89 @@
 .grid {
   display: grid;
-  gap: 2rem;
+  gap: clamp(1rem, 2vw, 2rem);
   width: 100%;
-  padding: 1rem;
-  max-width: 1400px;
+  padding: clamp(0.5rem, 2vw, 1.5rem);
+  max-width: 1200px;
   margin: 0 auto;
 
-  // Phones default: 2 columns (requested)
-  grid-template-columns: repeat(2, 1fr);
+  /* 1 col on phones, 2 on small tablets, 3 on desktop */
+  grid-template-columns: 1fr;
+  @media (min-width: 600px) { grid-template-columns: repeat(2, 1fr); }
+  @media (min-width: 992px) { grid-template-columns: repeat(3, 1fr); }
 
-  @media (min-width: 600px) {
-    // Keep 2 columns for small tablets too (as you asked)
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  @media (min-width: 992px) {
-    // Your desktop: 3 per row
-    grid-template-columns: repeat(3, 1fr);
-  }
+  /* make rows equal height */
+  align-items: stretch;
 }
 
-// Optional but helps avoid jank while images load
-.item {
-  display: grid;
+.item { display: flex; }
+
+.card {
+  /* uniform outer shell */
+  background: $color-white;
+  border: 1px solid rgba($color-dark, 0.06);
+  border-radius: 1px;
+  box-shadow: 0 8px 22px rgba($color-dark, 0.06);
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  overflow: clip;
+
+  /* stretch to same height */
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+
+  @media (hover: hover) {
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 14px 34px rgba($color-dark, 0.12);
+      border-color: rgba($color-primary, 0.18);
+    }
+  }
+
+  /* ensure the inner link (ProductCard root) fills the shell */
+  :global(a) {
+    display: grid;
+    grid-template-rows: auto auto auto; /* image / info / options/actions */
+    align-items: start;
+    height: 100%;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* normalize inner spacing */
+  :global(.imageWrapper) { aspect-ratio: 3 / 4; }
+  :global(.info)         { padding: .85rem 1rem 0.5rem; text-align: center; }
+  :global(.optionsBar)   { padding: 0 1rem 1rem; }
 }
 
-// Back-to-top button
+/* Back to top */
 .toTop {
   position: fixed;
   right: clamp(0.75rem, 3vw, 1.25rem);
   bottom: calc(0.75rem + env(safe-area-inset-bottom));
   z-index: 60;
-
-  padding: 0.6rem 0.85rem;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba($color-dark, 0.08);
   border-radius: 999px;
   background: $color-white;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 10px 24px rgba($color-dark, 0.14);
   font-weight: 700;
   cursor: pointer;
-
+  display: grid;
+  place-items: center;
+  font-size: 18px;
   opacity: 0;
   transform: translateY(12px);
   pointer-events: none;
-  transition: opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  transition: opacity .2s ease, transform .2s ease, box-shadow .2s ease, border-color .2s ease;
 }
-
-.visible {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-}
+.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
 
 @media (hover: hover) {
   .toTop:hover {
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.16);
+    box-shadow: 0 16px 36px rgba($color-dark, 0.18);
+    border-color: rgba($color-primary, 0.18);
   }
 }
-
-.toTop:focus-visible {
-  outline: 2px solid $color-accent;
-  outline-offset: 2px;
-}
+.toTop:focus-visible { outline: 2px solid $color-primary; outline-offset: 3px; }

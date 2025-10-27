@@ -1,18 +1,21 @@
-/* ——— CARD BASICS ——— */
+/* ——— CARD WRAPPER ——— */
 .productCard {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: auto auto auto;
   text-decoration: none;
   color: inherit;
   cursor: pointer;
+  height: 100%;
+  background: $color-white;
 }
 
+/* ——— IMAGE SECTION ——— */
 .imageWrapper {
   position: relative;
   width: 100%;
   aspect-ratio: 3 / 4;
   overflow: hidden;
-  border-radius: 12px;                  /* soft corners */
+  border-radius: 1px;
   background: $color-light;
 
   .productImage {
@@ -24,15 +27,27 @@
     transition: opacity .4s ease;
   }
 
-  .defaultImage { opacity: 1; z-index: 1; }
-  .hoverImage   { opacity: 0; z-index: 2; }
+  .defaultImage {
+    opacity: 1;
+    z-index: 1;
+  }
+
+  .hoverImage {
+    opacity: 0;
+    z-index: 2;
+  }
 
   &:hover {
-    .defaultImage { opacity: 0; }
-    .hoverImage   { opacity: 1; }
+    .defaultImage {
+      opacity: 0;
+    }
+    .hoverImage {
+      opacity: 1;
+    }
   }
 }
 
+/* ——— ICON BUTTONS ——— */
 .iconBar {
   position: absolute;
   top: 0.6rem;
@@ -62,23 +77,23 @@
   transition: transform .12s ease, box-shadow .18s ease, background .18s ease, color .18s ease;
 
   font-weight: 600;
-  font-size: 0.6rem; 
+  font-size: 0.6rem;
   line-height: 1;
 
   &:hover {
-    background: $color-accent;
+    background: $color-primary;
     color: $color-white;
     transform: translateY(-1px);
-    box-shadow: 0 6px 18px rgba($color-accent, 0.35);
+    box-shadow: 0 6px 18px rgba($color-primary, 0.35);
   }
 
   &:active {
     transform: translateY(0);
-    box-shadow: 0 3px 10px rgba($color-accent, 0.25);
+    box-shadow: 0 3px 10px rgba($color-primary, 0.25);
   }
 
   &:focus-visible {
-    outline: 3px solid rgba($color-accent, 0.45);
+    outline: 3px solid rgba($color-primary, 0.45);
     outline-offset: 2px;
   }
 
@@ -88,16 +103,17 @@
   }
 }
 
-
+/* ——— INFO (TITLE + PRICE) ——— */
 .info {
-  margin-top: .75rem;
+  padding: .85rem 1rem .5rem;
   text-align: center;
 
   .title {
-    font-size: .98rem;
+    font-size: clamp(0.95rem, 0.9rem + 0.2vw, 1.05rem);
     font-weight: 600;
-    margin: 0;
+    color: $color-dark;
     line-height: 1.25;
+    margin: 0;
   }
 
   .price {
@@ -109,13 +125,14 @@
   }
 }
 
-/* ——— OPTIONS (Ring size select) ——— */
+/* ——— OPTIONS (RING SIZE, ETC.) ——— */
 .optionsBar {
   display: flex;
   flex-wrap: wrap;
-  gap: .5rem;                  /* mobile gap */
-  justify-content: flex-start; /* left-align like mobile */
-  margin-top: .6rem;
+  gap: .6rem;
+  justify-content: center;
+  margin-top: .5rem;
+  padding: 0 1rem 1rem;
 }
 
 .optionGroup {
@@ -123,14 +140,14 @@
   flex-direction: column;
   align-items: flex-start;
   position: relative;
-  min-width: 120px;  /* mobile width */
-  max-width: 150px;  /* mobile width */
-  flex: 1 auto;
-  gap: .35rem;
+  min-width: 130px;
+  max-width: 160px;
+  flex: 1 1 130px;
+  gap: .3rem;
 }
 
 .optionLabel {
-  font-weight: 700;
+  font-weight: 600;
   color: $color-dark;
   font-size: .85rem;
   margin-bottom: .2rem;
@@ -142,8 +159,8 @@
   -moz-appearance: none;
 
   width: 100%;
-  padding: .45rem .7rem;  /* mobile padding */
-  padding-right: 2rem;    /* space for caret */
+  padding: .45rem .7rem;
+  padding-right: 2rem;
   border-radius: 10px;
   border: 1px solid rgba($color-dark, .15);
   background: $color-white;
@@ -152,21 +169,22 @@
   line-height: 1.2;
   cursor: pointer;
   box-shadow: 0 1px 3px rgba($color-dark, .05);
-  white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
   transition: border-color .2s ease, box-shadow .2s ease;
 
   &:hover {
-    border-color: rgba($color-accent, .4);
+    border-color: rgba($color-primary, .4);
   }
+
   &:focus {
-    border-color: $color-accent;
-    outline: 2px solid rgba($color-accent, .35);
+    border-color: $color-primary;
+    outline: 2px solid rgba($color-primary, .35);
     outline-offset: 1px;
   }
 }
 
+/* caret icon */
 .optionGroup::after {
   content: "▾";
   position: absolute;
@@ -174,18 +192,19 @@
   top: 50%;
   transform: translateY(-50%);
   pointer-events: none;
-  color: $color-muted;
+  color: rgba($color-dark, 0.4);
   font-size: .75rem;
 }
 
-/* price + badge under selector */
+/* ——— VARIANT PRICE + BADGE ——— */
 .variantPrice {
-  margin-top: .2rem;
+  margin-top: .25rem;
   font-weight: 700;
   color: $color-dark;
+  text-align: center;
 
   .badge {
-    margin-left: .45rem;
+    margin-left: .4rem;
     padding: .15rem .45rem;
     font-size: .72rem;
     border-radius: 999px;
@@ -193,4 +212,65 @@
     color: $color-dark;
     font-weight: 700;
   }
+}
+
+/* ——— RESPONSIVE TWEAKS ——— */
+@media (max-width: 768px) {
+  .info {
+    padding: .75rem .8rem .4rem;
+    .title {
+      font-size: .95rem;
+    }
+  }
+
+  .optionsBar {
+    gap: .4rem;
+    padding: 0 .8rem .8rem;
+  }
+
+  .optionGroup {
+    min-width: 120px;
+    max-width: 140px;
+  }
+
+  .optionSelect {
+    font-size: .8rem;
+    padding: .4rem .6rem;
+  }
+}
+/* Price row */
+.priceRow {
+  margin: .35rem 0 0;
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  font-size: .95rem;
+}
+
+.price {            /* regular price */
+  font-weight: 700;
+  color: $color-dark;
+  opacity: .95;
+}
+
+.priceCompare {     /* crossed out */
+  color: rgba($color-dark, .55);
+  text-decoration: line-through;
+  font-weight: 600;
+}
+
+.priceSale {        /* emphasized sale price */
+  font-weight: 800;
+  color: $color-primary;
+}
+
+/* optional: percentage badge */
+.saleBadge {
+  font-size: .75rem;
+  font-weight: 800;
+  line-height: 1;
+  padding: .2rem .45rem;
+  border-radius: 999px;
+  background: rgba($color-primary, .12);
+  color: $color-primary;
 }

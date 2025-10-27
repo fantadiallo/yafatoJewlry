@@ -12,8 +12,8 @@ $hover-row: mix($color-light, $color-primary, 85%);
   box-shadow: 0 2px 6px rgba($color-dark, 0.05);
 
   .topBar {
-    background: $color-white;
-    color: $color-accent;
+    background: $color-accent;
+    color: $color-white;
     font-size: 0.85rem;
     font-weight: 600;
     letter-spacing: 0.5px;
