@@ -2,12 +2,10 @@ import { useRef, useState } from "react";
 import styles from "./NewsletterForm.module.scss";
 
 /**
- * NewsletterForm Component (Shopify Version)
- *
+ * NewsletterForm Component
  * Sends email directly to Shopify via Storefront API.
  * Creates customer with acceptsMarketing: true
  */
-
 export default function NewsletterForm() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
@@ -41,7 +39,7 @@ export default function NewsletterForm() {
 
     try {
       const response = await fetch(
-        `https://${import.meta.env.VITE_SHOPIFY_STORE_DOMAIN}/api/2023-10/graphql.json`,
+        `https://${import.meta.env.VITE_SHOPIFY_DOMAIN}/api/${import.meta.env.VITE_SHOPIFY_API_VERSION}/graphql.json`,
         {
           method: "POST",
           headers: {
@@ -75,8 +73,7 @@ export default function NewsletterForm() {
 
       const result = await response.json();
 
-      const errors =
-        result?.data?.customerCreate?.customerUserErrors || [];
+      const errors = result?.data?.customerCreate?.customerUserErrors || [];
 
       if (errors.length > 0) {
         const errorMessage = errors[0].message.toLowerCase();

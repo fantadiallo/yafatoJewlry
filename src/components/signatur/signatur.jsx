@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import styles from "./Signatur.module.scss";
+import styles from "./signatur.module.scss";
 
 export default function Signatur() {
   return (
