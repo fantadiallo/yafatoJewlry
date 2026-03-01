@@ -1,4 +1,3 @@
-
 function normalizeDomain(s) {
   return String(s || "").trim().replace(/^https?:\/\//i, "").split("/")[0];
 }
@@ -107,6 +106,7 @@ function mapNodeToItem(node, cursor = null) {
     currency: v?.price?.currencyCode || "GBP",
     productType: node.productType || "",
     tags: node.tags || [],
+    createdAt: node.createdAt || "",
   };
 }
 
@@ -140,6 +140,7 @@ function mapProduct(p) {
     handle: p.handle,
     productType: p.productType || "",
     tags: p.tags || [],
+    createdAt: p.createdAt || "",
     images: (p.images?.edges || []).map((e, i) => ({
       url: e.node.url,
       alt: e.node.altText || `${p.title} image ${i + 1}`,
@@ -172,7 +173,7 @@ function mapProduct(p) {
 export async function fetchShopifyProducts(first = 20, after = null) {
   const query = `
     query ($first:Int!, $after:String) {
-      products(first:$first, after:$after) {
+      products(first:$first, after:$after, sortKey: CREATED_AT, reverse: true) {
         edges {
           cursor
           node {
@@ -182,6 +183,7 @@ export async function fetchShopifyProducts(first = 20, after = null) {
             description
             productType
             tags
+            createdAt
             featuredImage { url altText }
             images(first:1){ edges { node { url } } }
             variants(first:1){ edges { node { id price { amount currencyCode } } } }
@@ -205,7 +207,7 @@ export async function fetchShopifyProducts(first = 20, after = null) {
 export async function fetchShopifyProductsPaged(first = 20, after = null) {
   const query = `
     query ($first:Int!, $after:String) {
-      products(first:$first, after:$after) {
+      products(first:$first, after:$after, sortKey: CREATED_AT, reverse: true) {
         edges {
           cursor
           node {
@@ -215,6 +217,7 @@ export async function fetchShopifyProductsPaged(first = 20, after = null) {
             description
             productType
             tags
+            createdAt
             featuredImage { url altText }
             images(first:1){ edges { node { url } } }
             variants(first:1){ edges { node { id price { amount currencyCode } } } }
@@ -243,11 +246,12 @@ export async function fetchShopifyProductsPaged(first = 20, after = null) {
 export async function fetchShopifyProductsForCards(first = 20, after = null) {
   const query = `
     query ($first:Int!, $after:String) {
-      products(first:$first, after:$after) {
+      products(first:$first, after:$after, sortKey: CREATED_AT, reverse: true) {
         edges {
           cursor
           node {
             id
+            createdAt
             handle
             title
             description
@@ -300,6 +304,7 @@ export async function fetchSingleProductById(idOrGid) {
       node(id:$id) {
         ... on Product {
           id
+          createdAt
           title
           description
           handle
@@ -345,6 +350,7 @@ export async function fetchProductByHandle(handle) {
     query ($handle:String!) {
       product(handle:$handle) {
         id
+        createdAt
         title
         description
         handle
@@ -407,7 +413,7 @@ function buildShopifyQuery(input) {
 export async function searchShopifyProducts(q, first = 20, after = null) {
   const query = `
     query ($q:String!, $first:Int!, $after:String) {
-      products(first:$first, after:$after, query:$q) {
+      products(first:$first, after:$after, query:$q, sortKey: CREATED_AT, reverse: true) {
         edges {
           cursor
           node {
@@ -417,6 +423,7 @@ export async function searchShopifyProducts(q, first = 20, after = null) {
             description
             productType
             tags
+            createdAt
             featuredImage { url altText }
             images(first:1){ edges { node { url } } }
             variants(first:1){ edges { node { id price { amount currencyCode } } } }
@@ -440,7 +447,7 @@ export async function searchShopifyProducts(q, first = 20, after = null) {
 export async function searchShopifyProductsPaged(q, first = 20, after = null) {
   const query = `
     query ($q:String!, $first:Int!, $after:String) {
-      products(first:$first, after:$after, query:$q) {
+      products(first:$first, after:$after, query:$q, sortKey: CREATED_AT, reverse: true) {
         edges {
           cursor
           node {
@@ -450,6 +457,7 @@ export async function searchShopifyProductsPaged(q, first = 20, after = null) {
             description
             productType
             tags
+            createdAt
             featuredImage { url altText }
             images(first:1){ edges { node { url } } }
             variants(first:1){ edges { node { id price { amount currencyCode } } } }
@@ -775,7 +783,7 @@ export async function shopPing() {
         name
         primaryDomain { url }
       }
-      products(first: 1) { edges { node { id title } } }
+      products(first: 1, sortKey: CREATED_AT, reverse: true) { edges { node { id title createdAt } } }
     }
   `);
 }

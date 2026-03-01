@@ -150,7 +150,7 @@ export default function NewsletterPopup({
           >
             <button className={styles.closePopup} onClick={close} aria-label="Close">✕</button>
             <div className={styles.popupInner}>
-              <img src="/yafato.png" alt="Yafato" className={styles.logoImage} />
+              <img src="/logonybrown.png" alt="Yafato logo" className={styles.logoImage} />
               <h1 className={styles.logo}>YAFATO</h1>
               <h2 className={styles.heading}>A light that never leaves</h2>
               <p className={styles.notice}>10% for all new signups.</p>

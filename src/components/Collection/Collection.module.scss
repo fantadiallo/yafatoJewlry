@@ -1,260 +1,245 @@
+@use "../../styles/variables" as *;
+
 .sectionCollection {
   width: 100%;
-  padding: 5rem 2rem;
-  color: black;
-  background: $color-light;
-
-  opacity: 0;
-  transform: translateY(30px);
-  animation: fadeUp 0.8s ease forwards;
+  background: $ivory;
+  padding: clamp(60px, 12vh, 90px) 0;
 }
 
-@keyframes fadeUp {
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* Header */
-.sectionHeader {
-  max-width: 1200px;
-  margin: 0 auto 3rem auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  position: relative;
-}
-
-.sectionHeader h2 {
-  font-family: $display;
-  font-size: clamp(1.8rem, 3vw, 2.5rem);
-  font-weight: 700;
-  margin: 0;
-  color: black;
-  position: relative;
-}
-
-.sectionHeader h2::after {
-  content: "";
-  position: absolute;
-  bottom: -8px;
-  left: 0;
-  width: 60px;
-  height: 3px;
-  background: $color-accent;
-  border-radius: 2px;
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.4s ease;
-}
-
-.sectionHeader h2:hover::after { transform: scaleX(1); }
-
-.viewAll {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: $color-accent;
-  text-decoration: none;
-  position: relative;
-  transition: color 0.3s ease, transform 0.3s ease;
-}
-
-.viewAll::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: -4px;
-  width: 100%;
-  height: 2px;
-  background: $color-accent;
-  transform: scaleX(0);
-  transform-origin: right;
-  transition: transform 0.3s ease;
-}
-
-.viewAll:hover {
-  color: darken($color-accent, 10%);
-  transform: translateX(4px);
-}
-.viewAll:hover::after { transform: scaleX(1); transform-origin: left; }
-
-/* glowing divider */
-.sectionHeader::after {
-  content: "";
-  position: absolute;
-  bottom: -16px;
-  left: 0; right: 0;
-  height: 2px;
-  border-radius: 2px;
-  background: linear-gradient(90deg, $color-accent, lighten($color-accent, 15%), $color-accent);
-  box-shadow: 0 0 12px rgba($color-accent, 0.7);
-}
-
-/* Hero grid */
-.collectionHeroNew {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: clamp(1rem, 3vw, 2rem);
-  max-width: 1200px;
+.inner {
+  max-width: $container;
   margin: 0 auto;
+  padding: 0 $gutter;
 }
 
-.collectionHeroNew > div {
-  aspect-ratio: 1 / 1;
-  border-radius: 16px;
-  overflow: hidden;
+.topRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: clamp(32px, 5vh, 48px);
   position: relative;
-  transform: translateY(20px);
-  opacity: 0;
-  animation: fadeUp 0.8s ease forwards;
 }
 
-.collectionHeroNew > div:nth-child(1) { animation-delay: 0.2s; }
-.collectionHeroNew > div:nth-child(2) { animation-delay: 0.4s; }
-
-/* 📱 Mobile responsive: stack and keep nice height */
-@media (max-width: 600px) {
-  .collectionHeroNew {
-    grid-template-columns: 1fr;
-    gap: 1.25rem;
-  }
-  .collectionHeroNew > div {
-    aspect-ratio: auto;
-    min-height: clamp(280px, 52vw, 360px);
-  }
-}
-
-/* Left hero */
-.heroLeft { position: relative; overflow: hidden; }
-.heroLeft img {
-  width: 100%; height: 100%;
-  object-fit: cover;
-  border-radius: 16px;
-  transition: transform 0.6s ease;
-}
-.heroLeft:hover img { transform: scale(1.05); }
-
-.heroLeft::before {
+/* hairline divider */
+.topRow::after {
   content: "";
-  position: absolute; inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  border-radius: 16px;
-  z-index: 1;
-}
-
-.heroText {
-  position: absolute; inset: 0; z-index: 2;
-  display: flex; flex-direction: column; justify-content: flex-end;
-  padding: clamp(1.25rem, 4vw, 2.5rem);
-  color: white;
-  text-shadow: 0 3px 8px rgba(0, 0, 0, 0.6);
-  transition: all 0.4s ease;
-}
-
-.heroText h2 {
-  font-family: $display;
-  font-size: clamp(1.6rem, 3vw, 3rem);
-  font-weight: 800;
-  margin-bottom: 0.5rem;
-  line-height: 1.2;
-}
-
-.heroText p,
-.heroText .cta {
-  opacity: 0;
-  transform: translateY(15px);
-  transition: all 0.4s ease;
-}
-
-.heroLeft:hover .heroText p,
-.heroLeft:hover .heroText .cta {
-  opacity: 1; transform: translateY(0);
-}
-
-.cta {
-  position: relative;
-  display: inline-block;
-  color: $color-white;
-  text-decoration: none;
-  font-weight: 600;
-  padding-bottom: 2px;
-  transition: color 0.2s;
-}
-.cta::after {
-  content: "";
-  display: block;
-  position: absolute; left: 0; bottom: 0;
-  width: 100%; height: 2px;
-  background: $sage;
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.cta:hover::after, .cta:focus::after { transform: scaleX(1); background: $sage; }
-
-/* Right product spotlight */
-.heroRight { position: relative; }
-
-.productShowcase { width: 100%; height: 100%; position: relative; }
-
-.productCard {
-  width: 100%; height: 100%; position: relative;
-}
-
-.productCard img {
-  width: 100%; height: 100%;
-  object-fit: cover;
-  border-radius: 16px;
-  transition: transform 0.5s ease;
-}
-.productCard:hover img { transform: scale(1.04); }
-
-/* Hover overlay CTA */
-.overlay {
-  position: absolute; inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  color: white;
-  font-size: 1.2rem;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  display: flex; align-items: center; justify-content: center;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  border-radius: 16px;
-}
-.productCard:hover .overlay { opacity: 1; }
-
-/* Prev/Next buttons */
-.navBtn {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 42px; height: 42px;
+  left: 0;
+  bottom: -18px;
+  width: 100%;
+  height: 1px;
+  background: rgba($ink, 0.08);
+}
+
+
+
+.leftTitle {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.kicker {
+  font-size: 0.9rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba($ink, 0.7);
+}
+
+.heading {
+  font-size: clamp(1.4rem, 2vw, 1.7rem);
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: $ink;
+}
+
+.rightLabel {
+  align-self: center;
+  font-size: 0.95rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba($ink, 0.8);
+  white-space: nowrap;
+}
+
+/* Grid */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(32px, 3vw, 40px);
+  margin-bottom: clamp(40px, 6vh, 56px);
+}
+
+/* Card */
+.card {
+  display: flex;
+  flex-direction: column;
+  color: inherit;
+  text-decoration: none;
+  transform: translateY(0);
+  transition: transform 0.18s ease, opacity 0.18s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba($ink, 0.25);
+    outline-offset: 4px;
+  }
+}
+
+.cardImageWrapper {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  background: #f4f3f1;
+  position: relative;
+  overflow: hidden;
+}
+
+.primaryImage,
+.secondaryImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: opacity 0.35s ease, transform 0.45s ease;
+}
+
+.secondaryImage {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+
+/* hover swap triggers from the whole card */
+.card:hover .secondaryImage {
+  opacity: 1;
+}
+
+.card:hover .primaryImage {
+  opacity: 0;
+}
+
+.card:hover .primaryImage,
+.card:hover .secondaryImage {
+  transform: scale(1.02);
+}
+
+.cardInfo {
+  text-align: center;
+  padding-top: 18px;
+  padding-bottom: 10px;
+}
+
+.cardTitle {
+  font-size: 0.95rem;
+  font-weight: 400;
+  color: $ink;
+  margin-bottom: 6px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+
+.cardSub {
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  color: rgba($ink, 0.55);
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+.cardPrice {
+  font-size: 0.95rem;
+  color: $ink;
+}
+
+/* CTA */
+.ctaRow {
+  display: flex;
+  justify-content: center;
+}
+
+.ctaButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 26px;
+  border-radius: 2px;
+  font-size: 0.8rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  border: 1px solid rgba($ink, 0.12);
+  background: $orange;
+  color: $ivory;
+  text-decoration: none;
+  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover,
+  &:focus-visible {
+    background: #d2d2d2;
+    transform: translateY(-1px);
+    color: ink;
+    box-shadow: 0 6px 18px rgba($ink, 0.08);
+  }
+}
+
+/* Skeleton */
+.skeletonCard {
+  pointer-events: none;
+}
+
+.skeletonCard .cardImageWrapper {
+  background: rgba($ink, 0.06);
+}
+
+.skeletonLine {
+  height: 12px;
+  width: 70%;
+  margin: 8px auto 0;
+  background: rgba($ink, 0.08);
   border-radius: 999px;
-  border: 1px solid rgba(0,0,0,.12);
-  background: $color-white;
-  display: grid; place-items: center;
-  font-size: 22px;
-  cursor: pointer;
-  z-index: 3;
-  transition: box-shadow .2s ease, transform .2s ease;
 }
-.navBtn:hover { box-shadow: 0 10px 24px rgba(0,0,0,.16); transform: translateY(-50%) scale(1.02); }
-.prev { left: 0.5rem; }
-.next { right: 0.5rem; }
 
-/* Dots */
-.dots {
-  position: absolute; left: 50%; bottom: 0.9rem; transform: translateX(-50%);
-  display: flex; gap: 0.6rem; z-index: 3;
+.skeletonLineSmall {
+  height: 10px;
+  width: 52%;
+  margin: 10px auto 0;
+  background: rgba($ink, 0.06);
+  border-radius: 999px;
 }
-.dot {
-  width: 12px; height: 12px; border-radius: 50%;
-  background: rgba(255,255,255,.6);
-  border: 1px solid rgba(255,255,255,.8);
-  cursor: pointer;
-  transition: transform .2s ease, background .2s ease;
-}
-.dot:hover { background: rgba(255,255,255,.9); transform: scale(1.1); }
-.activeDot { background: $color-accent; transform: scale(1.2); }
 
-/* Accent strong text */
-strong { color: $sage; font-weight: 700; letter-spacing: 0.5px; }
+/* Responsive */
+@media (max-width: 1200px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .topRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .rightLabel {
+    align-self: flex-start;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 520px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ctaButton {
+    width: 100%;
+  }
+}

@@ -1,4 +1,5 @@
 /* AuthModal.module.scss */
+@use "../../styles/variables" as *;
 
 .overlay {
   position: fixed;
@@ -31,7 +32,12 @@
     display: block;
     height: 1px;
     margin-top: -1px;
-    background: linear-gradient(90deg, transparent, rgba($color-primary, 0.7), transparent);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba($color-primary, 0.7),
+      transparent
+    );
   }
 }
 
@@ -40,7 +46,11 @@
   align-items: center;
   position: relative;
   border-bottom: 1px solid rgba($color-dark, 0.08);
-  background: linear-gradient(180deg, rgba($color-white, 0.7), rgba($color-white, 0.3));
+  background: linear-gradient(
+    180deg,
+    rgba($color-white, 0.7),
+    rgba($color-white, 0.3)
+  );
   border-top-left-radius: 16px;
   border-top-right-radius: 16px;
   overflow: hidden;
@@ -58,11 +68,21 @@
     color: $color-dark;
     transition: background 180ms ease, color 180ms ease, box-shadow 180ms ease;
 
-    &:hover { background: rgba($color-primary, 0.2); }
-    &:focus-visible { outline: 3px solid rgba($color-accent, 0.35); outline-offset: -2px; border-radius: 12px; }
+    &:hover {
+      background: rgba($color-primary, 0.2);
+    }
+
+    &:focus-visible {
+      outline: 3px solid rgba($color-accent, 0.35);
+      outline-offset: -2px;
+      border-radius: 12px;
+    }
   }
 
-  .activeTab { color: $color-accent; box-shadow: inset 0 -3px 0 $color-accent; }
+  .activeTab {
+    color: $orange;
+    box-shadow: inset 0 -3px 0 $orange;
+  }
 
   .close {
     position: absolute;
@@ -78,8 +98,16 @@
     line-height: 1;
     color: $color-dark;
     transition: background 180ms ease, transform 120ms ease;
-    &:hover { background: rgba($color-dark, 0.1); transform: scale(1.03); }
-    &:focus-visible { outline: 3px solid rgba($color-accent, 0.4); outline-offset: 2px; }
+
+    &:hover {
+      background: rgba($color-dark, 0.1);
+      transform: scale(1.03);
+    }
+
+    &:focus-visible {
+      outline: 3px solid rgba($orange, 0.35);
+      outline-offset: 2px;
+    }
   }
 }
 
@@ -109,26 +137,52 @@
   font-weight: 800;
   cursor: pointer;
   transition: transform 120ms ease, box-shadow 180ms ease, background 180ms ease;
-  &:hover { background: lighten($color-dark, 6%); box-shadow: 0 8px 20px rgba($color-dark, 0.15); transform: translateY(-1px); }
-  &:active { transform: translateY(0); box-shadow: 0 4px 10px rgba($color-dark, 0.12); }
-  &:focus-visible { outline: 3px solid rgba($color-accent, 0.45); outline-offset: 2px; }
-  &:disabled { opacity: 0.7; cursor: default; }
+
+  &:hover {
+    background: lighten($color-dark, 6%);
+    box-shadow: 0 8px 20px rgba($color-dark, 0.15);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 10px rgba($color-dark, 0.12);
+  }
+
+  &:focus-visible {
+    outline: 3px solid rgba($orange, 0.35);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: default;
+  }
 }
 
 .subtle {
   text-align: center;
+
   a {
-    color: $color-accent;
+    color: $orange;
     text-decoration: none;
     font-weight: 600;
-    border-bottom: 1px dashed rgba($color-accent, 0.35);
+    border-bottom: 1px dashed rgba($orange, 0.35);
     transition: color 150ms ease, border-color 150ms ease;
-    &:hover { color: darken($color-accent, 6%); border-color: rgba($color-accent, 0.6); }
-    &:focus-visible { outline: 3px solid rgba($color-accent, 0.35); outline-offset: 2px; border-radius: 6px; }
+
+    &:hover {
+      color: darken($orange, 6%);
+      border-color: rgba($orange, 0.6);
+    }
+
+    &:focus-visible {
+      outline: 3px solid rgba($orange, 0.28);
+      outline-offset: 2px;
+      border-radius: 6px;
+    }
   }
 }
 
-/* Small devices: switch to bottom sheet */
 @media (max-width: 480px) {
   .modal {
     inset: auto 0 0 0;
@@ -138,11 +192,19 @@
     border-radius: 14px 14px 0 0;
     margin: 0 auto;
   }
+
   .header .tab,
-  .header .activeTab { padding: 0.85rem; font-weight: 700; }
+  .header .activeTab {
+    padding: 0.85rem;
+    font-weight: 700;
+  }
 }
 
-/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .submit, .header .tab, .header .activeTab, .header .close { transition: none; }
+  .submit,
+  .header .tab,
+  .header .activeTab,
+  .header .close {
+    transition: none;
+  }
 }

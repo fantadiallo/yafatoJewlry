@@ -1,39 +1,65 @@
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-import "./HeroHome.scss";
+import styles from "./HeroHome.module.scss";
 
+const heroImage =
+ "https://cdn.shopify.com/s/files/1/0952/4261/7177/files/IMG_5379.jpg?v=1771968067"
+const heroVideo =
+ "https://cdn.shopify.com/videos/c/o/v/fcfb4aff9466426d8dbcd9d47792583c.mov"
 export default function HeroHome() {
-  const videoRef = useRef(null);
-  const MOV_URL = "https://cdn.shopify.com/videos/c/o/v/896e9e67b0eb472e8a9c7e7fa38e3900.mov?v=force-mov-1";
-
-  useEffect(() => {
-    const v = videoRef.current;
-    if (!v) return;
-    v.src = MOV_URL;
-    v.muted = true;
-    v.defaultMuted = true;
-    v.volume = 0;
-    v.playbackRate = 0.5;
-    v.setAttribute("muted", "");
-    v.play?.().catch(() => {});
-  }, []);
-
   return (
-    <section className="hero-home">
-      <video
-        ref={videoRef}
-        className="hero-video"
-        autoPlay
-        loop
-        muted
-        playsInline
-        preload="none"
-        poster="https://cdn.shopify.com/videos/c/o/v/3a9635282e544649b927150a4134fb00-poster.jpg"
-        onLoadedData={(e) => console.log("Video src:", e.currentTarget.currentSrc)}
-        onError={(e) => console.error("Video error", e)}
-      />
-      <div className="hero-content">
-        <Link to="/products" className="hero-btn">Shop now</Link>
+    <section className={styles.heroBanner}>
+      <div className={styles.split}>
+        {/* LEFT — IMAGE */}
+        <div className={styles.left}>
+          <img
+            src={heroImage}
+            alt="Yafato sterling silver"
+            className={styles.media}
+          />
+
+          <div className={styles.leftOverlay} />
+
+          <div className={styles.textBlock}>
+            <span className={styles.kicker}>YAFATO</span>
+            <h1>Made by hand. Worn as you are.</h1>
+            <p>
+              Handcrafted sterling silver rooted in African symbolism, shaped by
+              Scandinavian calm.
+            </p>
+
+            <Link to="/products" className={styles.heroBtn}>
+              Shop now
+            </Link>
+          </div>
+        </div>
+
+        {/* RIGHT — VIDEO */}
+        <div className={styles.right}>
+          <video
+            className={styles.media}
+            src={heroVideo}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+          />
+
+          <div className={styles.rightOverlay}>
+            <span className={styles.rightTag}>New drop</span>
+            <h2 className={styles.rightTitle}>
+              Everyday pieces, made to last.
+            </h2>
+            <p className={styles.rightText}>
+              Sterling silver essentials with meaning.
+            </p>
+
+            <Link to="/products" className={styles.heroBtnMobile}>
+              Shop now
+            </Link>
+          </div>
+        </div>
       </div>
     </section>
   );

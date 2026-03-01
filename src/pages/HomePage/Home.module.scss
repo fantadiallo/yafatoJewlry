@@ -3,9 +3,9 @@
   width: 100%;
   padding: 3.5rem 1rem;
 text-align: center;
-  color: $color-white;
+  color: $ink;
   overflow: hidden;
-  background-color: $color-accent;
+  background-color: $ivory;
   opacity: 0;
   transform: translateY(30px);
   animation: fadeUp 0.9s ease forwards;
@@ -25,7 +25,7 @@ text-align: center;
     font-size: clamp(1.6rem, 2.2vw, 2.2rem);
     font-weight: 700;
     margin-bottom: 0.75rem;
-    color: $color-white;
+    color: $ink;
     letter-spacing: 0.5px;
 
     &::after {
@@ -34,7 +34,7 @@ text-align: center;
       margin: 0.75rem auto 0 auto;
       width: 72px;
       height: 3px;
-      background: $color-accent;
+      background: $orange;
       border-radius: 2px;
     }
   }

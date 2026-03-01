@@ -1,276 +1,136 @@
-/* ——— CARD WRAPPER ——— */
-.productCard {
-  display: grid;
-  grid-template-rows: auto auto auto;
-  text-decoration: none;
-  color: inherit;
-  cursor: pointer;
-  height: 100%;
-  background: $color-white;
+@use "../../styles/variables" as *;
+
+@mixin focusRing {
+  &:focus-visible {
+    outline: 2px solid rgba($orange, 0.55);
+    outline-offset: 3px;
+  }
 }
 
-/* ——— IMAGE SECTION ——— */
+.productCard {
+  display: grid;
+  grid-template-rows: auto auto;
+  text-decoration: none;
+  color: inherit;
+  background: transparent;
+  height: 100%;
+}
+
 .imageWrapper {
   position: relative;
   width: 100%;
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 1 / 1;
   overflow: hidden;
-  border-radius: 1px;
-  background: $color-light;
-
-  .productImage {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: opacity .4s ease;
-  }
-
-  .defaultImage {
-    opacity: 1;
-    z-index: 1;
-  }
-
-  .hoverImage {
-    opacity: 0;
-    z-index: 2;
-  }
-
-  &:hover {
-    .defaultImage {
-      opacity: 0;
-    }
-    .hoverImage {
-      opacity: 1;
-    }
-  }
+  background: rgba($ink, 0.04);
 }
 
-/* ——— ICON BUTTONS ——— */
-.iconBar {
+.productImage {
   position: absolute;
-  top: 0.6rem;
-  right: 0.6rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
-  z-index: 3;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: opacity 0.35s ease, transform 0.6s ease;
 }
 
-.iconButton {
-  all: unset;
+.defaultImage {
+  opacity: 1;
+  z-index: 1;
+}
+
+.hoverImage {
+  opacity: 0;
+  z-index: 2;
+}
+
+@media (hover: hover) {
+  .imageWrapper:hover .defaultImage {
+    opacity: 0;
+  }
+  .imageWrapper:hover .hoverImage {
+    opacity: 1;
+  }
+  .imageWrapper:hover .productImage {
+    transform: scale(1.02);
+  }
+}
+
+/* Heart icon bottom-right like Oro */
+.heartBtn {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  z-index: 3;
+
+  border: 0;
+  background: transparent;
   cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  padding: 0;
 
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
+  color: rgba($ink, 0.35);
+  opacity: 0.9;
+  transition: opacity 0.18s ease, transform 0.18s ease, color 0.18s ease;
 
-  background: rgba($color-white, 0.85);
-  backdrop-filter: saturate(130%) blur(3px);
-  color: $color-dark;
-
-  box-shadow: 0 2px 10px rgba($color-dark, 0.15);
-  transition: transform .12s ease, box-shadow .18s ease, background .18s ease, color .18s ease;
-
-  font-weight: 600;
-  font-size: 0.6rem;
-  line-height: 1;
-
-  &:hover {
-    background: $color-primary;
-    color: $color-white;
-    transform: translateY(-1px);
-    box-shadow: 0 6px 18px rgba($color-primary, 0.35);
-  }
-
-  &:active {
-    transform: translateY(0);
-    box-shadow: 0 3px 10px rgba($color-primary, 0.25);
-  }
-
-  &:focus-visible {
-    outline: 3px solid rgba($color-primary, 0.45);
-    outline-offset: 2px;
-  }
+  @include focusRing;
 
   :global(svg) {
     width: 18px;
     height: 18px;
-  }
-}
-
-/* ——— INFO (TITLE + PRICE) ——— */
-.info {
-  padding: .85rem 1rem .5rem;
-  text-align: center;
-
-  .title {
-    font-size: clamp(0.95rem, 0.9rem + 0.2vw, 1.05rem);
-    font-weight: 600;
-    color: $color-dark;
-    line-height: 1.25;
-    margin: 0;
+    display: block;
   }
 
-  .price {
-    font-size: .95rem;
-    font-weight: 700;
-    color: $color-dark;
-    opacity: .9;
-    margin: .3rem 0 0;
-  }
-}
-
-/* ——— OPTIONS (RING SIZE, ETC.) ——— */
-.optionsBar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: .6rem;
-  justify-content: center;
-  margin-top: .5rem;
-  padding: 0 1rem 1rem;
-}
-
-.optionGroup {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  position: relative;
-  min-width: 130px;
-  max-width: 160px;
-  flex: 1 1 130px;
-  gap: .3rem;
-}
-
-.optionLabel {
-  font-weight: 600;
-  color: $color-dark;
-  font-size: .85rem;
-  margin-bottom: .2rem;
-}
-
-.optionSelect {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-
-  width: 100%;
-  padding: .45rem .7rem;
-  padding-right: 2rem;
-  border-radius: 10px;
-  border: 1px solid rgba($color-dark, .15);
-  background: $color-white;
-  color: $color-dark;
-  font-size: .85rem;
-  line-height: 1.2;
-  cursor: pointer;
-  box-shadow: 0 1px 3px rgba($color-dark, .05);
-  text-overflow: ellipsis;
-  overflow: hidden;
-  transition: border-color .2s ease, box-shadow .2s ease;
-
-  &:hover {
-    border-color: rgba($color-primary, .4);
-  }
-
-  &:focus {
-    border-color: $color-primary;
-    outline: 2px solid rgba($color-primary, .35);
-    outline-offset: 1px;
-  }
-}
-
-/* caret icon */
-.optionGroup::after {
-  content: "▾";
-  position: absolute;
-  right: .6rem;
-  top: 50%;
-  transform: translateY(-50%);
-  pointer-events: none;
-  color: rgba($color-dark, 0.4);
-  font-size: .75rem;
-}
-
-/* ——— VARIANT PRICE + BADGE ——— */
-.variantPrice {
-  margin-top: .25rem;
-  font-weight: 700;
-  color: $color-dark;
-  text-align: center;
-
-  .badge {
-    margin-left: .4rem;
-    padding: .15rem .45rem;
-    font-size: .72rem;
-    border-radius: 999px;
-    background: rgba($color-dark, .06);
-    color: $color-dark;
-    font-weight: 700;
-  }
-}
-
-/* ——— RESPONSIVE TWEAKS ——— */
-@media (max-width: 768px) {
-  .info {
-    padding: .75rem .8rem .4rem;
-    .title {
-      font-size: .95rem;
+  @media (hover: hover) {
+    &:hover {
+      opacity: 1;
+      color: rgba($ink, 0.7);
+      transform: translateY(-1px);
     }
   }
-
-  .optionsBar {
-    gap: .4rem;
-    padding: 0 .8rem .8rem;
-  }
-
-  .optionGroup {
-    min-width: 120px;
-    max-width: 140px;
-  }
-
-  .optionSelect {
-    font-size: .8rem;
-    padding: .4rem .6rem;
-  }
 }
-/* Price row */
+
+.info {
+  padding: 18px 0 0;
+  text-align: center;
+}
+
+.title {
+  margin: 0;
+  font-family: $display;
+  font-weight: 500;
+  font-size: 1.05rem;
+  letter-spacing: 0.02em;
+  color: $ink;
+  text-transform: uppercase;
+}
+
 .priceRow {
-  margin: .35rem 0 0;
+  margin: 10px 0 0;
   display: inline-flex;
   align-items: center;
-  gap: .5rem;
-  font-size: .95rem;
+  justify-content: center;
+  gap: 10px;
+  font-size: 1rem;
 }
 
-.price {            /* regular price */
+.price {
+  font-weight: 500;
+  color: $ink;
+}
+
+.priceSale {
   font-weight: 700;
-  color: $color-dark;
-  opacity: .95;
+  color: $orange;
 }
 
-.priceCompare {     /* crossed out */
-  color: rgba($color-dark, .55);
+.priceCompare {
+  font-weight: 500;
+  color: rgba($ink, 0.5);
   text-decoration: line-through;
-  font-weight: 600;
 }
 
-.priceSale {        /* emphasized sale price */
-  font-weight: 800;
-  color: $color-primary;
-}
-
-/* optional: percentage badge */
-.saleBadge {
-  font-size: .75rem;
-  font-weight: 800;
-  line-height: 1;
-  padding: .2rem .45rem;
-  border-radius: 999px;
-  background: rgba($color-primary, .12);
-  color: $color-primary;
+@media (max-width: 520px) {
+  .title {
+    font-size: 1rem;
+  }
 }

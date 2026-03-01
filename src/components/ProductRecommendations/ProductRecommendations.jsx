@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import ProductCard from "../ProductCard/ProductCard";
 import styles from "./ProductRecommendations.module.scss";
-import {
-  fetchRecommendationsById,
-  fetchRecommendationsByHandle,
-} from "../../api/shopify";
+import { fetchRecommendationsById, fetchRecommendationsByHandle,}
+
+
+
+from "../../api/shopify";
+
 
 /**
  * Format a number as a currency string in NOK.
@@ -140,6 +142,8 @@ export default function ProductRecommendations({ products, productId, handle, cu
               id={p.id}
               image={p.image}
               title={p.title}
+              price={p.price}
+              currency={p.currency}
             />
           </div>
         ))}
@@ -153,6 +157,8 @@ export default function ProductRecommendations({ products, productId, handle, cu
               id={p.id}
               image={p.image}
               title={p.title}
+              price={p.price}
+              currency={p.currency}
             />
           </div>
         ))}

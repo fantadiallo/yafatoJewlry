@@ -54,45 +54,54 @@ export default function AboutPage() {
   return (
     <div className={styles.aboutPage}>
       {/* Hero Section */}
-      <section className={styles.heroSection}>
-        <img src="/heroimg2.jpg" alt="Yafato Jewelry" className={styles.bgImage} />
-        <div className={styles.heroOverlay}></div>
+  <section className={styles.heroSection}>
+  <div className={styles.heroGrid}>
+    <div className={styles.heroCopy}>
+      <motion.blockquote
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7 }}
+        className={styles.topQuote}
+      >
+        “Don’t leave home without it.” <span>– My Mom</span>
+      </motion.blockquote>
 
-        <div className={styles.heroContent}>
-          <motion.blockquote
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1 }}
-            className={styles.topQuote}
-          >
-            “Don’t leave home without it.” <span>– My Mom</span>
-          </motion.blockquote>
+      <motion.h1
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 0.1 }}
+      >
+        Jewelry That Carries Your Meaning
+      </motion.h1>
 
-          <div className={styles.centerContent}>
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1 }}
-            >
-              Jewelry That Carries Your Meaning
-            </motion.h1>
-            <p>
-              Yafato creates more than jewelry — we create reminders. Each piece is designed to
-              hold meaning, crafted to meet your eyes and return you to yourself.
-            </p>
-          </div>
+      <motion.p
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 0.18 }}
+        className={styles.lead}
+      >
+        Yafato creates more than jewelry we create reminders. Each piece is
+        designed to hold meaning, crafted to meet your eyes and return you to
+        yourself.
+      </motion.p>
 
-          <motion.blockquote
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1, duration: 1 }}
-            className={styles.bottomQuote}
-          >
-            “Crafted in quality silver 925 and real gold in 14k, 18k, and 22k — Yafato is a
-            Scandinavian brand rooted in West African heritage. Minimal. Timeless. Meaningful.”
-          </motion.blockquote>
-        </div>
-      </section>
+      <div className={styles.heroActions}>
+        <Link to="/products" className={styles.primaryBtn}>
+          Shop the pieces
+        </Link>
+      </div>
+
+      <p className={styles.heroMeta}>
+        Silver 925 • 14k / 18k / 22k gold • West African heritage, Scandinavian calm
+      </p>
+    </div>
+
+    <div className={styles.heroMedia}>
+      <img src="/heroimg2.jpg" alt="Yafato Jewelry" className={styles.bgImage} />
+      <div className={styles.mediaOverlay} />
+    </div>
+  </div>
+</section>
 
       {/* Maker Section */}
       <motion.section className={styles.makerSection}>
@@ -103,12 +112,12 @@ export default function AboutPage() {
           <div className={styles.textWrap}>
             <h2>Meet Amz Silver</h2>
             <p>
-              Amz is more than a craftsman — he’s an artist carrying generations of skill. From The
+              Amz is more than a craftsman he’s an artist carrying generations of skill. From The
               Gambia and Senegal, his legacy is one of precision, soul, and timeless artistry.
             </p>
             <p>
               Each creation is born from heritage and shaped with dignity. His jewelry is not just
-              worn — it’s carried, like a story passed down.
+              worn it’s carried, like a story passed down.
             </p>
           </div>
         </div>
@@ -159,25 +168,7 @@ export default function AboutPage() {
       </motion.section>
 
       {/* CTA Section */}
-      <motion.section
-        className={styles.ctaSection}
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
-      >
-        <div className={styles.ctaInner}>
-          <h2>Carry Your Reminder</h2>
-          <Link to="/newsletter" className={styles.shopBtn}>
-            Join the newsletter
-          </Link>
-          <p className={styles.instaFollow}>
-            Follow the journey on{" "}
-            <a href="https://instagram.com/yafato_" target="_blank" rel="noreferrer">
-              @yafato_
-            </a>
-          </p>
-        </div>
-      </motion.section>
+
     </div>
   );
 }

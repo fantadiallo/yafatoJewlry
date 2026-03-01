@@ -1,0 +1,98 @@
+@use "../../styles/variables" as *;
+
+.craft {
+  width: 100%;
+  background: $color-light;
+  padding: clamp(34px, 6vw, 60px) 0;
+}
+
+.inner {
+  max-width: $container;
+  margin: 0 auto;
+  padding: 0 $gutter;
+}
+
+/* top area: small, editorial */
+.head {
+  display: grid;
+  gap: 6px;
+  margin-bottom: clamp(18px, 3vw, 26px);
+}
+
+.kicker {
+  margin: 0;
+  font-size: 0.82rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba($ink, 0.65);
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(1.1rem, 1.7vw, 1.35rem);
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: $ink;
+}
+
+/* grid */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(12px, 2vw, 18px);
+}
+
+/* cards */
+.card {
+  background: rgba($color-white, 0.55);
+  border: 1px solid rgba($ink, 0.08);
+  border-radius: 12px;
+  padding: clamp(14px, 2.2vw, 18px);
+  display: grid;
+  gap: 8px;
+  min-height: 140px;
+  transition: transform 0.18s ease, border-color 0.18s ease;
+}
+
+.iconWrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba($orange, 0.12);
+  color: $ink;
+}
+
+.cardTitle {
+  margin: 0;
+  font-size: 0.92rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: $ink;
+}
+
+.cardText {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: rgba($ink, 0.75);
+}
+
+.card:hover {
+  transform: translateY(-1px);
+  border-color: rgba($orange, 0.28);
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    min-height: unset;
+  }
+}
