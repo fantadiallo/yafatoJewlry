@@ -52,7 +52,7 @@ export default function HeroHome() {
               Everyday pieces, made to last.
             </h2>
             <p className={styles.rightText}>
-              Sterling silver essentials with meaning.
+              Quality jewellery from heritage.
             </p>
 
             <Link to="/products" className={styles.heroBtnMobile}>

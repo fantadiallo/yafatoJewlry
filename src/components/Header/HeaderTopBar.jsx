@@ -3,8 +3,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import styles from "./Header.module.scss";
 
 const TOP_MESSAGES = [
-  "Free shipping in Scandinavia over €120",
-  "Subscribe to our newslletter and get 10% off your first order",
+  "Free shipping in Scandinavia over €200",
+  "Subscribe to our newsletter",
 ];
 
 export default function HeaderTopBar() {

@@ -14,11 +14,16 @@
     align-items: center;
 
     @media (max-width: 900px) {
-      grid-template-columns: 1fr;
+      grid-template-columns: 1fr 1fr; // tablet
+      gap: clamp(1.5rem, 4vw, 2.5rem);
+    }
+
+    @media (max-width: 520px) {
+      grid-template-columns: 1fr; // mobile stacked
+      gap: 14px;
     }
   }
 
-  /* LEFT COPY */
   .copy {
     max-width: 460px;
 
@@ -74,7 +79,6 @@
     }
   }
 
-  /* RIGHT VISUALS */
   .visuals {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -85,7 +89,8 @@
     }
 
     @media (max-width: 520px) {
-      grid-template-columns: 1fr; // mobile 1 per row
+      grid-template-columns: repeat(2, 1fr); // mobile 2 per row
+      gap: 10px;
     }
 
     .card {
@@ -108,6 +113,10 @@
 
       &:hover {
         transform: translateY(-4px);
+      }
+
+      @media (max-width: 520px) {
+        aspect-ratio: 1 / 1.2; // slightly taller for mobile
       }
     }
   }

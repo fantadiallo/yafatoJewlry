@@ -4,242 +4,234 @@
   width: 100%;
   background: $ivory;
   padding: clamp(60px, 12vh, 90px) 0;
-}
 
-.inner {
-  max-width: $container;
-  margin: 0 auto;
-  padding: 0 $gutter;
-}
-
-.topRow {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 24px;
-  margin-bottom: clamp(32px, 5vh, 48px);
-  position: relative;
-}
-
-/* hairline divider */
-.topRow::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: -18px;
-  width: 100%;
-  height: 1px;
-  background: rgba($ink, 0.08);
-}
-
-
-
-.leftTitle {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.kicker {
-  font-size: 0.9rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: rgba($ink, 0.7);
-}
-
-.heading {
-  font-size: clamp(1.4rem, 2vw, 1.7rem);
-  font-weight: 400;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: $ink;
-}
-
-.rightLabel {
-  align-self: center;
-  font-size: 0.95rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: rgba($ink, 0.8);
-  white-space: nowrap;
-}
-
-/* Grid */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: clamp(32px, 3vw, 40px);
-  margin-bottom: clamp(40px, 6vh, 56px);
-}
-
-/* Card */
-.card {
-  display: flex;
-  flex-direction: column;
-  color: inherit;
-  text-decoration: none;
-  transform: translateY(0);
-  transition: transform 0.18s ease, opacity 0.18s ease;
-
-  &:hover {
-    transform: translateY(-2px);
+  .inner {
+    max-width: $container;
+    margin: 0 auto;
+    padding: 0 $gutter;
   }
 
-  &:focus-visible {
-    outline: 2px solid rgba($ink, 0.25);
-    outline-offset: 4px;
-  }
-}
-
-.cardImageWrapper {
-  width: 100%;
-  aspect-ratio: 3 / 4;
-  background: #f4f3f1;
-  position: relative;
-  overflow: hidden;
-}
-
-.primaryImage,
-.secondaryImage {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  transition: opacity 0.35s ease, transform 0.45s ease;
-}
-
-.secondaryImage {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-}
-
-/* hover swap triggers from the whole card */
-.card:hover .secondaryImage {
-  opacity: 1;
-}
-
-.card:hover .primaryImage {
-  opacity: 0;
-}
-
-.card:hover .primaryImage,
-.card:hover .secondaryImage {
-  transform: scale(1.02);
-}
-
-.cardInfo {
-  text-align: center;
-  padding-top: 18px;
-  padding-bottom: 10px;
-}
-
-.cardTitle {
-  font-size: 0.95rem;
-  font-weight: 400;
-  color: $ink;
-  margin-bottom: 6px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-
-.cardSub {
-  font-size: 0.75rem;
-  letter-spacing: 0.18em;
-  color: rgba($ink, 0.55);
-  margin-bottom: 10px;
-  text-transform: uppercase;
-}
-
-.cardPrice {
-  font-size: 0.95rem;
-  color: $ink;
-}
-
-/* CTA */
-.ctaRow {
-  display: flex;
-  justify-content: center;
-}
-
-.ctaButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 26px;
-  border-radius: 2px;
-  font-size: 0.8rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  border: 1px solid rgba($ink, 0.12);
-  background: $orange;
-  color: $ivory;
-  text-decoration: none;
-  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.15s ease;
-
-  &:hover,
-  &:focus-visible {
-    background: #d2d2d2;
-    transform: translateY(-1px);
-    color: ink;
-    box-shadow: 0 6px 18px rgba($ink, 0.08);
-  }
-}
-
-/* Skeleton */
-.skeletonCard {
-  pointer-events: none;
-}
-
-.skeletonCard .cardImageWrapper {
-  background: rgba($ink, 0.06);
-}
-
-.skeletonLine {
-  height: 12px;
-  width: 70%;
-  margin: 8px auto 0;
-  background: rgba($ink, 0.08);
-  border-radius: 999px;
-}
-
-.skeletonLineSmall {
-  height: 10px;
-  width: 52%;
-  margin: 10px auto 0;
-  background: rgba($ink, 0.06);
-  border-radius: 999px;
-}
-
-/* Responsive */
-@media (max-width: 1200px) {
-  .grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (max-width: 900px) {
   .topRow {
-    flex-direction: column;
+    display: flex;
     align-items: flex-start;
-  }
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: clamp(32px, 5vh, 48px);
+    position: relative;
 
-  .rightLabel {
-    align-self: flex-start;
+    &::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -18px;
+      width: 100%;
+      height: 1px;
+      background: rgba($ink, 0.08);
+    }
+
+    .leftTitle {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      .kicker {
+        font-size: 0.9rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: rgba($ink, 0.7);
+      }
+
+      .heading {
+        font-size: clamp(1.4rem, 2vw, 1.7rem);
+        font-weight: 400;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: $ink;
+      }
+    }
+
+    .rightLabel {
+      align-self: center;
+      font-size: 0.95rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba($ink, 0.8);
+      white-space: nowrap;
+    }
+
+    @media (max-width: 520px) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+
+      .rightLabel {
+        font-size: 0.75rem;
+        letter-spacing: 0.1em;
+        color: rgba($ink, 0.7);
+        white-space: normal;
+        width: 100%;
+        text-align: left; // or center if you prefer
+      }
+    }
   }
 
   .grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: clamp(32px, 3vw, 40px);
+    margin-bottom: clamp(40px, 6vh, 56px);
 
-@media (max-width: 520px) {
-  .grid {
-    grid-template-columns: 1fr;
+    @media (max-width: 1200px) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    @media (max-width: 900px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 520px) {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    color: inherit;
+    text-decoration: none;
+    transform: translateY(0);
+    transition: transform 0.18s ease, opacity 0.18s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+    }
+
+    &:focus-visible {
+      outline: 2px solid rgba($ink, 0.25);
+      outline-offset: 4px;
+    }
+
+    .cardImageWrapper {
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      background: #f4f3f1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .primaryImage,
+    .secondaryImage {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: opacity 0.35s ease, transform 0.45s ease;
+    }
+
+    .secondaryImage {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+    }
+
+    .card:hover .secondaryImage {
+      opacity: 1;
+    }
+
+    .card:hover .primaryImage {
+      opacity: 0;
+    }
+
+    .card:hover .primaryImage,
+    .card:hover .secondaryImage {
+      transform: scale(1.02);
+    }
+
+    .cardInfo {
+      text-align: center;
+      padding-top: 18px;
+      padding-bottom: 10px;
+    }
+
+    .cardTitle {
+      font-size: 0.95rem;
+      font-weight: 400;
+      color: $ink;
+      margin-bottom: 6px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .cardSub {
+      font-size: 0.75rem;
+      letter-spacing: 0.18em;
+      color: rgba($ink, 0.55);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    .cardPrice {
+      font-size: 0.95rem;
+      color: $ink;
+    }
+  }
+
+  .ctaRow {
+    display: flex;
+    justify-content: center;
   }
 
   .ctaButton {
-    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 26px;
+    border-radius: 2px;
+    font-size: 0.8rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    border: 1px solid rgba($ink, 0.12);
+    background: $orange;
+    color: $ivory;
+    text-decoration: none;
+    transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.15s ease;
+
+    &:hover,
+    &:focus-visible {
+      background: #d2d2d2;
+      transform: translateY(-1px);
+      color: $ink;
+      box-shadow: 0 6px 18px rgba($ink, 0.08);
+    }
+
+    @media (max-width: 520px) {
+      width: 100%;
+    }
+  }
+
+  /* Skeleton styles */
+  .skeletonCard {
+    pointer-events: none;
+
+    .cardImageWrapper {
+      background: rgba($ink, 0.06);
+    }
+
+    .skeletonLine {
+      height: 12px;
+      width: 70%;
+      margin: 8px auto 0;
+      background: rgba($ink, 0.08);
+      border-radius: 999px;
+    }
+
+    .skeletonLineSmall {
+      height: 10px;
+      width: 52%;
+      margin: 10px auto 0;
+      background: rgba($ink, 0.06);
+      border-radius: 999px;
+    }
   }
 }
