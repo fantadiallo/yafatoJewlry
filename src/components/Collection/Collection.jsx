@@ -32,9 +32,9 @@ export default function Collection() {
   const formatPrice = (price) => {
     const value = Number(price);
     if (!Number.isFinite(value)) return "";
-    return new Intl.NumberFormat("de-DE", {
+    return new Intl.NumberFormat("de-NO", {
       style: "currency",
-      currency: "EUR",
+      currency: "NOK",
       minimumFractionDigits: 2,
     }).format(value);
   };
