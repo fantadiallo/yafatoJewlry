@@ -49,7 +49,7 @@ export default function HeroHome() {
           <div className={styles.rightOverlay}>
             <span className={styles.rightTag}>New drop</span>
             <h2 className={styles.rightTitle}>
-              Everyday pieces, made to last.
+              Every piece, is made to last.
             </h2>
             <p className={styles.rightText}>
               Quality jewellery from heritage.
