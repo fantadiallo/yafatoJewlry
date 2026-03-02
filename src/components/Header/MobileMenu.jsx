@@ -24,7 +24,7 @@ export default function MobileMenu({ open, onClose }) {
             aria-label="Mobile menu"
           >
             <div className={styles.menuHeader}>
-              <img src="/logonybrown.png" alt="Yafato Logo" />
+              <img src="/yafato.png" alt="Yafato Logo" />
               <button onClick={onClose} aria-label="Close menu" type="button">
                 <FiX />
               </button>

@@ -7,7 +7,7 @@ export default function NewsletterPage() {
     <div className={styles.page}>
       <div className={styles.container}>
         <img
-          src="/logonybrown.png"
+          src="/yafato.png"
           alt="Yafato Logo"
           className={styles.logo}
         />

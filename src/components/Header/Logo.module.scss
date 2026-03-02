@@ -1,31 +1,25 @@
 .logo {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100px; // default max width for desktop
   text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  max-width: 200px;
-}
 
-.wordmark {
-  display: inline-flex;
-  align-items: center;
-  text-transform: uppercase;
-}
+  @media (max-width: 1200px) {
+    max-width: 90px; // slightly smaller on tablets
+  }
 
+  @media (max-width: 768px) {
+    max-width: 120px; // smaller on mobile
+  }
 
-.yPart {
-   font-family: "Allura", cursive;
-  font-style: italic;
-  font-size: 2.4rem;
-  font-weight: 500;
-  color: #3b2a22;  
-  margin-right: 0.05em;
-}
+  @media (max-width: 520px) {
+    max-width: 90px; // very small for small phones
+  }
 
-
-.afatoPart {
-  font-family: "Cormorant Garamond", serif;
-  font-size: 1.5rem;
-  font-weight: 500;
-  letter-spacing: 0.35em;
-  color: #3b2a22;  
+  .logoImage {
+    display: block;
+    width: 100%; // scales to container
+    height: auto;
+    object-fit: contain;
+  }
 }
